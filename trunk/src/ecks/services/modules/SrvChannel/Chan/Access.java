@@ -24,6 +24,7 @@ import ecks.services.SrvChannel;
 import ecks.protocols.Protocol;
 import ecks.Configuration;
 import ecks.util;
+
 public class Access extends bCommand {
     public final CommandDesc Desc = new CommandDesc("access", 2, true, CommandDesc.access_levels.A_PENDING, "Shows access of user in a channel", "[channel] [user]");
 
@@ -46,18 +47,23 @@ public class Access extends bCommand {
         whatchan = replyto;
         whom = user;
 
-        if (args.length > 0 && (!(args[0].equals("")))) { // if we have arguments
-            if (args[0].startsWith("#")) { // assume channel
-                whatchan = args[0];
-                if (args.length > 1)   // if there's another argument, assume it's a user
-                    whom = args[1];
-            } else if ((args.length > 1) && args[1].startsWith("#")) { // assume channel
-                whatchan = args[1];
-                whom = args[0];
-            } else {
-                whom = args[0];
-            }
+        try {
+            if (args.length > 0 && (!(args[0].equals("")))) { // if we have arguments
+                if (args[0].startsWith("#")) { // assume channel
+                    whatchan = args[0];
+                    if (args.length > 1)   // if there's another argument, assume it's a user
+                        whom = args[1];
+                } else if ((args.length > 1) && args[1].startsWith("#")) { // assume channel
+                    whatchan = args[1];
+                    whom = args[0];
+                } else {
+                    whom = args[0];
+                }
 
+            }
+        } catch (NullPointerException NPE) {
+            NPE.printStackTrace();
+            System.out.println("access" + arguments);
         }
 
         whom = whom.toLowerCase();
@@ -65,15 +71,17 @@ public class Access extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
-                if (c.getDB().Users.get(whom).authname != null) {
-                    String aname = c.getDB().Users.get(whom).authname;
-                    if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
+                if (c.getDB().Users.containsKey(whom)) {
+                    if (c.getDB().Users.get(whom).authname != null) {
+                        String aname = c.getDB().Users.get(whom).authname;
+                        if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
 
-                        String alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(aname).toString();
+                            String alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(aname).toString();
 
-                        p.PrivMessage(who, replyto, util.pad("\u0002" + aname + "\u0002 ",20) + alevel.substring(2));
-                    } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 User has no access to channel!");
-                } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 User is not authed!");
+                            p.PrivMessage(who, replyto, util.pad("\u0002" + aname + "\u0002 ", 20) + alevel.substring(2));
+                        } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 User has no access to channel!");
+                    } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 User is not authed!");
+                } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 User does not exist!");
             } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
         } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Not a channel!");
     }
