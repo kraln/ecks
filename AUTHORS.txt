@@ -1,0 +1,11 @@
+Ecks was primarily developed for the GamesNET IRC Network
+by Jeff Katz <kuja@gamesnet.com> starting in November of 2006. 
+
+The following external libraries are linked:
+	EasyMail: 	https://easymail.dev.java.net/
+			Developed by Liao Xue Feng
+			GPL Licensed.
+
+The following people have contributed:
+
+<none>
