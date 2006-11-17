@@ -33,7 +33,7 @@ public class bahamut extends bProtocol {
             System.exit(1);
         }
 
- //       System.out.println(line); // make this use a debugger class
+        System.out.println(line); // make this use a debugger class
 
         if (line.startsWith("ERROR")) // oh no. bail bail bail
         {
@@ -280,7 +280,7 @@ public class bahamut extends bProtocol {
 
     public void Outgoing(String what) throws IOException {
         out.write(what + "\r\n");
-//        System.out.println(what); // make this use a debugger class
+        System.out.println(what); // make this use a debugger class
         out.flush();
     }
 

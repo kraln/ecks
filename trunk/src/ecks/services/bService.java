@@ -71,7 +71,9 @@ public abstract class bService implements Service {
                     if (config.getSvc().containsKey(config.authservice)) // if we have an authserv
                     {
                         CommandDesc.access_levels req = Commands.get(cmd.toLowerCase()).getDesc().Required_Access;
-                        String handle = config.getDB().Users.get(user.toLowerCase()).authname;
+                        String handle = null;
+                        if (config.getDB().Users.containsKey(user.toLowerCase()))
+                            handle = config.getDB().Users.get(user.toLowerCase()).authname;
                         CommandDesc.access_levels cur = ((SrvAuth) config.getSvc().get(config.authservice)).checkAccess(handle);
                         if ((handle != null) || (req.ordinal() == 0)) { // we're authed, or the command doesn't care
                             if (cur.ordinal() >= req.ordinal()) { // if we have the access
