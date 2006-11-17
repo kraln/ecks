@@ -23,7 +23,7 @@ import ecks.util;
 import ecks.services.Service;
 
 public class cmdShowCmds extends bCommand{
-    public final CommandDesc Desc = new CommandDesc("ShowCmds", 0, true, CommandDesc.access_levels.A_HELPER, "Shows all loaded command modules.");
+    public final CommandDesc Desc = new CommandDesc("ShowCmds", 0, true, CommandDesc.access_levels.A_HELPER, "Shows all loaded command modules. (Use help instead of this)");
     public CommandDesc getDesc() { return Desc; }
     public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
         p.Notice(who, user, "Loaded Commands:");

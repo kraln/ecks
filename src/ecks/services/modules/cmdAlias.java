@@ -22,7 +22,7 @@ import ecks.protocols.Protocol;
 import ecks.Configuration;
 
 public class cmdAlias extends bCommand{
-    public final CommandDesc Desc = new CommandDesc("alias", 2, true, CommandDesc.access_levels.A_SRA, "Alias a command to another command");
+    public final CommandDesc Desc = new CommandDesc("alias", 2, true, CommandDesc.access_levels.A_SRA, "Alias a command to another command", "<original command> <new command>");
     public CommandDesc getDesc() { return Desc; }
     public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
         String args[] = arguments.split(" ");

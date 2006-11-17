@@ -93,7 +93,7 @@
 		<password value="password" />
 
 		<!-- numeric: what our server id is -->
-		<numeric value="036" />
+		<numeric value="020" />
     </uplink>
 
 	<!--
@@ -153,6 +153,8 @@
             <command value="ecks.services.modules.cmdVersion" />
             <command value="ecks.services.modules.ctcpVersion" />
             <command value="ecks.services.modules.SrvOper.Grep" />
+            <command value="ecks.services.modules.SrvOper.Help" />
+            <command value="ecks.services.modules.SrvOper.Raw" />
             <command value="ecks.services.modules.SrvOper.DumpInfo" />
         </modules>
      	</service>

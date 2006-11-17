@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
 public class Grep extends bCommand {
-    public final CommandDesc Desc = new CommandDesc("grep", 50, true, CommandDesc.access_levels.A_OPER, "Sort and act upon data.");
+    public final CommandDesc Desc = new CommandDesc("grep", 50, true, CommandDesc.access_levels.A_OPER, "Sort (java regex) and act upon data.", "[users|channels] [(uid|ident|mask)(name|topic)] [print|(kill|gline)(close)] regexp");
 
     public CommandDesc getDesc() {
         return Desc;

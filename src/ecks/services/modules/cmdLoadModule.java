@@ -22,7 +22,7 @@ import ecks.Configuration;
 import ecks.services.Service;
 
 public class cmdLoadModule extends bCommand{
-    public final CommandDesc Desc = new CommandDesc("loadmod", 1, true, CommandDesc.access_levels.A_SRA, "Load a module.");
+    public final CommandDesc Desc = new CommandDesc("loadmod", 1, true, CommandDesc.access_levels.A_SRA, "Load a module.", "<path to module>");
     public CommandDesc getDesc() { return Desc; }
     public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
         try {
