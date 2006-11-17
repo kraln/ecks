@@ -28,7 +28,7 @@ import ecks.Channel;
 import java.util.Map;
 
 public class DumpInfo extends bCommand {
-    public final CommandDesc Desc = new CommandDesc("dumpinfo", 0, true, CommandDesc.access_levels.A_SRA, "Dumps the services's view of the network (users and channels).");
+    public final CommandDesc Desc = new CommandDesc("dumpinfo", 0, true, CommandDesc.access_levels.A_SRA, "Dumps the services's view of the network (users and channels). FLOOD WARNING!");
     public CommandDesc getDesc() { return Desc; }
     public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
         p.PrivMessage(who, replyto, "\u0002Users:\u0002");

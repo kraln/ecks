@@ -53,13 +53,20 @@ public class bahamut extends bProtocol {
         if (line.startsWith("NICK")) // this is a bursting nick, or just a new client
         // NICK phil 2 1163265829 +i ~u3435591 cpc3-nthc11-0-0-cust625.nrth.cable.ntl.com King.GamesNET.net svsid numip :phil
         {
+            try {
             String nick, host, ident, gecos, uplink;
             nick = line.split(" ")[1];
             host = line.split(" ")[6];
             ident = line.split(" ")[5];
-            gecos = line.split(":")[1];
+            gecos = line.split(" :")[1];
             uplink = line.split(" ")[7];
             config.Database.Users.put(nick.toLowerCase(), new Client(nick, uplink, ident, host, gecos));
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+                System.err.println(line);
+            }
+
         }
         if (line.split(" ")[1].equals("PART"))  // someone is leaving a channel, probably causing the channel to close.
         // :cathy PART #Cheers

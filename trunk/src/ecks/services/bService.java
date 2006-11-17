@@ -61,7 +61,7 @@ public abstract class bService implements Service {
             cmd = cmd.substring(4); // remove the fqdn
             command = command.substring(4);
         }    
-
+        try {
         if (Commands.containsKey(cmd.toLowerCase())) {
             CommandDesc c = Commands.get(cmd.toLowerCase()).getDesc();
             if ((inchan && c.InChannel) || !inchan)               // inchannel check
@@ -84,6 +84,11 @@ public abstract class bService implements Service {
                 } else proto.PrivMessage(this, replyto, "\u0002Error:\u0002 Too many arguments!");
             } else proto.PrivMessage(this, replyto, "\u0002Error:\u0002 That command is unavailable in-channel!");
         } else proto.PrivMessage(this, replyto, "\u0002Error:\u0002 Unknown Command!");
+        } catch (NullPointerException NPE)
+        {
+            System.err.println(user + " \\ " + replyto + " \\ " + command);
+            NPE.printStackTrace();
+        }
     }
 
     public void diegraceful(String message) {
