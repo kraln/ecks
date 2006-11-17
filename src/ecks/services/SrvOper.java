@@ -39,4 +39,17 @@ public class SrvOper extends bService {
     {
 
     }
+
+    public void handle(String user, String replyto, String command) {
+        // todo: actually handle user mode updates...
+        String cmd = command.split(" ")[0];
+        if (config.Database.Users.get(user.toLowerCase()).modes.contains("o")) // if we're an oper
+            super.handle(user.toLowerCase(), replyto.toLowerCase(), command);
+        else {
+            if (!cmd.toLowerCase().equals("oper")) // let people oper using us
+                proto.PrivMessage(this, replyto, "\u0002Error:\u0002 You \u0002*MUST*\u0002 be an IRCop to use this service!");
+            else
+                super.handle(user.toLowerCase(), replyto.toLowerCase(), command);
+        }
+    }
 }
