@@ -406,7 +406,7 @@ public class bahamut extends bProtocol {
 
     public void gline(Service me, Configuration conf, Client who, String why) {
         try {
-            Outgoing(":" + conf.Config.get("hostname") + " AKILL " + who.hostmask + " " + who.uid + " 0 " + me.getname() + " " + (int) (System.currentTimeMillis() / 1000) + " :" + why);
+            Outgoing(":" + conf.Config.get("hostname") + " AKILL *@" + who.hostmask + " " + who.uid + " 0 " + me.getname() + " " + (int) (System.currentTimeMillis() / 1000) + " :" + why);
         } catch (IOException e) {
             e.printStackTrace();
         }
