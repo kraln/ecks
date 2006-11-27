@@ -20,14 +20,33 @@ package ecks;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.net.InetAddress;
+import java.net.URLEncoder;
+import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 import sun.misc.BASE64Encoder;
 
 public class util {
-    
+
+    public static List<Thread> threads;
+
+    public static Thread startThread(Thread whattostart) {
+        if (threads == null) // not set
+            threads = new ArrayList<Thread>();
+        threads.add(whattostart);
+        return whattostart;
+    }
+
+    public static List<Thread> getThreads() {
+        return threads;
+    }
+
     public static synchronized String pad(String s, int n) {
         return paddingString(s, n, ' ', false);
     }
@@ -74,7 +93,7 @@ public class util {
     }
 
     public static void SendRegMail(String to, String code) {
-        new Thread(new EmailThread(to, code)).start();
+        startThread(new Thread(new EmailThread(to, code))).start();
     }
 
     protected static String readFileAsString(String filePath)
@@ -104,6 +123,28 @@ public class util {
         return pass;
     }
 
+    public static String encodeUTF(String what) {
+        String result = null;
+        try {
+            result = URLEncoder.encode(what, "UTF-8");
+        }
+        catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException("UTF-8 not supported", ex);
+        }
+        return result;
+    }
+
+    public static String decodeUTF(String what) {
+        String result = null;
+        try {
+            result = URLDecoder.decode(what, "UTF-8");
+        }
+        catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException("UTF-8 not supported", ex);
+        }
+        return result;
+    }
+
     public static synchronized String hash(String plaintext) {
         MessageDigest md;
         try {
@@ -120,6 +161,11 @@ public class util {
         return (new BASE64Encoder()).encode(raw);
     }
 
+     static class CustomException extends Exception {
+        CustomException(String message) {
+            super(message);
+        }
+    }
 
 }
 

@@ -41,17 +41,17 @@ public class Confirm extends bCommand {
                 if (((temp.getUsers().get(c.getDB().Users.get(user).authname)).getAccess() == Desc.Required_Access) || (temp.getUsers().get(c.getDB().Users.get(user).authname)).getAccess().ordinal() >= CommandDesc.access_levels.A_HELPER.ordinal() ) {
                     if (temp.getUsers().containsKey(uTemp)) {
                         if (util.sanitize(arguments)) {
-                            if (temp.getUsers().get(uTemp).getMetaData().containsKey("cookie") || (temp.getUsers().get(c.getDB().Users.get(user).authname)).getAccess().ordinal() >= CommandDesc.access_levels.A_HELPER.ordinal() ) {
-                                if (temp.getUsers().get(uTemp).getMetaData().get("cookie").equals(arguments)) {
+                            if (temp.getUsers().get(uTemp).getAllMeta().containsKey("cookie") || (temp.getUsers().get(c.getDB().Users.get(user).authname)).getAccess().ordinal() >= CommandDesc.access_levels.A_HELPER.ordinal() ) {
+                                if (temp.getUsers().get(uTemp).getMeta("cookie").equals(arguments)) {
                                     temp.getUsers().get(uTemp).update(CommandDesc.access_levels.A_AUTHED);
-                                    temp.getUsers().get(uTemp).getMetaData().remove("cookie");
+                                    temp.getUsers().get(uTemp).rmMeta("cookie");
                                     p.PrivMessage(who, replyto, "\u0002" + c.getDB().Users.get(user).uid + ":\u0002 Your account has been confirmed!");
                                 } else if (temp.getUsers().get(uTemp).getAccess().ordinal() >= CommandDesc.access_levels.A_HELPER.ordinal()) {
                                 // is a helper and is confirming account for user
                                     if (temp.getUsers().containsKey(arguments.toLowerCase()))
                                     {
                                         temp.getUsers().get(arguments.toLowerCase()).update(CommandDesc.access_levels.A_AUTHED);
-                                        temp.getUsers().get(arguments.toLowerCase()).getMetaData().remove("cookie");
+                                        temp.getUsers().get(arguments.toLowerCase()).rmMeta("cookie");
                                         p.PrivMessage(who, arguments.toLowerCase(), "\u0002" + c.getDB().Users.get(arguments.toLowerCase()).uid + ":\u0002 Your account has been confirmed!");
                                     } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 That user doesn't exist!");                                     
                                 } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Your cookie is wrong!");

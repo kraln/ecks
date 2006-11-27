@@ -27,6 +27,7 @@ public interface Protocol {
     int state = 0;
     BufferedWriter out = null;
     public void setConfig(Configuration conf);
+    public int getState();
     void setBuffers(BufferedWriter o);
     void Incoming(String line);
     void Outgoing(String what) throws IOException;

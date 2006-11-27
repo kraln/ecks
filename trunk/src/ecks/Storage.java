@@ -66,7 +66,8 @@ public class Storage {
                 }
             }
         } else {
-            System.exit(3);
+            System.err.println("*** No services defined in configuration file. Exiting.");
+            main.goGracefullyIntoTheNight();
         }
 
     }

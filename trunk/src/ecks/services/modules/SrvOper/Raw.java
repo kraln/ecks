@@ -30,7 +30,7 @@ import java.util.Map;
 import java.io.IOException;
 
 public class Raw extends bCommand {
-    public final CommandDesc Desc = new CommandDesc("help", 99, true, CommandDesc.access_levels.A_SRA, "Inserts a raw string into the uplink stream", "<irc>");
+    public final CommandDesc Desc = new CommandDesc("raw", 99, true, CommandDesc.access_levels.A_SRA, "Inserts a raw string into the uplink stream", "<irc>");
 
     public CommandDesc getDesc() {
         return Desc;

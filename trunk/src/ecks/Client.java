@@ -21,6 +21,7 @@ public class Client {
     public String uid;
     public String uplink;
     public String hostmask;
+    public String realhost;
     public String authname;
     public String ident;
     public String gecos;
@@ -28,7 +29,7 @@ public class Client {
 
     public Client(String ud, String upl, String id, String host, String gec) // in on a burst or otherwise introduced
     {
-        uid = ud; uplink = upl; hostmask = host; ident = id; gecos=gec; authname = null;
+        uid = ud; uplink = upl; hostmask = host; realhost = host; ident = id; gecos=gec; authname = null;
         modes="+o"; // todo: implement modes
     }
     public Client(){}

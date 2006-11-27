@@ -33,16 +33,13 @@ import ecks.services.Service;
 import ecks.services.modules.CommandModule;
 
 public class Configuration {
-    public static enum debuglevels {
-        D_NONE, D_SUMMARY, D_INFO, D_VERBOSE
-    }
-
     public Map<String, String> Config;
     public Map<String, Service> Services;
     public Storage Database;
     public Object cp;
     public String authservice;
     public String chanservice;
+    public String logservice; // what service ends up logging in-chan
 
     Configuration() {
         Config = new HashMap<String, String>();
@@ -51,6 +48,7 @@ public class Configuration {
         cp = new ConfParse(this);
         authservice = "";
         chanservice = "";
+        logservice = "";
     }
 
     public Storage getDB()

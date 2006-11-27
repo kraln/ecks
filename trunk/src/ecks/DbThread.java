@@ -34,10 +34,14 @@ public class DbThread implements Runnable {
           try {
               Thread.sleep(1000 * 60 * 5);
           } catch (InterruptedException e) {
-              e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+              System.out.println("*** We got interrupted! Saving...");
+              Conf.getDB().flushDB(Conf);
+              System.out.println("*** Wrote Database! Breaking out of loop...");
+              break;
           }
-          System.out.println("*** Wrote Database");
           Conf.getDB().flushDB(Conf);
+          System.out.println("*** Wrote Database");
       }
+      util.getThreads().remove(Thread.currentThread()); // if we're out of this loop, then this thread is over.
     }
 }

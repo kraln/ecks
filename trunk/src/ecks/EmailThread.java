@@ -53,5 +53,8 @@ public class EmailThread implements Runnable {
         {
             e.printStackTrace();
         }
+
+        System.out.println("*** Email thread completed.");
+        util.getThreads().remove(Thread.currentThread()); // this thread is over.
     }
 }

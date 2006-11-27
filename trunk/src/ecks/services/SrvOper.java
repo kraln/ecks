@@ -22,7 +22,8 @@ import org.w3c.dom.NodeList;
 public class SrvOper extends bService {
     String name = "SrvOper";
 
-    public void introduce() {        
+    public void introduce() {
+        config.logservice = name.toLowerCase(); // I lay claim to logging
         proto.Introduce(name, this);
         if(!(config.Config.get("debugchan").equals("OFF")))
         {
