@@ -19,23 +19,53 @@ package ecks.services;
 
 import ecks.Client;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
 public class SrvHelp_channel { // direct correlation to a database entry
     String channel;
     public List<Client> queue;
+    Map<String, String> Metadata;
 
-    public SrvHelp_channel(){}
-    public SrvHelp_channel(String chan)
-    {
+    public String getMeta(String what) throws NoSuchElementException {
+        if (Metadata.containsKey(what)) {
+            return Metadata.get(what);
+        } else
+            throw new java.util.NoSuchElementException();
+    }
+
+    public void setMeta(String what, String val) {
+        if (Metadata.containsKey(what))
+            Metadata.remove(what);
+        Metadata.put(what, val);
+    }
+
+    public void rmMeta(String what) throws NoSuchElementException {
+        if (Metadata.containsKey(what)) {
+            Metadata.remove(what);
+        } else
+            throw new java.util.NoSuchElementException();
+    }
+
+    public Map<String, String> getAllMeta() {
+        return new HashMap<String, String>(Metadata); // read only copy...
+    }
+
+    public SrvHelp_channel() {
+    }
+
+    public SrvHelp_channel(String chan) {
         channel = chan;
         queue = new ArrayList<Client>();
+        Metadata = new HashMap<String, String>();
     }
-    public String toString()
-    {
+
+    public SrvHelp_channel(String chan, Map<String, String> m) {
+        channel = chan;
+        queue = new ArrayList<Client>();
+        Metadata = m;
+    }
+
+    public String toString() {
         return channel + ": queue size " + queue.size();
     }
 

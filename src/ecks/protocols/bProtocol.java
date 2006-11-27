@@ -30,6 +30,11 @@ public abstract class bProtocol implements Protocol {
         state = 0;
     }
 
+    public int getState()
+    {
+        return state;
+    }
+
     public void setConfig(Configuration conf)
     {
         config = conf;

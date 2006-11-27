@@ -52,7 +52,7 @@ public class Sync extends bCommand {
         }
 
         whom = whom.toLowerCase();
-        whatchan = whatchan.toLowerCase();
+        whatchan = whatchan.toLowerCase(); // srvchan only knows about lowercase versions of channels...
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {

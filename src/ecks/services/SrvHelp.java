@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 
+import ecks.util;
+
 public class SrvHelp extends bService {
     String name = "SrvHelp";
     public Map<String, SrvHelp_channel> Channels;
@@ -58,7 +60,12 @@ public class SrvHelp extends bService {
         tOut = tOut+ "<service class=\"" + this.getClass().getName() + "\" name=\"" + name + "\">\r\n";
         for (Map.Entry<String, SrvHelp_channel> usar : Channels.entrySet()) {
             tOut = tOut + "\t" + "<channel>\r\n";
-            tOut = tOut + "\t\t" +"<name value=\"" + usar.getValue().channel + "\"/>\r\n";
+            tOut = tOut + "\t\t" +"<name value=\"" + util.encodeUTF(usar.getValue().channel) + "\"/>\r\n";
+            tOut = tOut + "\t\t" +"<metadata>\r\n";
+            for (Map.Entry<String, String> md : usar.getValue().getAllMeta().entrySet()) {
+                tOut = tOut + "\t\t\t" +"<" + util.encodeUTF(md.getKey()) + " value=\"" + util.encodeUTF(md.getValue()) + "\"/>\r\n";
+            }
+            tOut = tOut + "\t\t" +"</metadata>\r\n";
             tOut = tOut + "\t" + "</channel>\r\n";
         }
         tOut = tOut+ "</service>\r\n";
@@ -68,14 +75,21 @@ public class SrvHelp extends bService {
     {
         for (int i = 0; i < XMLin.getLength(); i++) {  // channel tags
             String nTemp;
-
+            Map <String,String> mTemp = new HashMap<String, String>();
             NodeList t;
 
             if (XMLin.item(i).getNodeType() != 1 ) continue;
 
             t = ((Element)XMLin.item(i)).getElementsByTagName("name");
-            nTemp = t.item(0).getAttributes().getNamedItem("value").getNodeValue();
-            Channels.put(nTemp.toLowerCase().trim(), new SrvHelp_channel(nTemp));
+            nTemp = util.decodeUTF(t.item(0).getAttributes().getNamedItem("value").getNodeValue());
+            t = ((Element)XMLin.item(i)).getElementsByTagName("metadata").item(0).getChildNodes();
+
+            for (int j =0; j< t.getLength();j++) {
+                if (t.item(j).getNodeType() != 1 ) continue;
+                mTemp.put(util.decodeUTF((t.item(j)).getNodeName()), util.decodeUTF((t.item(j)).getAttributes().getNamedItem("value").getNodeValue()));
+            }
+
+            Channels.put(nTemp.toLowerCase().trim(), new SrvHelp_channel(nTemp, mTemp));
         }
     }
 }

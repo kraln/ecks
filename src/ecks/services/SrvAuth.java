@@ -30,7 +30,7 @@ public class  SrvAuth extends bService {
     public Map<String, SrvAuth_user> Users;
 
     public void introduce() {
-        config.authservice = name.toLowerCase();
+        config.authservice = name.toLowerCase(); // I lay claim to users
         proto.Introduce(name, this);
         if(!(config.Config.get("debugchan").equals("OFF")))
             proto.SJoin(name, config.Config.get("debugchan"), "+stn");
@@ -73,13 +73,13 @@ public class  SrvAuth extends bService {
         tOut = tOut+ "<service class=\"" + this.getClass().getName() + "\" name=\"" + name + "\">\r\n";
         for (Map.Entry<String, SrvAuth_user> usar : Users.entrySet()) {
             tOut = tOut + "\t" + "<user>\r\n";
-            tOut = tOut + "\t\t" +"<username value=\"" + usar.getValue().username + "\"/>\r\n";
-            tOut = tOut + "\t\t" +"<password value=\"" + usar.getValue().password + "\"/>\r\n";
-            tOut = tOut + "\t\t" +"<email value=\"" + usar.getValue().email + "\"/>\r\n";
+            tOut = tOut + "\t\t" +"<username value=\"" + util.encodeUTF(usar.getValue().username) + "\"/>\r\n";
+            tOut = tOut + "\t\t" +"<password value=\"" +util.encodeUTF(usar.getValue().password) + "\"/>\r\n";
+            tOut = tOut + "\t\t" +"<email value=\"" + util.encodeUTF(usar.getValue().email) + "\"/>\r\n";
             tOut = tOut + "\t\t" +"<access value=\"" + usar.getValue().services_access + "\"/>\r\n";
             tOut = tOut + "\t\t" +"<metadata>\r\n";
-            for (Map.Entry<String, String> md : usar.getValue().getMetaData().entrySet()) {
-                tOut = tOut + "\t\t\t" +"<" + md.getKey() + " value=\"" + md.getValue() + "\"/>\r\n";
+            for (Map.Entry<String, String> md : usar.getValue().getAllMeta().entrySet()) {
+                tOut = tOut + "\t\t\t" +"<" + util.encodeUTF(md.getKey()) + " value=\"" + util.encodeUTF(md.getValue()) + "\"/>\r\n";
             }
             tOut = tOut + "\t\t" +"</metadata>\r\n";
             tOut = tOut + "\t" + "</user>\r\n";
@@ -99,18 +99,18 @@ public class  SrvAuth extends bService {
             if (XMLin.item(i).getNodeType() != 1 ) continue;
 
             t = ((Element)XMLin.item(i)).getElementsByTagName("username");
-            uTemp = t.item(0).getAttributes().getNamedItem("value").getNodeValue();
+            uTemp = util.decodeUTF(t.item(0).getAttributes().getNamedItem("value").getNodeValue());
             t = ((Element)XMLin.item(i)).getElementsByTagName("password");
-            pTemp = t.item(0).getAttributes().getNamedItem("value").getNodeValue();
+            pTemp = util.decodeUTF(t.item(0).getAttributes().getNamedItem("value").getNodeValue());
             t = ((Element)XMLin.item(i)).getElementsByTagName("email");
-            eTemp = t.item(0).getAttributes().getNamedItem("value").getNodeValue();
+            eTemp = util.decodeUTF(t.item(0).getAttributes().getNamedItem("value").getNodeValue());
             t = ((Element)XMLin.item(i)).getElementsByTagName("access");
             aTemp = CommandDesc.access_levels.valueOf(t.item(0).getAttributes().getNamedItem("value").getNodeValue());
 
             t = ((Element)XMLin.item(i)).getElementsByTagName("metadata").item(0).getChildNodes();
             for (int j =0; j< t.getLength();j++) {
                 if (t.item(j).getNodeType() != 1 ) continue;
-                mTemp.put((t.item(j)).getNodeName(), (t.item(j)).getAttributes().getNamedItem("value").getNodeValue());
+                mTemp.put(util.decodeUTF((t.item(j)).getNodeName()), util.decodeUTF((t.item(j)).getAttributes().getNamedItem("value").getNodeValue()));
             }
 
             Users.put(uTemp.toLowerCase().trim(), new SrvAuth_user(uTemp,pTemp,eTemp,aTemp,mTemp));

@@ -42,6 +42,8 @@ public class ShowUsers extends bCommand {
         else
             whatchan = replyto;
 
+        whatchan = whatchan.toLowerCase();
+
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
                 p.PrivMessage(who, user, "\u0002" + util.pad("USER",12) + "\u0002 " + "ACCESS");

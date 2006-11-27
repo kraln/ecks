@@ -37,7 +37,7 @@ public class Connection {
      BufferedReader in;
 
      Connection(String hostname, int port, String lport, InetAddress lh, Protocol grok) {host=hostname; p=port; prot=grok; lhost = lh; lp = lport; }
-     public void Connect(){
+     public void Connect() {
          try {
              if (lp.equals("any")) // we don't care about binding to a specific address
                  sock = new Socket(host, p);
@@ -47,12 +47,11 @@ public class Connection {
              in = new BufferedReader (new InputStreamReader(sock.getInputStream()));
          } catch (IOException e) {
              e.printStackTrace();
-             System.exit(1);
              return;
          }
          prot.setBuffers(out);
 
-         new Thread(new ConnThread(in,prot)).start(); // start async input thread
+         util.startThread(new Thread(new ConnThread(in,prot))).start(); // start async input thread
 
      }
 }

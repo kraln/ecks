@@ -22,6 +22,7 @@ import ecks.util;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 public class SrvChannel_channel { // direct correlation to a database entry
     public static enum ChanAccess { C_NONE, C_PEON, C_CHANOP, C_MASTER, C_COOWNER, C_OWNER }
@@ -29,6 +30,7 @@ public class SrvChannel_channel { // direct correlation to a database entry
     String owner;
     Map<String, ChanAccess> Users;
     Map<String, String> Settings;
+    Map<String, String> Metadata;
 
     public SrvChannel_channel(){}
     public SrvChannel_channel(String chan, String o)
@@ -38,14 +40,44 @@ public class SrvChannel_channel { // direct correlation to a database entry
         owner = o;
         Users.put(o,ChanAccess.C_OWNER);
         Settings = new HashMap<String,String>();
+        Metadata = new HashMap<String,String>();
     }
-    public SrvChannel_channel(String chan, String o, Map<String, ChanAccess> u, Map<String, String> s)
+    public SrvChannel_channel(String chan, String o, Map<String, ChanAccess> u, Map<String, String> s, Map<String, String> m)
     {
         channel = chan;
         Users = u;
         owner = o;
         Settings = s;
+        Metadata = m;
     }
+
+    public Map<String,String> getAllMeta()
+    {
+        return new HashMap<String,String>(Metadata); // read only copy...
+    }
+
+    public String getMeta(String what) throws NoSuchElementException
+    {
+        if (Metadata.containsKey(what))
+        {
+            return Metadata.get(what);
+        } else
+            throw new java.util.NoSuchElementException();
+    }
+
+    public void setMeta(String what, String val)
+    {
+        if (Metadata.containsKey(what))
+            Metadata.remove(what);
+        Metadata.put(what,val);
+    }
+    public void rmMeta(String what) throws NoSuchElementException {
+        if (Metadata.containsKey(what)) {
+            Metadata.remove(what);
+        } else
+            throw new java.util.NoSuchElementException();
+    }
+
     public Map<String,ChanAccess> getUsers()
     {
         return Users;

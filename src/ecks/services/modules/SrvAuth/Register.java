@@ -51,7 +51,7 @@ public class Register extends bCommand {
                                     temp.getUsers().put(u, new SrvAuth_user(u, pw, e, CommandDesc.access_levels.A_PENDING));
                                     c.getDB().Users.get(user).authname = u.trim().toLowerCase(); // user is now authed
                                     String tCookie = util.makeCookie();
-                                    temp.getUsers().get(u).getMetaData().put("cookie", tCookie);
+                                    temp.getUsers().get(u).setMeta("cookie", tCookie);
                                     util.SendRegMail(e, tCookie);
                                     p.PrivMessage(who, replyto, "\u0002" + c.getDB().Users.get(user).uid + ":\u0002 Registration Succeeded!");
                                 } else { // first registration is an SRA

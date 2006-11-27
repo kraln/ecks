@@ -17,9 +17,7 @@
  */
 package ecks.protocols;
 
-import ecks.Client;
-import ecks.Channel;
-import ecks.Configuration;
+import ecks.*;
 import ecks.services.Service;
 
 import java.io.IOException;
@@ -33,7 +31,7 @@ public class bahamut extends bProtocol {
             System.exit(1);
         }
 
-        System.out.println(line); // make this use a debugger class
+        Logging.raw(line,true); // if we're logging raw, this would be the place to deal wif it
 
         if (line.startsWith("ERROR")) // oh no. bail bail bail
         {
@@ -54,7 +52,7 @@ public class bahamut extends bProtocol {
         // NICK phil 2 1163265829 +i ~u3435591 cpc3-nthc11-0-0-cust625.nrth.cable.ntl.com King.GamesNET.net svsid numip :phil
         {
             try {
-            String nick, host, ident, gecos, uplink;
+            String nick = "", host = "", ident = "", gecos = "", uplink = "";
             nick = line.split(" ")[1];
             host = line.split(" ")[6];
             ident = line.split(" ")[5];
@@ -80,9 +78,9 @@ public class bahamut extends bProtocol {
 
             c = config.Database.Users.get(cname.toLowerCase()); // this should never, ever fail if we're sync'd
 
-            if (config.Database.Channels.containsKey(channame)) // it had better...
+            if (config.Database.Channels.containsKey(channame.toLowerCase())) // it had better...
             {
-                chan = config.Database.Channels.get(channame);
+                chan = config.Database.Channels.get(channame.toLowerCase());
 
                 try {
                     chan.clientmodes.remove(c); // remove user
@@ -95,7 +93,7 @@ public class bahamut extends bProtocol {
                 }
 
                 if (chan.clientmodes.size() == 0) // no more users in this channel, it goes boom
-                    config.Database.Channels.remove(channame);
+                    config.Database.Channels.remove(channame.toLowerCase());
 
                 for (String s : config.Services.keySet()) {
                     if (config.Services.get(s).getCommands().containsKey("desync")) // if we care about userparts
@@ -135,16 +133,16 @@ public class bahamut extends bProtocol {
                     }
                     cmodes.put(config.Database.Users.get(tusers[i].toLowerCase()), tmode);
                 }
-                config.Database.Channels.put(name, new Channel(time, name, modes, cmodes));
+                config.Database.Channels.put(name.toLowerCase(), new Channel(time, name, modes, cmodes));
             } else { // just a user joining
-                if (config.Database.Channels.containsKey(name)) // if this check fails we fail somewhere
+                if (config.Database.Channels.containsKey(name.toLowerCase())) // if this check fails we fail somewhere
                 {
-                    cmodes = config.Database.Channels.get(name).clientmodes;
-                    int t = config.Database.Channels.get(name).ts;
-                    String m = config.Database.Channels.get(name).modes;
+                    cmodes = config.Database.Channels.get(name.toLowerCase()).clientmodes;
+                    int t = config.Database.Channels.get(name.toLowerCase()).ts;
+                    String m = config.Database.Channels.get(name.toLowerCase()).modes;
                     cmodes.put(config.Database.Users.get(line.split(" ")[0].substring(1).toLowerCase()), "");
-                    config.Database.Channels.remove(name);
-                    config.Database.Channels.put(name, new Channel(t, name, m, cmodes));
+                    config.Database.Channels.remove(name.toLowerCase());
+                    config.Database.Channels.put(name.toLowerCase(), new Channel(t, name, m, cmodes));
 
                     for (String s : config.Services.keySet()) {
                         if (config.Services.get(s).getCommands().containsKey("sync")) // if we care about userjoins
@@ -246,6 +244,7 @@ public class bahamut extends bProtocol {
             String split1[] = line.split(" :");
             String split2[] = split1[0].split(" ");
 
+            try {
             if (split2.length > 1) // OH NO NPE
             {
                 if (split2[1].equals("PRIVMSG")) // I'm interested
@@ -278,6 +277,11 @@ public class bahamut extends bProtocol {
                     }
                 }
             }
+            } catch (NullPointerException NPE)
+            {
+                NPE.printStackTrace();
+                System.err.println("*** IMPORTANT NPE! Line: " + line);
+            }
 
             // we're going to be getting lots of nothing, and occasionally some commands
             //    if the commands are for services, dispatch them.
@@ -287,7 +291,7 @@ public class bahamut extends bProtocol {
 
     public void Outgoing(String what) throws IOException {
         out.write(what + "\r\n");
-        System.out.println(what); // make this use a debugger class
+        Logging.raw(what,false); // if we're logging raw, this would be the place to deal wif it
         out.flush();
     }
 
@@ -315,18 +319,18 @@ public class bahamut extends bProtocol {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (!config.Database.Channels.containsKey(where)) // we're making tihs channel by joining it
+        if (!config.Database.Channels.containsKey(where.toLowerCase())) // we're making this channel by joining it
         {
             Map<Client, String> blah = new HashMap<Client, String>();
             blah.put(config.Database.Users.get(servicename.toLowerCase()), "+o");
-            config.Database.Channels.put(where, new Channel((int) (System.currentTimeMillis() / 1000), where, modes, blah));
+            config.Database.Channels.put(where.toLowerCase(), new Channel((int) (System.currentTimeMillis() / 1000), where, modes, blah));
         } else { // gotta update the channel...
-            Map<Client, String> blah = config.Database.Channels.get(where).clientmodes;
-            int t = config.Database.Channels.get(where).ts;
-            String m = config.Database.Channels.get(where).modes;
+            Map<Client, String> blah = config.Database.Channels.get(where.toLowerCase()).clientmodes;
+            int t = config.Database.Channels.get(where.toLowerCase()).ts;
+            String m = config.Database.Channels.get(where.toLowerCase()).modes;
             blah.put(config.Database.Users.get(servicename.toLowerCase()), "+o");
-            config.Database.Channels.remove(where);
-            config.Database.Channels.put(where, new Channel(t, where, m, blah));
+            config.Database.Channels.remove(where.toLowerCase());
+            config.Database.Channels.put(where.toLowerCase(), new Channel(t, where, m, blah));
         }
     }
 
@@ -369,7 +373,7 @@ public class bahamut extends bProtocol {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.exit(0);
+        main.goGracefullyIntoTheNight();
     }
 
     public void forcemode(Service me, String channel, String mode, String who) {
@@ -395,13 +399,13 @@ public class bahamut extends bProtocol {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Map<Client, String> blah = config.Database.Channels.get(chan).clientmodes;
-        int t = config.Database.Channels.get(chan).ts;
-        String m = config.Database.Channels.get(chan).modes;
+        Map<Client, String> blah = config.Database.Channels.get(chan.toLowerCase()).clientmodes;
+        int t = config.Database.Channels.get(chan.toLowerCase()).ts;
+        String m = config.Database.Channels.get(chan.toLowerCase()).modes;
         blah.remove(config.Database.Users.get(me.getname().toLowerCase()));
-        config.Database.Channels.remove(chan);
+        config.Database.Channels.remove(chan.toLowerCase());
         if (blah.size() > 0) // only put it back if it still has users
-            config.Database.Channels.put(chan, new Channel(t, chan, m, blah));
+            config.Database.Channels.put(chan.toLowerCase(), new Channel(t, chan, m, blah));
     }
 
     public void gline(Service me, Configuration conf, Client who, String why) {

@@ -21,10 +21,11 @@ import ecks.protocols.Protocol;
 
 import java.io.*;
 import java.net.*;
+import java.nio.channels.ClosedByInterruptException;
 
 public class ConnThread implements Runnable {
 
-    // my entire existence is to provide non-blocking (input) reads
+    // my entire existence is to provide psudo non-blocking (input) reads
 
     BufferedReader stream;
     Protocol handoff;
@@ -36,13 +37,23 @@ public class ConnThread implements Runnable {
       {
           try {
               handoff.Incoming(  stream.readLine().trim() ); // give the incoming line to the protocol handler
+          } catch (ClosedByInterruptException e) { // occurs when we get interrupted
+              e.printStackTrace();
+              System.out.println("*** Incoming thread interrupted. Breaking loop...");
+              break;
+          } catch (NullPointerException npe) {
+              npe.printStackTrace();
+              break; // connection terminated. likely, our uplink cored.
           } catch (IOException e) {
               e.printStackTrace();
-          } catch (NullPointerException npe)
-          {
-              npe.printStackTrace();
-              System.exit(666); // connection terminated. likely, our uplink cored.
+              break;
           }
+
+          if(Thread.interrupted())
+              break; // we've been interrupted. likely going for a shutdown
       }
+
+      util.getThreads().remove(Thread.currentThread()); // if we're out of this loop, then this thread is over.
+
     }
 }

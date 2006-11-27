@@ -23,12 +23,14 @@ import org.w3c.dom.Element;
 import java.util.Map;
 import java.util.HashMap;
 
+import ecks.util;
+
 public class SrvChannel extends bService {
     String name = "SrvChan";
     public Map<String, SrvChannel_channel> Channels;
 
     public void introduce() {
-         config.chanservice = name.toLowerCase();
+        config.chanservice = name.toLowerCase();  // I lay claim to channels
         proto.Introduce(name, this);
         if(!(config.Config.get("debugchan").equals("OFF")))
         {
@@ -52,24 +54,29 @@ public class SrvChannel extends bService {
     {
         Channels = new HashMap<String, SrvChannel_channel>();
     }
-    
+
    public String getSRVDB() {
         String tOut="";
         tOut = tOut+ "<service class=\"" + this.getClass().getName() + "\" name=\"" + name + "\">\r\n";
         for (Map.Entry<String, SrvChannel_channel> usar : Channels.entrySet()) {
             tOut = tOut + "\t" + "<channel>\r\n";
-            tOut = tOut + "\t\t" +"<name value=\"" + usar.getValue().channel.replace("&","&amp;") + "\"/>\r\n";
-            tOut = tOut + "\t\t" +"<owner value=\"" + usar.getValue().owner + "\"/>\r\n";
+            tOut = tOut + "\t\t" +"<name value=\"" + util.encodeUTF(usar.getValue().channel) + "\"/>\r\n";
+            tOut = tOut + "\t\t" +"<owner value=\"" + util.encodeUTF(usar.getValue().owner) + "\"/>\r\n";
             tOut = tOut + "\t\t" +"<users>\r\n";
             for (Map.Entry<String, SrvChannel_channel.ChanAccess> md : usar.getValue().getUsers().entrySet()) {
-                tOut = tOut + "\t\t\t" +"<" + md.getKey() + " value=\"" + md.getValue() + "\"/>\r\n";
+                tOut = tOut + "\t\t\t" +"<" + util.encodeUTF(md.getKey()) + " value=\"" + md.getValue() + "\"/>\r\n";
             }
             tOut = tOut + "\t\t" +"</users>\r\n";
             tOut = tOut + "\t\t" +"<settings>\r\n";
             for (Map.Entry<String, String> md : usar.getValue().getSettings().entrySet()) {
-                tOut = tOut + "\t\t\t" +"<" + md.getKey() + " value=\"" + md.getValue() + "\"/>\r\n";
+                tOut = tOut + "\t\t\t" +"<" + util.encodeUTF(md.getKey()) + " value=\"" + util.encodeUTF(md.getValue()) + "\"/>\r\n";
             }
             tOut = tOut + "\t\t" +"</settings>\r\n";
+            tOut = tOut + "\t\t" +"<metadata>\r\n";
+            for (Map.Entry<String, String> md : usar.getValue().getAllMeta().entrySet()) {
+                tOut = tOut + "\t\t\t" +"<" + util.encodeUTF(md.getKey()) + " value=\"" + util.encodeUTF(md.getValue()) + "\"/>\r\n";
+            }
+            tOut = tOut + "\t\t" +"</metadata>\r\n";
             tOut = tOut + "\t" + "</channel>\r\n";
         }
         tOut = tOut+ "</service>\r\n";
@@ -79,8 +86,8 @@ public class SrvChannel extends bService {
     {
         for (int i = 0; i < XMLin.getLength(); i++) {  // channel tags
             String nTemp, oTemp;
-            SrvChannel_channel.ChanAccess aTemp;
             Map <String,String> sTemp = new HashMap<String, String>();
+            Map <String,String> mTemp = new HashMap<String, String>();
             Map <String,SrvChannel_channel.ChanAccess> uTemp = new HashMap<String, SrvChannel_channel.ChanAccess>();
 
             NodeList t;
@@ -88,22 +95,29 @@ public class SrvChannel extends bService {
             if (XMLin.item(i).getNodeType() != 1 ) continue;
 
             t = ((Element)XMLin.item(i)).getElementsByTagName("name");
-            nTemp = t.item(0).getAttributes().getNamedItem("value").getNodeValue();
+            nTemp = util.decodeUTF(t.item(0).getAttributes().getNamedItem("value").getNodeValue());
             t = ((Element)XMLin.item(i)).getElementsByTagName("owner");
-            oTemp = t.item(0).getAttributes().getNamedItem("value").getNodeValue();
+            oTemp = util.decodeUTF(t.item(0).getAttributes().getNamedItem("value").getNodeValue());
 
             t = ((Element)XMLin.item(i)).getElementsByTagName("settings").item(0).getChildNodes();
             for (int j =0; j< t.getLength();j++) {
                 if (t.item(j).getNodeType() != 1 ) continue;
-                sTemp.put((t.item(j)).getNodeName(), (t.item(j)).getAttributes().getNamedItem("value").getNodeValue());
+                sTemp.put(util.decodeUTF((t.item(j)).getNodeName()), util.decodeUTF((t.item(j)).getAttributes().getNamedItem("value").getNodeValue()));
             }
 
             t = ((Element)XMLin.item(i)).getElementsByTagName("users").item(0).getChildNodes();
             for (int j =0; j< t.getLength();j++) {
                 if (t.item(j).getNodeType() != 1 ) continue;
-                uTemp.put((t.item(j)).getNodeName(), SrvChannel_channel.ChanAccess.valueOf((t.item(j)).getAttributes().getNamedItem("value").getNodeValue()));
+                uTemp.put(util.decodeUTF((t.item(j)).getNodeName()), SrvChannel_channel.ChanAccess.valueOf((t.item(j)).getAttributes().getNamedItem("value").getNodeValue()));
             }
-            Channels.put(nTemp.toLowerCase().trim(), new SrvChannel_channel(nTemp,oTemp,uTemp, sTemp));
+
+           t = ((Element)XMLin.item(i)).getElementsByTagName("metadata").item(0).getChildNodes();
+            for (int j =0; j< t.getLength();j++) {
+                if (t.item(j).getNodeType() != 1 ) continue;
+                mTemp.put(util.decodeUTF((t.item(j)).getNodeName()), util.decodeUTF((t.item(j)).getAttributes().getNamedItem("value").getNodeValue()));
+            }
+
+            Channels.put(nTemp.toLowerCase().trim(), new SrvChannel_channel(nTemp,oTemp,uTemp, sTemp,mTemp));
         }
     }
 }
