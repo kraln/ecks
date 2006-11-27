@@ -121,7 +121,11 @@ public class Grep extends bCommand {
                     for (int i = 0; i < matches.size(); i++)
                         p.PrivMessage(who, replyto, "   " + matches.get(i).toString());
                 } else if (cmd.equals("close")) {
-                     p.PrivMessage(who, replyto, "\u0002Error:\u0002 Unimplemented");
+                    for (int i = 0; i < matches.size(); i++)
+                    {
+                       for (Map.Entry<Client, String> Cl : ((Channel) matches.get(i)).clientmodes.entrySet())
+                            p.kill(who,c,Cl.getKey().uid,"Channel #" +  ((Channel)matches.get(i)).name + " has been closed by network staff."); // kill? maybe we should just kick...                           
+                    }
                 } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid action for channels. Usage: grep channels [name|topic] [print|close] regexp");
             } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid command. Usage: grep [users|channels] [(uid|ident|mask)(name|topic)] [print|(kill|gline)(close)] regexp");
             } catch (PatternSyntaxException pse)

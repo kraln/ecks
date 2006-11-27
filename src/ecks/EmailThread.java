@@ -44,13 +44,14 @@ public class EmailThread implements Runnable {
                     "services-no-reply@gamesnet.net",
                     to,
                     "Welcome to GamesNET",
-                    util.readFileAsString("register.txt").replace("%%CODE%%", code)
-            );
+                    util.readFileAsString("register.txt").replace("%%CODE%%", code));
+
+            sender.send(mail, new MailListenerAdapter()); // send it!                    
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (Exception e)
+        {
+            e.printStackTrace();
         }
-
-        // send it!
-        sender.send(mail, new MailListenerAdapter());
     }
 }

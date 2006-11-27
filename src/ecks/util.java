@@ -17,18 +17,14 @@
  */
 package ecks;
 
-import com.crackj2ee.mail.*;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import sun.misc.BASE64Encoder;
-import sun.misc.CharacterEncoder;
 
 public class util {
     
@@ -65,12 +61,12 @@ public class util {
     }
 
     public static String getVersion() {
-        return "0.2A";
+        return "0.3A";
     }
 
     public static boolean checkemail(String input) {
-
-        return input.matches("(\\w+)@(\\w+\\.)(\\w+)(\\.\\w+)*");
+        return true;
+        // return input.matches("(.+)@(.+)*");
     }
 
     public static boolean sanitize(String input) { // verify string is good for the database
