@@ -12,8 +12,10 @@
 		debuglevel: What verbosity to output debugging statements.
 		
 		D_NONE:    No output.
+		D_ERRORS:  Only show critical errors.
+		D_WARN:    Show some exceptions, 
 		D_SUMMARY: Before a graceful shutdown, output a quick summary
-		D_INFO:	   Informational output, such as modules loaded
+		D_INFO:	   Informational output, such as modules loaded, client connecting, channels, etc.
 		D_VERBOSE: Everything, including raw irc
 	-->
 	<debuglevel value="D_VERBOSE" />
@@ -21,10 +23,10 @@
 	<!--
 		debugdevice: Where debugging statements go
 		
-		STDIO:	   Output to the controlling terminal
+		stdio:	   Output to the controlling terminal
 		Anything else is considered a filename.
 	-->
-	<debugdevice value="STDIO" />
+	<debugdevice value="stdio" />
 
 	<!--
 		debugchan: Where all services will join
