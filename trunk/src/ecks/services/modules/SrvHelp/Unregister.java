@@ -24,6 +24,7 @@ import ecks.services.SrvChannel;
 import ecks.services.SrvHelp;
 import ecks.protocols.Protocol;
 import ecks.Configuration;
+import ecks.Logging;
 
 public class Unregister extends bCommand {
     public final CommandDesc Desc = new CommandDesc("unregister", 1, true, CommandDesc.access_levels.A_OPER, "Unregisters a channel", "<channel>");
@@ -41,6 +42,7 @@ public class Unregister extends bCommand {
                 temp.getChannels().remove(tU); // drop the account
                 p.part(who, tU, "Channel Unregistered.");
                 p.PrivMessage(who, replyto, "Channel removed.");
+                Logging.info("SRVHELP", "Channel " + tU + " unregistered by " + user + ".");                
             } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 No such channel is registered");
         } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: unregister <channel>");
     }

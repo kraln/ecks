@@ -24,6 +24,7 @@ import ecks.services.SrvChannel;
 import ecks.protocols.Protocol;
 import ecks.Configuration;
 import ecks.util;
+import ecks.Logging;
 
 public class Access extends bCommand {
     public final CommandDesc Desc = new CommandDesc("access", 2, true, CommandDesc.access_levels.A_PENDING, "Shows access of user in a channel", "[channel] [user]");
@@ -63,7 +64,7 @@ public class Access extends bCommand {
             }
         } catch (NullPointerException NPE) {
             NPE.printStackTrace();
-            System.out.println("access" + arguments);
+            Logging.warn("SRVCHAN_ACCESS", "Got NPE: " + arguments);
         }
 
         whom = whom.toLowerCase();

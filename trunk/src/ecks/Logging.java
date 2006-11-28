@@ -35,6 +35,11 @@ public class Logging {
     This class should handle all logging. Duh.
 
     */
+    public Logging()
+    {
+           myLogLevel = loglevels.D_NONE;
+    }
+
     public static void setup(Configuration c, Protocol p)
     {
         myLogLevel = loglevels.valueOf(c.Config.get("debuglevel"));
@@ -63,15 +68,15 @@ public class Logging {
     static void log(String what, loglevels ll, String ai) throws IOException {
         // TIME \t EVENTLVL \t EVENT \t ADDT'L INFO
         // or
-        // RAW \t -> RAW IRC HERE
-        // RAW \t <- RAW IRC HERE
+        // \t \t RAW \t -> RAW IRC HERE
+        // \t \t RAW \t <- RAW IRC HERE
         if (myLogLevel.equals(loglevels.D_NONE)){
             // goggles do nothing...
             return;
         } else if (myLogLevel.equals(loglevels.D_VERBOSE)) {
             if (what.equals("RAW"))
             {
-                out.write(what + '\t' + ai + "\r\n");
+                out.write("         \t          \t" + util.pad(what, 10) + '\t' + ai + "\r\n");
                 out.flush();
                 return;
             }
@@ -80,9 +85,9 @@ public class Logging {
         if (inchan)
         {
             if (myP.getState() == 4) // only do this if we're connected
-            myP.PrivMessage(myC.getSvc().get(myC.logservice), myC.Config.get("debugchan"), String.valueOf(System.currentTimeMillis() / 1000) + '\t' + ll.toString() + '\t' + what + '\t' + ai);
+            myP.PrivMessage(myC.getSvc().get(myC.logservice), myC.Config.get("debugchan"), String.valueOf(System.currentTimeMillis() / 1000) + '\t' + util.pad(ll.toString(), 10) + '\t' + util.pad(what, 10) + '\t' + ai);
         }
-        out.write(String.valueOf(System.currentTimeMillis() / 1000) + '\t' + ll.toString() + '\t' + what + '\t' + ai+ "\r\n");
+        out.write(String.valueOf(System.currentTimeMillis() / 1000) + '\t' + util.pad(ll.toString(),10) + '\t' + util.pad(what,10) + '\t' + ai+ "\r\n");
         out.flush();
 
     }

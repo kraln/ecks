@@ -45,23 +45,23 @@ public class main {
         myProto.setConfig(myConf);
 
         Logging.setup(myConf,myProto);
-        Logging.verbose("STARTUP", "Welcome to Ecks Services. Internal Version: " + util.getVersion());
+        Logging.summary("STARTUP", "Welcome to Ecks Services. Internal Version: " + util.getVersion());
         Logging.verbose("STARTUP", "Logging loaded...");
 
         //load services
         myConf.LoadServices(myProto);
-        Logging.verbose("STARTUP", "Services loaded...");
+        Logging.info("STARTUP", "Services loaded...");
 
         // at this point, we load up the services database.
         myConf.Database = new Storage();
 
         // load up the database
         myConf.Database.loadDB(myConf);
-        Logging.verbose("STARTUP", "Database loaded...");
+        Logging.info("STARTUP", "Database loaded...");
 
         // start a thread to save the database every five minutes.
         util.startThread(new Thread(new DbThread(myConf))).start();
-        Logging.verbose("STARTUP", "Database thread started...");
+        Logging.info("STARTUP", "Database thread started...");
 
         // initialize the connection
         InetAddress inetT;
@@ -73,16 +73,16 @@ public class main {
         Connection myConnection = new Connection(myConf.Config.get("remote"), Integer.parseInt(myConf.Config.get("port")),myConf.Config.get("localport"), inetT, myProto);
 
         myConnection.Connect(); // cross our fingers and connect
-        Logging.verbose("STARTUP", "Connection attempted...");
+        Logging.info("STARTUP", "Connection attempted...");
         Logging.verbose("STARTUP", "Good luck!");
     }
 
     public static void goGracefullyIntoTheNight()
     {
-        Logging.verbose("SHUTDOWN", "Interrupting Threads...");
+        Logging.warn("SHUTDOWN", "Interrupting Threads...");
         for (Thread t : util.getThreads())
             t.interrupt();
-        Logging.verbose("SHUTDOWN", "Goodbye."); // should put summary here.
+        Logging.warn("SHUTDOWN", "Goodbye."); // should put summary here.
         // if we're not done by this point, something is terribly amiss
     }
 

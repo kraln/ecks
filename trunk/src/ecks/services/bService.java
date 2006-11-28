@@ -60,7 +60,8 @@ public abstract class bService implements Service {
         {
             cmd = cmd.substring(4); // remove the fqdn
             command = command.substring(4);
-        }    
+            Logging.verbose("SERVICE", "Command \"" + cmd + "\" is fully qualified.");
+        }
         try {
         if (Commands.containsKey(cmd.toLowerCase())) {
             CommandDesc c = Commands.get(cmd.toLowerCase()).getDesc();
@@ -77,6 +78,7 @@ public abstract class bService implements Service {
                         CommandDesc.access_levels cur = ((SrvAuth) config.getSvc().get(config.authservice)).checkAccess(handle);
                         if ((handle != null) || (req.ordinal() == 0)) { // we're authed, or the command doesn't care
                             if (cur.ordinal() >= req.ordinal()) { // if we have the access
+                                Logging.verbose("SERVICE", "Handling command: " + cmd + ", for user: " + user + ".");
                                 Commands.get(cmd.toLowerCase()).handle_command(this, user.toLowerCase(), replyto, command.substring(cmd.length()).trim(), proto, config); // run command
                             } else proto.PrivMessage(this, replyto, "\u0002Error:\u0002 Not enough access!");
                         } else proto.PrivMessage(this, replyto, "\u0002Error:\u0002 You're not authed!");
@@ -86,7 +88,8 @@ public abstract class bService implements Service {
         } else proto.PrivMessage(this, replyto, "\u0002Error:\u0002 Unknown Command!");
         } catch (NullPointerException NPE)
         {
-            System.err.println(user + " \\ " + replyto + " \\ " + command);
+            Logging.error("SERVICE", "Caught NPE in command.");
+            Logging.info("SERVICE", "NPE handling command:" + user + " \\ " + replyto + " \\ " + command);
             NPE.printStackTrace();
         }
     }

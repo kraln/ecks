@@ -62,11 +62,13 @@ public class Storage {
             for (int i = 0; i < zl.getLength(); i++) {
                 el = (Element) zl.item(i);
                 if (conf.Services.containsKey(el.getAttribute("name").toLowerCase())) {
+                    Logging.verbose("DATABASE", el.getAttribute("name") + " Loading database...");
                     conf.getSvc().get(el.getAttribute("name").toLowerCase()).loadSRVDB(el.getChildNodes());
+                    Logging.verbose("DATABASE", el.getAttribute("name") + " Loading complete...");
                 }
             }
         } else {
-            System.err.println("*** No services defined in configuration file. Exiting.");
+            Logging.error("DATABASE", "No services defined in configuration file! Exiting");
             main.goGracefullyIntoTheNight();
         }
 
@@ -78,10 +80,12 @@ public class Storage {
             out = out + Serve.getValue().getSRVDB(); // get well-formed xml from each
         }
         out = out.trim();
+        Logging.info("DATABASE", "Writing " + (out.getBytes().length) + "bytes of services data to disk...");
         try {
             BufferedWriter o = new BufferedWriter(new FileWriter("srvdb.xml"));
             o.write("<db>\r\n" + out + "\r\n</db>");
             o.close();
+            Logging.verbose("DATABASE", "Write completed.");
         } catch (IOException e) {
             e.printStackTrace();
         }

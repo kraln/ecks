@@ -24,6 +24,7 @@ import ecks.services.SrvAuth;
 import ecks.protocols.Protocol;
 import ecks.Configuration;
 import ecks.util;
+import ecks.Logging;
 
 public class Promote extends bCommand {
     public final CommandDesc Desc = new CommandDesc("promote", 2, true, CommandDesc.access_levels.A_HELPER, "Gives user services access.");
@@ -53,6 +54,7 @@ public class Promote extends bCommand {
                         } else if ((temp.getUsers().get(c.getDB().Users.get(user).authname)).getAccess().equals(CommandDesc.access_levels.A_SRA)) { // if we're an SRA, we can do whatever we damn well please.
                             temp.getUsers().get(tU).update(tA); // update the account
                             p.PrivMessage(who, replyto, "User account promoted to " + tA + ".");
+                            Logging.info("SRVAUTH", "Account " + tU + " promoted by " + user + " to " + tA +  ".");
                         }else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Cannot promote users to your access level.");
                     } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 User has access that is unpromotable from you!");
                 } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 No such username is registered");

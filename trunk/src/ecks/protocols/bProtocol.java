@@ -46,5 +46,6 @@ public abstract class bProtocol implements Protocol {
     public void setBuffers(BufferedWriter o) {
         out = o;
         state = 1;
+        Logging.info("PROTOCOL", "Awaiting Identd Check");
     }
 }

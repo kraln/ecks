@@ -46,6 +46,7 @@ public class EmailThread implements Runnable {
                     "Welcome to GamesNET",
                     util.readFileAsString("register.txt").replace("%%CODE%%", code));
 
+
             sender.send(mail, new MailListenerAdapter()); // send it!                    
         } catch (IOException e) {
             e.printStackTrace();
@@ -54,7 +55,8 @@ public class EmailThread implements Runnable {
             e.printStackTrace();
         }
 
-        System.out.println("*** Email thread completed.");
+        Logging.info("EMAIL", "Email thread completed.");
+        Logging.verbose("EMAIL", "Email sent to " + to + ", code was " + code);
         util.getThreads().remove(Thread.currentThread()); // this thread is over.
     }
 }

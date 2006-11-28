@@ -25,6 +25,7 @@ import ecks.services.SrvAuth;
 import ecks.protocols.Protocol;
 import ecks.Configuration;
 import ecks.util;
+import ecks.Logging;
 
 import java.util.Map;
 import java.io.IOException;
@@ -39,9 +40,11 @@ public class Raw extends bCommand {
     public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
         try {
             p.Outgoing(arguments);
+            Logging.warn("SRVOPER", user + " issued raw command!");
+            Logging.info("SRVOPER RAW", arguments);
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            System.err.println(arguments);
+            e.printStackTrace(); 
+            Logging.error("SRVOPER", user + " issued raw command, and it failed miserably.");
         }
     }
 }

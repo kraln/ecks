@@ -19,6 +19,7 @@ package ecks.services;
 
 import ecks.services.modules.CommandDesc;
 import ecks.util;
+import ecks.Logging;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -115,5 +116,6 @@ public class  SrvAuth extends bService {
 
             Users.put(uTemp.toLowerCase().trim(), new SrvAuth_user(uTemp,pTemp,eTemp,aTemp,mTemp));
         }
+        Logging.info("SRVAUTH", "Loaded " + Users.size() + " registered users from database.");
     }
 }

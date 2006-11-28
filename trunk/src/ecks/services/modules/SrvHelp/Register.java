@@ -22,6 +22,7 @@ import ecks.services.modules.CommandDesc;
 import ecks.services.*;
 import ecks.protocols.Protocol;
 import ecks.Configuration;
+import ecks.Logging;
 
 public class Register extends bCommand {
     public final CommandDesc Desc = new CommandDesc("register", 2, true, CommandDesc.access_levels.A_OPER, "Registers a channel.", "<channel>");
@@ -38,6 +39,7 @@ public class Register extends bCommand {
                     if (!temp.getChannels().containsKey(ch)) {
                         temp.getChannels().put(ch, new SrvHelp_channel(ch));
                         p.PrivMessage(who, replyto, "\u0002" + c.getDB().Users.get(user).uid + ":\u0002 Registration Succeeded!");
+                        Logging.info("SRVHELP", "Channel " + ch + " registered by " + user + ".");
                         p.SJoin(who.getname(), ch, "+stn");
                         p.forcemode(who, ch, "+o", who.getname());
                     } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Channel is already registered.");

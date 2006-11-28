@@ -25,6 +25,7 @@ import ecks.services.SrvChannel_channel;
 import ecks.protocols.Protocol;
 import ecks.Configuration;
 import ecks.util;
+import ecks.Logging;
 
 public class Register extends bCommand {
     public final CommandDesc Desc = new CommandDesc("register", 2, true, CommandDesc.access_levels.A_HELPER, "Registers a channel.", "<channel> <user>");
@@ -45,6 +46,7 @@ public class Register extends bCommand {
                         temp.getChannels().put(ch, new SrvChannel_channel(ch, u));
                         temp.getChannels().get(ch).getUsers().put(u, SrvChannel_channel.ChanAccess.C_OWNER);
                         p.PrivMessage(who, replyto, "\u0002" + c.getDB().Users.get(user).uid + ":\u0002 Registration Succeeded!");
+                        Logging.info("SRVCHAN", "Channel " + ch + " registered by " + user + " to " +  u +  ".");
                         p.SJoin(who.getname(), ch, "+stn");
                         p.forcemode(who, ch, "+o", who.getname());
                         

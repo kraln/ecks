@@ -27,22 +27,24 @@ import java.util.HashMap;
 public class bahamut extends bProtocol {
     public void Incoming(String line) {
         if (line == null) {
-            System.out.println("*** Got NULL incoming line! \r\n*** We are bailing!");
-            System.exit(1);
+            Logging.error("PROTOCOL", "Got NULL incoming line!");
+            main.goGracefullyIntoTheNight();
         }
 
         Logging.raw(line,true); // if we're logging raw, this would be the place to deal wif it
 
         if (line.startsWith("ERROR")) // oh no. bail bail bail
         {
-            System.out.println("*** Got an ERROR! \r\n*** We are bailing!");
-            System.exit(1);
+            Logging.error("PROTOCOL", "Recieved Error.");
+            Logging.warn("PROTOCOL RAW", line);
+            main.goGracefullyIntoTheNight();
         }
 
         if (line.startsWith("PING")) // we pong no matter what state we're in
         {
             try {
                 Outgoing("PONG :" + (System.currentTimeMillis() / 1000)); // reply
+                Logging.info("PROTOCOL", "Server ping-ponged...");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -59,10 +61,12 @@ public class bahamut extends bProtocol {
             gecos = line.split(" :")[1];
             uplink = line.split(" ")[7];
             config.Database.Users.put(nick.toLowerCase(), new Client(nick, uplink, ident, host, gecos));
+            Logging.info("PROTOCOL", "Added new client: " +  nick);
             } catch (Exception e)
             {
                 e.printStackTrace();
-                System.err.println(line);
+                Logging.error("PROTOCOL", "Got exception adding new client: " + e.getMessage());
+                Logging.warn("PROTOCOL RAW", line);
             }
 
         }
@@ -86,9 +90,9 @@ public class bahamut extends bProtocol {
                     chan.clientmodes.remove(c); // remove user
                 } catch (NullPointerException npe) {
                     npe.printStackTrace();
-                    System.out.println("Tried to delete '" + c.toString() + "' from collection of");
+                    Logging.error("PROTOCOL", "Caused NPE - tried to delete " + c.toString() + " from the following:");
                     for (Client ch : chan.clientmodes.keySet()) {
-                        System.out.println(ch.toString());
+                        Logging.error("PROTOCOL", "    " + ch.toString());
                     }
                 }
 
@@ -134,6 +138,7 @@ public class bahamut extends bProtocol {
                     cmodes.put(config.Database.Users.get(tusers[i].toLowerCase()), tmode);
                 }
                 config.Database.Channels.put(name.toLowerCase(), new Channel(time, name, modes, cmodes));
+                Logging.info("PROTOCOL", "Added new channel: " +  name);
             } else { // just a user joining
                 if (config.Database.Channels.containsKey(name.toLowerCase())) // if this check fails we fail somewhere
                 {
@@ -164,7 +169,8 @@ public class bahamut extends bProtocol {
             } catch (NullPointerException NPE)
             {
                 NPE.printStackTrace();
-                System.err.println(line);
+                Logging.warn("PROTOCOL", "Caused NPE during rename");
+                Logging.info("PROTOCOL RAW", line);
             }
         }
 
@@ -179,6 +185,7 @@ public class bahamut extends bProtocol {
         {
             if (config.Services.containsKey(line.split(" ")[2].toLowerCase())) {
                 // they've killed one of us. bad idea.
+                Logging.info("PROTOCOL", "Service was killed!");
                 config.Services.get(line.split(" ")[2].toLowerCase()).introduce();
             } else config.Database.Users.remove(line.split(" ")[2].toLowerCase());
         }
@@ -188,6 +195,7 @@ public class bahamut extends bProtocol {
             if (config.Services.containsKey(line.split(" ")[3].toLowerCase()))
             {    // they've kicked one of us. bad idea.
                 SJoin(line.split(" ")[3].toLowerCase(), line.split(" ")[2].toLowerCase(), "+nt");
+                Logging.info("PROTOCOL", "Service was kicked!");
                 forcemode(config.Services.get(line.split(" ")[3].toLowerCase()), line.split(" ")[2].toLowerCase(), "+o", line.split(" ")[3].toLowerCase());
             }
         }
@@ -208,18 +216,22 @@ public class bahamut extends bProtocol {
                     e.printStackTrace();
                 }
                 state = 2;
+                Logging.info("PROTOCOL", "Started Burst.");
             }
         }
 
         if (state == 2) // this is burst. we're going to get some NICKS, channels, etc. handle this stuff
         {
+
             if (line.startsWith("PING")) // after the burst, we get pignal. or just a ping, really
             {
                 state = 3;
+                Logging.info("PROTOCOL", "End of Burst. Bringing agents online...");
             }
         }
         if (state == 3) // time to bring services online
         {
+
             // fall down from above
             try {
                 for (Map.Entry<String, Service> Serve : config.Services.entrySet()) {
@@ -231,17 +243,20 @@ public class bahamut extends bProtocol {
                 // System.exit(1);
             }
             state = 4;
+            Logging.warn("PROTOCOL", "Services Online.");
         }
 
         if (state == 4) // this is our main operational state.
         {
 
-            // the brackets, they do nothing
+            // the brackets, they do nothing -- wtf was I thinking when I wrote this comment - Jeff?
 
             // Example of an in-channel message :Kuja PRIVMSG #debug :SrvChan: hi
             // Example of a private pm          :Kuja PRIVMSG SrvChan :hi
 
-            String split1[] = line.split(" :");
+            int z = line.indexOf(" :");
+            if (z == -1) return;
+            String split1[] = {line.substring(0,z),line.substring(z+2)};
             String split2[] = split1[0].split(" ");
 
             try {
@@ -280,7 +295,8 @@ public class bahamut extends bProtocol {
             } catch (NullPointerException NPE)
             {
                 NPE.printStackTrace();
-                System.err.println("*** IMPORTANT NPE! Line: " + line);
+                Logging.error("PROTOCOL", "Raised Generic NPE...");
+                Logging.info("PROTOCOL RAW", line);
             }
 
             // we're going to be getting lots of nothing, and occasionally some commands
@@ -425,3 +441,5 @@ public class bahamut extends bProtocol {
         }
     }
 }
+
+//:Kuja KICK #debug NuclearFriend :rejoin
