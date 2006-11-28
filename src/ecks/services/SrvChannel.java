@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 import ecks.util;
+import ecks.Logging;
 
 public class SrvChannel extends bService {
     String name = "SrvChan";
@@ -111,7 +112,7 @@ public class SrvChannel extends bService {
                 uTemp.put(util.decodeUTF((t.item(j)).getNodeName()), SrvChannel_channel.ChanAccess.valueOf((t.item(j)).getAttributes().getNamedItem("value").getNodeValue()));
             }
 
-           t = ((Element)XMLin.item(i)).getElementsByTagName("metadata").item(0).getChildNodes();
+            t = ((Element)XMLin.item(i)).getElementsByTagName("metadata").item(0).getChildNodes();
             for (int j =0; j< t.getLength();j++) {
                 if (t.item(j).getNodeType() != 1 ) continue;
                 mTemp.put(util.decodeUTF((t.item(j)).getNodeName()), util.decodeUTF((t.item(j)).getAttributes().getNamedItem("value").getNodeValue()));
@@ -119,5 +120,6 @@ public class SrvChannel extends bService {
 
             Channels.put(nTemp.toLowerCase().trim(), new SrvChannel_channel(nTemp,oTemp,uTemp, sTemp,mTemp));
         }
+        Logging.info("SRVCHAN", "Loaded " + Channels.size() + " registered channels from database.");
     }
 }

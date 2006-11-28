@@ -34,13 +34,13 @@ public class DbThread implements Runnable {
           try {
               Thread.sleep(1000 * 60 * 5);
           } catch (InterruptedException e) {
-              System.out.println("*** We got interrupted! Saving...");
+              Logging.warn("DBTHREAD", "Thread interrupted. Initiating DB Write...");
               Conf.getDB().flushDB(Conf);
-              System.out.println("*** Wrote Database! Breaking out of loop...");
+              Logging.info("DBTHREAD", "DB Write completed...");
               break;
           }
           Conf.getDB().flushDB(Conf);
-          System.out.println("*** Wrote Database");
+          Logging.info("DBTHREAD", "Wrote database...");
       }
       util.getThreads().remove(Thread.currentThread()); // if we're out of this loop, then this thread is over.
     }

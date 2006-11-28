@@ -47,7 +47,8 @@ public class Connection {
              in = new BufferedReader (new InputStreamReader(sock.getInputStream()));
          } catch (IOException e) {
              e.printStackTrace();
-             return;
+             Logging.error("CONNECTION", "Got exception. Probably couldn't bind to the port. Anyway, exception says:" + e.getMessage());
+             main.goGracefullyIntoTheNight();
          }
          prot.setBuffers(out);
 

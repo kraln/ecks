@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import ecks.util;
+import ecks.Logging;
 
 public class SrvHelp extends bService {
     String name = "SrvHelp";
@@ -82,14 +83,15 @@ public class SrvHelp extends bService {
 
             t = ((Element)XMLin.item(i)).getElementsByTagName("name");
             nTemp = util.decodeUTF(t.item(0).getAttributes().getNamedItem("value").getNodeValue());
+
             t = ((Element)XMLin.item(i)).getElementsByTagName("metadata").item(0).getChildNodes();
 
             for (int j =0; j< t.getLength();j++) {
                 if (t.item(j).getNodeType() != 1 ) continue;
                 mTemp.put(util.decodeUTF((t.item(j)).getNodeName()), util.decodeUTF((t.item(j)).getAttributes().getNamedItem("value").getNodeValue()));
             }
-
             Channels.put(nTemp.toLowerCase().trim(), new SrvHelp_channel(nTemp, mTemp));
         }
+        Logging.info("SRVHELP", "Loaded " + Channels.size() + " help channels from database.");
     }
 }

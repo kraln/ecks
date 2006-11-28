@@ -123,7 +123,7 @@ class ConfParse {
                 mval = (cnod.item(i)).getAttributes().getNamedItem("value").getNodeValue();
 
             } catch (NullPointerException N) {
-                // myLog.log("Loading XML Config: EXCEPTION at NODE " + i);
+
             }
             if (!mname.equals("#text") && !mname.equals("#comment")) {
                 conf.Config.put(mname, mval);
@@ -152,19 +152,20 @@ class ConfParse {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
-                System.out.println("Class not found... Bad configuration");
-                System.exit(1);
+                Logging.error("CONFIGURATION", "Exception: Class not found! (check your config)");
+                main.goGracefullyIntoTheNight();
             }
 
             NodeList z = ((Element) nl.item(i)).getElementsByTagName("modules");
             NodeList nle;
             if (z.item(0) != null) {
                 nle = ((Element) z.item(0)).getElementsByTagName("command");
-                // debug - loaded commands here
+                Logging.info("CONFIGURATION", "Loading " + nle.getLength() + " command modules for service " + newSvc + ".");
                 for (int iz = 0; iz < nle.getLength(); iz++) {
                     try {
-                        // I dare you to understand what this line does. I don't
+                        // I dare you to understand what this line does in one go. I can't.
                         conf.Services.get(newSvc.toLowerCase()).addCommand(((CommandModule) Class.forName(((Element) nle.item(iz)).getAttribute("value")).newInstance()).getName().toLowerCase(), (CommandModule) Class.forName(((Element) nle.item(iz)).getAttribute("value")).newInstance());
+                        Logging.verbose("CONFIGURATION", "Loading command module " + ((Element) nle.item(iz)).getAttribute("value") + " for service " + newSvc + ".");
                     } catch (InstantiationException e) {
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {

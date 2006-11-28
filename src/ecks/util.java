@@ -40,6 +40,7 @@ public class util {
         if (threads == null) // not set
             threads = new ArrayList<Thread>();
         threads.add(whattostart);
+        Logging.verbose("THREADING", "New thread created!");
         return whattostart;
     }
 

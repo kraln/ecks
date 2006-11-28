@@ -20,6 +20,7 @@ package ecks.services.modules.SrvAuth;
 import ecks.protocols.Protocol;
 import ecks.Configuration;
 import ecks.util;
+import ecks.Logging;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
 import ecks.services.SrvAuth_user;
@@ -52,8 +53,9 @@ public class Confirm extends bCommand {
                                     {
                                         temp.getUsers().get(arguments.toLowerCase()).update(CommandDesc.access_levels.A_AUTHED);
                                         temp.getUsers().get(arguments.toLowerCase()).rmMeta("cookie");
-                                        p.PrivMessage(who, arguments.toLowerCase(), "\u0002" + c.getDB().Users.get(arguments.toLowerCase()).uid + ":\u0002 Your account has been confirmed!");
-                                    } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 That user doesn't exist!");                                     
+                                        p.PrivMessage(who, arguments.toLowerCase(), "\u0002" + c.getDB().Users.get(arguments.toLowerCase()).uid + ":\u0002 The account has been confirmed!");
+                                        Logging.info("SRVAUTH", "Username " + arguments + " had email confirmed by " + user + ".");
+                                    } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 That user doesn't exist!");
                                 } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Your cookie is wrong!");
                             } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You don't have a cookie!");
                         } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Your cookie contains invalid characters!");

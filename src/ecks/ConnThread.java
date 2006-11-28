@@ -39,10 +39,11 @@ public class ConnThread implements Runnable {
               handoff.Incoming(  stream.readLine().trim() ); // give the incoming line to the protocol handler
           } catch (ClosedByInterruptException e) { // occurs when we get interrupted
               e.printStackTrace();
-              System.out.println("*** Incoming thread interrupted. Breaking loop...");
+              Logging.warn("CONNTHREAD", "Thread is being interrupted.");
               break;
           } catch (NullPointerException npe) {
               npe.printStackTrace();
+              Logging.error("CONNTHREAD", "Uplink closed connection!");
               break; // connection terminated. likely, our uplink cored.
           } catch (IOException e) {
               e.printStackTrace();
@@ -53,6 +54,7 @@ public class ConnThread implements Runnable {
               break; // we've been interrupted. likely going for a shutdown
       }
 
+      Logging.warn("CONNTHREAD", "Thread has broken free of loop.");
       util.getThreads().remove(Thread.currentThread()); // if we're out of this loop, then this thread is over.
 
     }

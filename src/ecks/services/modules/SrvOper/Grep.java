@@ -25,6 +25,7 @@ import ecks.protocols.Protocol;
 import ecks.Configuration;
 import ecks.Client;
 import ecks.Channel;
+import ecks.Logging;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -80,7 +81,10 @@ public class Grep extends bCommand {
                     {
                         if (confirm) {
                             for (int i = 0; i < matches.size(); i++)
+                            {
+                                Logging.warn("SRVOPER", user + " killed more than 10% of the network.!");
                                 p.kill(who, c, ((Client) matches.get(i)).getName(), reason);
+                            }
                         } else
                             p.PrivMessage(who, replyto, "\u0002Error:\u0002 Affects more than 10% of network (" + matches.size() + "/" + c.getDB().Users.size() + ", " + ((matches.size()/c.getDB().Users.size()) * 100) + "%). Confirm by adding CONFIRM to end of command.");
                     } else {
@@ -88,11 +92,13 @@ public class Grep extends bCommand {
                             p.kill(who, c, ((Client) matches.get(i)).getName(), reason);
                     }
                 } else if (cmd.equals("gline")) {
-                    if (matches.size() > (c.getDB().Users.size() / 10))  // we're not going to kill more than 10% without confirm
+                    if (matches.size() > (c.getDB().Users.size() / 10))  // we're not going to akill more than 10% without confirm
                     {
                         if (confirm) {
-                            for (int i = 0; i < matches.size(); i++)
+                            for (int i = 0; i < matches.size(); i++) {
                                 p.gline(who, c, ((Client) matches.get(i)), reason);
+                                Logging.warn("SRVOPER", user + " managed to gline more than 10% of the network!");
+                            }
                         } else
                             p.PrivMessage(who, replyto, "\u0002Error:\u0002 Affects more than 10% of network (" + matches.size() + "/" + c.getDB().Users.size() + ", " + ((matches.size()/c.getDB().Users.size()) * 100) + "%). Confirm by adding CONFIRM to end of command.");
                     } else {
@@ -123,8 +129,10 @@ public class Grep extends bCommand {
                 } else if (cmd.equals("close")) {
                     for (int i = 0; i < matches.size(); i++)
                     {
-                       for (Map.Entry<Client, String> Cl : ((Channel) matches.get(i)).clientmodes.entrySet())
-                            p.kill(who,c,Cl.getKey().uid,"Channel #" +  ((Channel)matches.get(i)).name + " has been closed by network staff."); // kill? maybe we should just kick...                           
+                       for (Map.Entry<Client, String> Cl : ((Channel) matches.get(i)).clientmodes.entrySet()) {
+                            p.kill(who,c,Cl.getKey().uid,"Channel #" +  ((Channel)matches.get(i)).name + " has been closed by network staff."); // kill? maybe we should just kick...
+                            Logging.warn("SRVOPER", user + " closed channel " +  ((Channel)matches.get(i)).name + " !");
+                       }
                     }
                 } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid action for channels. Usage: grep channels [name|topic] [print|close] regexp");
             } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid command. Usage: grep [users|channels] [(uid|ident|mask)(name|topic)] [print|(kill|gline)(close)] regexp");
