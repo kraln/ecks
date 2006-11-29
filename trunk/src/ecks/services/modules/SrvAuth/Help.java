@@ -17,13 +17,13 @@
  */
 package ecks.services.modules.SrvAuth;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
-import ecks.services.modules.CommandModule;
+import ecks.Configuration;
+import ecks.protocols.Protocol;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
-import ecks.protocols.Protocol;
-import ecks.Configuration;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.CommandModule;
+import ecks.services.modules.bCommand;
 import ecks.util;
 
 import java.util.Map;
@@ -40,7 +40,7 @@ public class Help extends bCommand {
         for(Map.Entry<String, CommandModule> z : who.getCommands().entrySet())
         {
             CommandModule cm = z.getValue();
-            if (cm.getDesc().Required_Access.ordinal() <= ((SrvAuth)c.Services.get(c.authservice)).checkAccess(user.toLowerCase()).ordinal())
+            if (cm.getDesc().Required_Access.ordinal() <= ((SrvAuth)Configuration.getSvc().get(Configuration.authservice)).checkAccess(user.toLowerCase()).ordinal())
             {
                 if(!cm.getName().startsWith("\u0001"))
                 {

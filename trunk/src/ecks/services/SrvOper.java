@@ -53,4 +53,8 @@ public class SrvOper extends bService {
                 super.handle(user.toLowerCase(), replyto.toLowerCase(), command);
         }
     }
+    public int getcount()
+    {
+        return -1; // return ideally the number of opers online...
+    }
 }

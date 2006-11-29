@@ -18,6 +18,7 @@
 package ecks.services;
 
 import ecks.services.modules.CommandDesc;
+import ecks.util;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -78,7 +79,7 @@ public class SrvAuth_user { // direct correlation to a database entry
     }
 
     public void cngpass(String p) {
-        password = p;
+        password = util.hash(p);
     }
 
     public void update(String e) {

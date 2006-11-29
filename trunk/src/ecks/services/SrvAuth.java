@@ -48,12 +48,12 @@ public class  SrvAuth extends bService {
     }
 
     public void handle(String user, String replyto, String command) {
-        // don't let people auth or register without fqdn
+        // don't let people auth or register, or change password without fqdn
         String cmd = command.split(" ")[0];
         if (cmd.startsWith("FQDN"))
             super.handle(user.toLowerCase(), replyto.toLowerCase(), command);
         else {
-            if (cmd.toLowerCase().equals("auth") || cmd.toLowerCase().equals("register"))
+            if (cmd.toLowerCase().equals("auth") || cmd.toLowerCase().equals("register") || cmd.toLowerCase().equals("changepass"))
                 proto.PrivMessage(this, replyto, "\u0002Error:\u0002 You \u0002*MUST*\u0002 /msg " + this.getname() + "@" + this.config.Config.get("hostname") + " " + cmd + "!");
             else
                 super.handle(user.toLowerCase(), replyto.toLowerCase(), command);
@@ -117,5 +117,9 @@ public class  SrvAuth extends bService {
             Users.put(uTemp.toLowerCase().trim(), new SrvAuth_user(uTemp,pTemp,eTemp,aTemp,mTemp));
         }
         Logging.info("SRVAUTH", "Loaded " + Users.size() + " registered users from database.");
+    }
+    public int getcount()
+    {
+        return Users.size();
     }
 }

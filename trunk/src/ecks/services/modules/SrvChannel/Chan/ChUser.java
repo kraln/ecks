@@ -24,6 +24,7 @@ import ecks.services.SrvChannel_channel;
 import ecks.services.SrvChannel;
 import ecks.protocols.Protocol;
 import ecks.Configuration;
+import ecks.Storage;
 
 public class ChUser extends bCommand {
     public final CommandDesc Desc = new CommandDesc("chuser", 3, true, CommandDesc.access_levels.A_AUTHED, "Changes a user's access on a channel", "<user> [channel] <access>");
@@ -96,20 +97,20 @@ public class ChUser extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
-                if (c.getDB().Users.containsKey(whom)) {
-                    if (c.getDB().Users.get(whom).authname != null) {
-                        if (c.getDB().Users.get(user).authname != null) {
-                            if (!c.getDB().Users.get(user).authname.equals(c.getDB().Users.get(whom).authname)) {
-                                String aname = c.getDB().Users.get(user).authname;
-                                String bname = c.getDB().Users.get(whom).authname;
+                if (Storage.Users.containsKey(whom)) {
+                    if (Storage.Users.get(whom).authname != null) {
+                        if (Storage.Users.get(user).authname != null) {
+                            if (!Storage.Users.get(user).authname.equals(Storage.Users.get(whom).authname)) {
+                                String aname = Storage.Users.get(user).authname;
+                                String bname = Storage.Users.get(whom).authname;
                                 if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
                                     if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(bname)) {
-                                        SrvChannel_channel.ChanAccess alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(c.getDB().Users.get(user).authname);
-                                        SrvChannel_channel.ChanAccess blevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(c.getDB().Users.get(whom).authname);
+                                        SrvChannel_channel.ChanAccess alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(Storage.Users.get(user).authname);
+                                        SrvChannel_channel.ChanAccess blevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(Storage.Users.get(whom).authname);
                                         if (alevel.ordinal() > blevel.ordinal()) {
                                             if (newacc.ordinal() < alevel.ordinal()) {
-                                                ((SrvChannel) who).getChannels().get(whatchan).getUsers().remove(c.getDB().Users.get(whom).authname);
-                                                ((SrvChannel) who).getChannels().get(whatchan).getUsers().put(c.getDB().Users.get(whom).authname, newacc);
+                                                ((SrvChannel) who).getChannels().get(whatchan).getUsers().remove(Storage.Users.get(whom).authname);
+                                                ((SrvChannel) who).getChannels().get(whatchan).getUsers().put(Storage.Users.get(whom).authname, newacc);
                                                 p.PrivMessage(who, replyto, "User Changed!");
                                             } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You cannot change a user to higher access than yourself!");
                                         } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You cannot change a with higher access than yourself!");

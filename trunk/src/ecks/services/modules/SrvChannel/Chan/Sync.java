@@ -25,6 +25,7 @@ import ecks.services.SrvChannel_channel;
 import ecks.protocols.Protocol;
 import ecks.Configuration;
 import ecks.util;
+import ecks.Storage;
 
 public class Sync extends bCommand {
     public final CommandDesc Desc = new CommandDesc("sync", 1, true, CommandDesc.access_levels.A_NONE, "Synchronizes a user's modes with their access.", "[channel]");
@@ -56,8 +57,8 @@ public class Sync extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
-                if (c.getDB().Users.get(whom).authname != null) {
-                    String aname = c.getDB().Users.get(whom).authname;
+                if (Storage.Users.get(whom).authname != null) {
+                    String aname = Storage.Users.get(whom).authname;
                     if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
                         SrvChannel_channel.ChanAccess alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(aname);
                         String newmode = "+";

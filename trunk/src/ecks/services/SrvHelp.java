@@ -94,4 +94,8 @@ public class SrvHelp extends bService {
         }
         Logging.info("SRVHELP", "Loaded " + Channels.size() + " help channels from database.");
     }
+    public int getcount()
+    {
+        return Channels.size();
+    }
 }

@@ -81,7 +81,7 @@ public class util {
     }
 
     public static String getVersion() {
-        return "0.3A";
+        return "0.3.1A";
     }
 
     public static boolean checkemail(String input) {

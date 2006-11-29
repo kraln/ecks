@@ -122,4 +122,8 @@ public class SrvChannel extends bService {
         }
         Logging.info("SRVCHAN", "Loaded " + Channels.size() + " registered channels from database.");
     }
+    public int getcount()
+    {
+        return Channels.size();
+    }
 }

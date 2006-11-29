@@ -34,8 +34,8 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Document;
 
 public class Storage {
-    public Map<String, Client> Users = new HashMap<String, Client>();
-    public Map<String, Channel> Channels = new HashMap<String, Channel>();
+    public static Map<String, Client> Users = new HashMap<String, Client>();
+    public static Map<String, Channel> Channels = new HashMap<String, Channel>();
 
     public void loadDB(Configuration conf) {
         Document dom = null;
@@ -74,7 +74,7 @@ public class Storage {
 
     }
 
-    public synchronized void flushDB(Configuration conf) {
+    public static synchronized void flushDB(Configuration conf) {
         String out = "";
         for (Map.Entry<String, Service> Serve : conf.Services.entrySet()) {
             out = out + Serve.getValue().getSRVDB(); // get well-formed xml from each

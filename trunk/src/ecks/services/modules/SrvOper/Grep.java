@@ -22,10 +22,7 @@ import ecks.services.modules.CommandDesc;
 import ecks.services.Service;
 import ecks.services.SrvOper;
 import ecks.protocols.Protocol;
-import ecks.Configuration;
-import ecks.Client;
-import ecks.Channel;
-import ecks.Logging;
+import ecks.*;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -57,7 +54,7 @@ public class Grep extends bCommand {
             try {
             if (what.equals("users")) {
                 List matches = new ArrayList<Client>();
-                for (Map.Entry<String, Client> Client : c.getDB().Users.entrySet()) {
+                for (Map.Entry<String, Client> Client : Storage.Users.entrySet()) {
                     if (what2.equals("uid")) {
                         if (Client.getValue().uid.matches(towhat.replace("*", "\\S+")))
                             matches.add(Client.getValue());
@@ -77,7 +74,7 @@ public class Grep extends bCommand {
                     for (int i = 0; i < matches.size(); i++)
                         p.PrivMessage(who, replyto, "   " + matches.get(i).toString());
                 } else if (cmd.equals("kill")) {
-                    if (matches.size() > (c.getDB().Users.size() / 10))  // we're not going to kill more than 10% without confirm
+                    if (matches.size() > (Storage.Users.size() / 10))  // we're not going to kill more than 10% without confirm
                     {
                         if (confirm) {
                             for (int i = 0; i < matches.size(); i++)
@@ -86,13 +83,13 @@ public class Grep extends bCommand {
                                 p.kill(who, c, ((Client) matches.get(i)).getName(), reason);
                             }
                         } else
-                            p.PrivMessage(who, replyto, "\u0002Error:\u0002 Affects more than 10% of network (" + matches.size() + "/" + c.getDB().Users.size() + ", " + ((matches.size()/c.getDB().Users.size()) * 100) + "%). Confirm by adding CONFIRM to end of command.");
+                            p.PrivMessage(who, replyto, "\u0002Error:\u0002 Affects more than 10% of network (" + matches.size() + "/" + Storage.Users.size() + ", " + ((matches.size()/Storage.Users.size()) * 100) + "%). Confirm by adding CONFIRM to end of command.");
                     } else {
                         for (int i = 0; i < matches.size(); i++)
                             p.kill(who, c, ((Client) matches.get(i)).getName(), reason);
                     }
                 } else if (cmd.equals("gline")) {
-                    if (matches.size() > (c.getDB().Users.size() / 10))  // we're not going to akill more than 10% without confirm
+                    if (matches.size() > (Storage.Users.size() / 10))  // we're not going to akill more than 10% without confirm
                     {
                         if (confirm) {
                             for (int i = 0; i < matches.size(); i++) {
@@ -100,7 +97,7 @@ public class Grep extends bCommand {
                                 Logging.warn("SRVOPER", user + " managed to gline more than 10% of the network!");
                             }
                         } else
-                            p.PrivMessage(who, replyto, "\u0002Error:\u0002 Affects more than 10% of network (" + matches.size() + "/" + c.getDB().Users.size() + ", " + ((matches.size()/c.getDB().Users.size()) * 100) + "%). Confirm by adding CONFIRM to end of command.");
+                            p.PrivMessage(who, replyto, "\u0002Error:\u0002 Affects more than 10% of network (" + matches.size() + "/" + Storage.Users.size() + ", " + ((matches.size()/Storage.Users.size()) * 100) + "%). Confirm by adding CONFIRM to end of command.");
                     } else {
                         for (int i = 0; i < matches.size(); i++)
                             p.gline(who, c, ((Client) matches.get(i)), reason);
@@ -109,7 +106,7 @@ public class Grep extends bCommand {
                     p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid action for user. Usage: grep users [uid|mask|ident] [print|kill|gline] regexp");
             } else if (what.equals("channels")) {
                 List matches = new ArrayList<Channel>();
-                for (Map.Entry<String, Channel> Client : c.getDB().Channels.entrySet()) {
+                for (Map.Entry<String, Channel> Client : Storage.Channels.entrySet()) {
                     if (what2.equals("name")) {
                         if (Client.getValue().name.matches(towhat.replace("*", "\\S+")))
                             matches.add(Client.getValue());

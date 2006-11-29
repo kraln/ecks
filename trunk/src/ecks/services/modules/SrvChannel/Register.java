@@ -26,6 +26,7 @@ import ecks.protocols.Protocol;
 import ecks.Configuration;
 import ecks.util;
 import ecks.Logging;
+import ecks.Storage;
 
 public class Register extends bCommand {
     public final CommandDesc Desc = new CommandDesc("register", 2, true, CommandDesc.access_levels.A_HELPER, "Registers a channel.", "<channel> <user>");
@@ -38,14 +39,14 @@ public class Register extends bCommand {
         SrvChannel temp = ((SrvChannel) who);
         String args[] = arguments.split(" ");
         if (args.length == 2) {
-            if (c.getDB().Users.containsKey(args[1].toLowerCase())) {
-                if (c.getDB().Users.get(args[1].toLowerCase()).authname != null) {
-                    String u = c.getDB().Users.get(args[1].toLowerCase()).authname;
+            if (Storage.Users.containsKey(args[1].toLowerCase())) {
+                if (Storage.Users.get(args[1].toLowerCase()).authname != null) {
+                    String u = Storage.Users.get(args[1].toLowerCase()).authname;
                     String ch = args[0].toLowerCase();
                     if (!temp.getChannels().containsKey(ch)) {
                         temp.getChannels().put(ch, new SrvChannel_channel(ch, u));
                         temp.getChannels().get(ch).getUsers().put(u, SrvChannel_channel.ChanAccess.C_OWNER);
-                        p.PrivMessage(who, replyto, "\u0002" + c.getDB().Users.get(user).uid + ":\u0002 Registration Succeeded!");
+                        p.PrivMessage(who, replyto, "\u0002" + Storage.Users.get(user).uid + ":\u0002 Registration Succeeded!");
                         Logging.info("SRVCHAN", "Channel " + ch + " registered by " + user + " to " +  u +  ".");
                         p.SJoin(who.getname(), ch, "+stn");
                         p.forcemode(who, ch, "+o", who.getname());

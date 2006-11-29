@@ -17,14 +17,13 @@
  */
 package ecks.services.modules.SrvAuth;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
+import ecks.Configuration;
+import ecks.protocols.Protocol;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
 import ecks.services.SrvAuth_user;
-import ecks.protocols.Protocol;
-import ecks.Configuration;
-import ecks.Client;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
 import java.util.Map;
 

@@ -23,7 +23,7 @@ import ecks.services.Service;
 import ecks.services.SrvChannel;
 import ecks.services.SrvChannel_channel;
 import ecks.protocols.Protocol;
-import ecks.Configuration;
+import ecks.Configuration;import ecks.Storage;
 
 public class AddUser extends bCommand {
     public final CommandDesc Desc = new CommandDesc("adduser", 3, true, CommandDesc.access_levels.A_AUTHED, "Adds a user to a channel. Access is one of [none|peon|chanop|master|coowner].", "<user> [channel] [access]");
@@ -104,17 +104,17 @@ public class AddUser extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
-                if (c.getDB().Users.containsKey(whom)) {
-                    if (c.getDB().Users.get(whom).authname != null) {
-                        if (c.getDB().Users.get(user).authname != null) {
-                            if (!c.getDB().Users.get(user).authname.equals(c.getDB().Users.get(whom).authname)) {
-                                String aname = c.getDB().Users.get(user).authname;
-                                String bname = c.getDB().Users.get(whom).authname;
+                if (Storage.Users.containsKey(whom)) {
+                    if (Storage.Users.get(whom).authname != null) {
+                        if (Storage.Users.get(user).authname != null) {
+                            if (!Storage.Users.get(user).authname.equals(Storage.Users.get(whom).authname)) {
+                                String aname = Storage.Users.get(user).authname;
+                                String bname = Storage.Users.get(whom).authname;
                                 if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
                                     if (!((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(bname)) {
                                         SrvChannel_channel.ChanAccess alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(aname);
                                         if (newacc.ordinal() < alevel.ordinal()) {
-                                            ((SrvChannel) who).getChannels().get(whatchan).getUsers().put(c.getDB().Users.get(whom).authname, newacc);
+                                            ((SrvChannel) who).getChannels().get(whatchan).getUsers().put(Storage.Users.get(whom).authname, newacc);
                                             p.PrivMessage(who, replyto, "User Added!");
                                         } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You cannot grant a user higher access than yourself!");
                                     } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You have no access to channel!");

@@ -20,15 +20,13 @@ package ecks;
 import ecks.protocols.*;
 
 import java.net.InetAddress;
-import java.util.Map;
-import java.util.HashMap;
+import org.apache.xmlrpc.WebServer;
 
 public class main {
 
-    public static void main(String[] args) throws Exception {
+    static Configuration myConf = new Configuration(); // hold our configuration
 
-        // get our configuration
-        Configuration myConf = new Configuration();
+    public static void main(String[] args) throws Exception {
 
         // declare our protocol
         Protocol myProto = null;
@@ -74,6 +72,16 @@ public class main {
 
         myConnection.Connect(); // cross our fingers and connect
         Logging.info("STARTUP", "Connection attempted...");
+
+        if (myConf.Config.get("localport").equals("any"))
+            myConf.RPCServer = new WebServer(8081);
+        else
+            myConf.RPCServer = new WebServer(Integer.parseInt(myConf.Config.get("localport"))+1,inetT);
+
+        myConf.RPCServer.addHandler("ecks", new RPCHandler());
+        myConf.RPCServer.start();
+
+        Logging.info("STARTUP", "XMLRPC Started...");
         Logging.verbose("STARTUP", "Good luck!");
     }
 
@@ -82,6 +90,8 @@ public class main {
         Logging.warn("SHUTDOWN", "Interrupting Threads...");
         for (Thread t : util.getThreads())
             t.interrupt();
+        Logging.warn("SHUTDOWN", "Stopping RPC");
+        myConf.RPCServer.shutdown();
         Logging.warn("SHUTDOWN", "Goodbye."); // should put summary here.
         // if we're not done by this point, something is terribly amiss
     }

@@ -43,8 +43,8 @@ public class Help extends bCommand {
 
         for (Map.Entry<String, CommandModule> z : who.getCommands().entrySet()) {
             CommandModule cm = z.getValue();
-            if (c.Services.containsKey(c.authservice)) {
-                if (cm.getDesc().Required_Access.ordinal() <= ((SrvAuth) c.Services.get(c.authservice)).checkAccess(user.toLowerCase()).ordinal())
+            if (Configuration.getSvc().containsKey(Configuration.authservice)) {
+                if (cm.getDesc().Required_Access.ordinal() <= ((SrvAuth)Configuration.getSvc().get(Configuration.authservice)).checkAccess(user.toLowerCase()).ordinal())
                 {
                     if (!cm.getName().startsWith("\u0001")) {
                         p.PrivMessage(who, user, "\u0002" + util.pad(z.getKey(), 12) + "\u0002" + cm.getDesc().arguments);

@@ -54,6 +54,7 @@ public abstract class bService implements Service {
 
     public void handle(String user, String replyto, String command) {
         boolean inchan = (!user.equals(replyto));
+        command = command.trim();
         String cmd = command.split(" ")[0];
 
         if (cmd.startsWith("FQDN"))
@@ -69,13 +70,13 @@ public abstract class bService implements Service {
             {
                 if (command.split(" ").length <= (c.ArgCount + 1)) // too many arguments check
                 {
-                    if (config.getSvc().containsKey(config.authservice)) // if we have an authserv
+                    if (Configuration.getSvc().containsKey(Configuration.authservice)) // if we have an authserv
                     {
                         CommandDesc.access_levels req = Commands.get(cmd.toLowerCase()).getDesc().Required_Access;
                         String handle = null;
-                        if (config.getDB().Users.containsKey(user.toLowerCase()))
-                            handle = config.getDB().Users.get(user.toLowerCase()).authname;
-                        CommandDesc.access_levels cur = ((SrvAuth) config.getSvc().get(config.authservice)).checkAccess(handle);
+                        if (Storage.Users.containsKey(user.toLowerCase()))
+                            handle = Storage.Users.get(user.toLowerCase()).authname;
+                        CommandDesc.access_levels cur = ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).checkAccess(handle);
                         if ((handle != null) || (req.ordinal() == 0)) { // we're authed, or the command doesn't care
                             if (cur.ordinal() >= req.ordinal()) { // if we have the access
                                 Logging.verbose("SERVICE", "Handling command: " + cmd + ", for user: " + user + ".");
