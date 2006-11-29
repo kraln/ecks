@@ -24,6 +24,7 @@ import ecks.protocols.Protocol;
 import ecks.Configuration;
 import ecks.Client;
 import ecks.Channel;
+import ecks.Storage;
 
 import java.util.Map;
 
@@ -32,12 +33,12 @@ public class DumpInfo extends bCommand {
     public CommandDesc getDesc() { return Desc; }
     public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
         p.PrivMessage(who, replyto, "\u0002Users:\u0002");
-        for(Map.Entry<String, Client> t : c.getDB().Users.entrySet())
+        for(Map.Entry<String, Client> t : Storage.Users.entrySet())
         {
             p.PrivMessage(who, replyto, "  " + t.toString());
         }
         p.PrivMessage(who, replyto, "\u0002Channels:\u0002");
-        for(Map.Entry<String, Channel> t : c.getDB().Channels.entrySet())
+        for(Map.Entry<String, Channel> t : Storage.Channels.entrySet())
         {
             p.PrivMessage(who, replyto, "  " + t.toString());
         }

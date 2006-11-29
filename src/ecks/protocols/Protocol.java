@@ -43,4 +43,6 @@ public interface Protocol {
     void diegraceful(String message);
     void forcemode(Service me, String channel, String mode, String who);
     void setauthed(Service me, Configuration conf, String who);
+    void kick(Service me, String who, String where, String why);
+    void invite(Service me, String who, String where);
 }

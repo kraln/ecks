@@ -25,7 +25,7 @@ public class Logging {
 
     public static enum loglevels { D_NONE, D_ERRORS, D_WARN, D_SUMMARY, D_INFO, D_VERBOSE }
 
-    static loglevels myLogLevel;
+    public static loglevels myLogLevel;
     static boolean inchan;
     static Writer out;
     static Protocol myP;

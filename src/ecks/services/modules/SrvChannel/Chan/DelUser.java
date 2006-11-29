@@ -23,7 +23,7 @@ import ecks.services.Service;
 import ecks.services.SrvChannel_channel;
 import ecks.services.SrvChannel;
 import ecks.protocols.Protocol;
-import ecks.Configuration;
+import ecks.Configuration;import ecks.Storage;
 
 public class DelUser extends bCommand {
     public final CommandDesc Desc = new CommandDesc("deluser", 2, true, CommandDesc.access_levels.A_AUTHED, "Removes a user from a channel", "<user> [channel]");
@@ -69,16 +69,16 @@ public class DelUser extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
-                if (c.getDB().Users.containsKey(whom)) {
-                    if (c.getDB().Users.get(whom).authname != null) {
-                        if (c.getDB().Users.get(user).authname != null) {
-                            String aname = c.getDB().Users.get(user).authname;
+                if (Storage.Users.containsKey(whom)) {
+                    if (Storage.Users.get(whom).authname != null) {
+                        if (Storage.Users.get(user).authname != null) {
+                            String aname = Storage.Users.get(user).authname;
                             if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
-                                if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(c.getDB().Users.get(whom).authname)) {
+                                if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(Storage.Users.get(whom).authname)) {
                                     SrvChannel_channel.ChanAccess alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(aname);
-                                    SrvChannel_channel.ChanAccess blevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(c.getDB().Users.get(whom).authname);
+                                    SrvChannel_channel.ChanAccess blevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(Storage.Users.get(whom).authname);
                                     if (blevel.ordinal() < alevel.ordinal()) {
-                                        ((SrvChannel) who).getChannels().get(whatchan).getUsers().remove(c.getDB().Users.get(whom).authname);
+                                        ((SrvChannel) who).getChannels().get(whatchan).getUsers().remove(Storage.Users.get(whom).authname);
                                         p.PrivMessage(who, replyto, "User Removed!");
                                     } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You cannot remove a user of higher access than yourself!");
                                 } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 User already has no access to channel!");

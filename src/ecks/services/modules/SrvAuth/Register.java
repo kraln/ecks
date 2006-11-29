@@ -17,14 +17,15 @@
  */
 package ecks.services.modules.SrvAuth;
 
-import ecks.protocols.Protocol;
 import ecks.Configuration;
-import ecks.util;
+import ecks.Storage;
+import ecks.protocols.Protocol;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
 import ecks.services.SrvAuth_user;
 import ecks.services.modules.CommandDesc;
 import ecks.services.modules.bCommand;
+import ecks.util;
 
 public class Register extends bCommand {
     public final CommandDesc Desc = new CommandDesc("register", 3, false, CommandDesc.access_levels.A_NONE, "Registers your account with services", "<username> <password> <email address>");
@@ -37,7 +38,7 @@ public class Register extends bCommand {
         SrvAuth temp = ((SrvAuth) who);
         String args[] = arguments.split(" ");
         if (args.length == 3) {
-            if (c.getDB().Users.get(user).authname == null) {
+            if (Storage.Users.get(user).authname == null) {
                 String u = args[0].toLowerCase();
                 if (util.sanitize(u)) {
                     if (!temp.getUsers().containsKey(u)) {
@@ -49,15 +50,15 @@ public class Register extends bCommand {
                                 if (!(temp.getUsers().size()==0))
                                 {
                                     temp.getUsers().put(u, new SrvAuth_user(u, pw, e, CommandDesc.access_levels.A_PENDING));
-                                    c.getDB().Users.get(user).authname = u.trim().toLowerCase(); // user is now authed
+                                    Storage.Users.get(user).authname = u.trim().toLowerCase(); // user is now authed
                                     String tCookie = util.makeCookie();
                                     temp.getUsers().get(u).setMeta("cookie", tCookie);
                                     util.SendRegMail(e, tCookie);
-                                    p.PrivMessage(who, replyto, "\u0002" + c.getDB().Users.get(user).uid + ":\u0002 Registration Succeeded!");
+                                    p.PrivMessage(who, replyto, "\u0002" + Storage.Users.get(user).uid + ":\u0002 Registration Succeeded!");
                                 } else { // first registration is an SRA
                                     temp.getUsers().put(u, new SrvAuth_user(u, pw, e, CommandDesc.access_levels.A_SRA));
-                                    c.getDB().Users.get(user).authname = u.trim().toLowerCase(); // user is now authed
-                                    p.PrivMessage(who, replyto, "\u0002" + c.getDB().Users.get(user).uid + ":\u0002 Registration Succeeded! You are now an SRA!");
+                                    Storage.Users.get(user).authname = u.trim().toLowerCase(); // user is now authed
+                                    p.PrivMessage(who, replyto, "\u0002" + Storage.Users.get(user).uid + ":\u0002 Registration Succeeded! You are now an SRA!");
                                 }
                             } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid Email Address");
                         } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Password contains invalid characters");

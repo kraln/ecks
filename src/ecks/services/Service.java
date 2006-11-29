@@ -32,6 +32,7 @@ public abstract interface Service {
     public void Initialize(Configuration c, Protocol p, String n);
     public void introduce();
     public String getname();
+    public int getcount();
     public void setname(String nname);
     public void handle(String user, String replyto, String command);
     public void diegraceful(String message);

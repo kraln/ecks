@@ -24,6 +24,7 @@ import java.util.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.apache.xmlrpc.WebServer;
 
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
@@ -34,12 +35,13 @@ import ecks.services.modules.CommandModule;
 
 public class Configuration {
     public Map<String, String> Config;
-    public Map<String, Service> Services;
-    public Storage Database;
-    public Object cp;
-    public String authservice;
-    public String chanservice;
-    public String logservice; // what service ends up logging in-chan
+    static Map<String, Service> Services;
+    public static Storage Database;
+    public WebServer RPCServer;
+    Object cp;
+    public static String authservice;
+    public static String chanservice;
+    public static String logservice; // what service ends up logging in-chan
 
     Configuration() {
         Config = new HashMap<String, String>();
@@ -51,12 +53,12 @@ public class Configuration {
         logservice = "";
     }
 
-    public Storage getDB()
+    public static Storage getDB()
     {
         return Database;
     }
 
-    public Map<String,Service> getSvc()
+    public static Map<String,Service> getSvc()
     {
         return Services;
     }

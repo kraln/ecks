@@ -17,14 +17,15 @@
  */
 package ecks.services.modules.SrvAuth;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
+import ecks.Configuration;
+import ecks.Logging;
+import ecks.Storage;
+import ecks.protocols.Protocol;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
-import ecks.protocols.Protocol;
-import ecks.Configuration;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 import ecks.util;
-import ecks.Logging;
 
 public class Promote extends bCommand {
     public final CommandDesc Desc = new CommandDesc("promote", 2, true, CommandDesc.access_levels.A_HELPER, "Gives user services access.");
@@ -47,11 +48,11 @@ public class Promote extends bCommand {
         if (args.length == 2) {
             if (util.sanitize(tU)) {
                 if (temp.getUsers().containsKey(tU)) {
-                    if ((temp.getUsers().get(c.getDB().Users.get(user).authname)).getAccess().ordinal() > (temp.getUsers().get(tU).getAccess().ordinal() + 1)) { // we can only promote who are below us by two
-                        if ((temp.getUsers().get(c.getDB().Users.get(user).authname)).getAccess().ordinal() > (tA.ordinal())) {
+                    if ((temp.getUsers().get(Storage.Users.get(user).authname)).getAccess().ordinal() > (temp.getUsers().get(tU).getAccess().ordinal() + 1)) { // we can only promote who are below us by two
+                        if ((temp.getUsers().get(Storage.Users.get(user).authname)).getAccess().ordinal() > (tA.ordinal())) {
                         temp.getUsers().get(tU).update(tA); // update the account
                         p.PrivMessage(who, replyto, "User account promoted to " + tA + ".");
-                        } else if ((temp.getUsers().get(c.getDB().Users.get(user).authname)).getAccess().equals(CommandDesc.access_levels.A_SRA)) { // if we're an SRA, we can do whatever we damn well please.
+                        } else if ((temp.getUsers().get(Storage.Users.get(user).authname)).getAccess().equals(CommandDesc.access_levels.A_SRA)) { // if we're an SRA, we can do whatever we damn well please.
                             temp.getUsers().get(tU).update(tA); // update the account
                             p.PrivMessage(who, replyto, "User account promoted to " + tA + ".");
                             Logging.info("SRVAUTH", "Account " + tU + " promoted by " + user + " to " + tA +  ".");

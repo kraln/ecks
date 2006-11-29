@@ -60,7 +60,7 @@ public class bahamut extends bProtocol {
             ident = line.split(" ")[5];
             gecos = line.split(" :")[1];
             uplink = line.split(" ")[7];
-            config.Database.Users.put(nick.toLowerCase(), new Client(nick, uplink, ident, host, gecos));
+            Storage.Users.put(nick.toLowerCase(), new Client(nick, uplink, ident, host, gecos));
             Logging.info("PROTOCOL", "Added new client: " +  nick);
             } catch (Exception e)
             {
@@ -80,11 +80,11 @@ public class bahamut extends bProtocol {
             cname = line.split(" ")[0].substring(1).toLowerCase();
             channame = line.split(" ")[2];
 
-            c = config.Database.Users.get(cname.toLowerCase()); // this should never, ever fail if we're sync'd
+            c = Storage.Users.get(cname.toLowerCase()); // this should never, ever fail if we're sync'd
 
-            if (config.Database.Channels.containsKey(channame.toLowerCase())) // it had better...
+            if (Storage.Channels.containsKey(channame.toLowerCase())) // it had better...
             {
-                chan = config.Database.Channels.get(channame.toLowerCase());
+                chan = Storage.Channels.get(channame.toLowerCase());
 
                 try {
                     chan.clientmodes.remove(c); // remove user
@@ -97,12 +97,12 @@ public class bahamut extends bProtocol {
                 }
 
                 if (chan.clientmodes.size() == 0) // no more users in this channel, it goes boom
-                    config.Database.Channels.remove(channame.toLowerCase());
+                    Storage.Channels.remove(channame.toLowerCase());
 
-                for (String s : config.Services.keySet()) {
-                    if (config.Services.get(s).getCommands().containsKey("desync")) // if we care about userparts
+                for (String s : Configuration.getSvc().keySet()) {
+                    if (Configuration.getSvc().get(s).getCommands().containsKey("desync")) // if we care about userparts
                     {
-                        config.Services.get(s).handle
+                        Configuration.getSvc().get(s).handle
                                 (line.split(" ")[0].substring(1).toLowerCase(), channame, "desync silent");
                     }
                 }
@@ -135,24 +135,24 @@ public class bahamut extends bProtocol {
                         tmode += "v";
                         tusers[i] = tusers[i].substring(1);
                     }
-                    cmodes.put(config.Database.Users.get(tusers[i].toLowerCase()), tmode);
+                    cmodes.put(Storage.Users.get(tusers[i].toLowerCase()), tmode);
                 }
-                config.Database.Channels.put(name.toLowerCase(), new Channel(time, name, modes, cmodes));
+                Storage.Channels.put(name.toLowerCase(), new Channel(time, name, modes, cmodes));
                 Logging.info("PROTOCOL", "Added new channel: " +  name);
             } else { // just a user joining
-                if (config.Database.Channels.containsKey(name.toLowerCase())) // if this check fails we fail somewhere
+                if (Storage.Channels.containsKey(name.toLowerCase())) // if this check fails we fail somewhere
                 {
-                    cmodes = config.Database.Channels.get(name.toLowerCase()).clientmodes;
-                    int t = config.Database.Channels.get(name.toLowerCase()).ts;
-                    String m = config.Database.Channels.get(name.toLowerCase()).modes;
-                    cmodes.put(config.Database.Users.get(line.split(" ")[0].substring(1).toLowerCase()), "");
-                    config.Database.Channels.remove(name.toLowerCase());
-                    config.Database.Channels.put(name.toLowerCase(), new Channel(t, name, m, cmodes));
+                    cmodes = Storage.Channels.get(name.toLowerCase()).clientmodes;
+                    int t = Storage.Channels.get(name.toLowerCase()).ts;
+                    String m = Storage.Channels.get(name.toLowerCase()).modes;
+                    cmodes.put(Storage.Users.get(line.split(" ")[0].substring(1).toLowerCase()), "");
+                    Storage.Channels.remove(name.toLowerCase());
+                    Storage.Channels.put(name.toLowerCase(), new Channel(t, name, m, cmodes));
 
-                    for (String s : config.Services.keySet()) {
-                        if (config.Services.get(s).getCommands().containsKey("sync")) // if we care about userjoins
+                    for (String s : Configuration.getSvc().keySet()) {
+                        if (Configuration.getSvc().get(s).getCommands().containsKey("sync")) // if we care about userjoins
                         {
-                            config.Services.get(s).handle
+                            Configuration.getSvc().get(s).handle
                                     (line.split(" ")[0].substring(1).toLowerCase(), name, "sync silent");
                         }
                     }
@@ -163,9 +163,9 @@ public class bahamut extends bProtocol {
         if (line.split(" ")[1].equals("NICK")) // just a rename
         {
             try {
-            config.Database.Users.put(line.split(" ")[2].toLowerCase(), config.Database.Users.get(line.split(" ")[0].substring(1).toLowerCase()));
-            config.Database.Users.get(line.split(" ")[2].toLowerCase()).uid = line.split(" ")[2];
-            config.Database.Users.remove(line.split(" ")[0].substring(1).toLowerCase());
+            Storage.Users.put(line.split(" ")[2].toLowerCase(), Storage.Users.get(line.split(" ")[0].substring(1).toLowerCase()));
+            Storage.Users.get(line.split(" ")[2].toLowerCase()).uid = line.split(" ")[2];
+            Storage.Users.remove(line.split(" ")[0].substring(1).toLowerCase());
             } catch (NullPointerException NPE)
             {
                 NPE.printStackTrace();
@@ -177,26 +177,26 @@ public class bahamut extends bProtocol {
         if (line.split(" ")[1].equals("QUIT")) // farvel fair user
         //:O35012812 QUIT :Client Quit
         {
-            config.Database.Users.remove(line.split(" ")[0].substring(1).toLowerCase());
+            Storage.Users.remove(line.split(" ")[0].substring(1).toLowerCase());
         }
 
         if (line.split(" ")[1].equals("KILL")) // farvel asshat
         //:nocebo KILL SrvChan :US.Hub.GamesNET.net!nocebo.!nocebo!nocebo (bye)
         {
-            if (config.Services.containsKey(line.split(" ")[2].toLowerCase())) {
+            if (Configuration.getSvc().containsKey(line.split(" ")[2].toLowerCase())) {
                 // they've killed one of us. bad idea.
                 Logging.info("PROTOCOL", "Service was killed!");
-                config.Services.get(line.split(" ")[2].toLowerCase()).introduce();
-            } else config.Database.Users.remove(line.split(" ")[2].toLowerCase());
+                Configuration.getSvc().get(line.split(" ")[2].toLowerCase()).introduce();
+            } else Storage.Users.remove(line.split(" ")[2].toLowerCase());
         }
         // :Kuja KICK #debug ChanServ :feck off // someone's getting kicked - do we care?
         if (line.split(" ")[1].equals("KICK")) // we only care if this is us, on non-ulined servers
         {
-            if (config.Services.containsKey(line.split(" ")[3].toLowerCase()))
+            if (Configuration.getSvc().containsKey(line.split(" ")[3].toLowerCase()))
             {    // they've kicked one of us. bad idea.
                 SJoin(line.split(" ")[3].toLowerCase(), line.split(" ")[2].toLowerCase(), "+nt");
                 Logging.info("PROTOCOL", "Service was kicked!");
-                forcemode(config.Services.get(line.split(" ")[3].toLowerCase()), line.split(" ")[2].toLowerCase(), "+o", line.split(" ")[3].toLowerCase());
+                forcemode(Configuration.getSvc().get(line.split(" ")[3].toLowerCase()), line.split(" ")[2].toLowerCase(), "+o", line.split(" ")[3].toLowerCase());
             }
         }
 
@@ -234,7 +234,7 @@ public class bahamut extends bProtocol {
 
             // fall down from above
             try {
-                for (Map.Entry<String, Service> Serve : config.Services.entrySet()) {
+                for (Map.Entry<String, Service> Serve : Configuration.getSvc().entrySet()) {
                     Serve.getValue().Initialize(config, this, Serve.getKey());
                     Serve.getValue().introduce(); // tell all the ladies about our services
                 }
@@ -270,24 +270,24 @@ public class bahamut extends bProtocol {
                         {
                             String who = split1[1];
                             who = who.substring(0, who.indexOf(':')).toLowerCase();
-                            if (config.Services.containsKey(who)) // you're talking to me
+                            if (Configuration.getSvc().containsKey(who)) // you're talking to me
                             {
-                                config.Services.get(who).handle(split2[0].substring(1).toLowerCase(), split2[2].toLowerCase(),
+                                Configuration.getSvc().get(who).handle(split2[0].substring(1).toLowerCase(), split2[2].toLowerCase(),
                                         split1[1].substring(who.length() + 1).trim());
                             }
                         }
                     } else if (split1[1].startsWith("\u0001")) {  // is a ctcp, you're talking to me
-                        config.Services.get(split2[2].toLowerCase()).handle
+                        Configuration.getSvc().get(split2[2].toLowerCase()).handle
                                 (split2[0].substring(1).toLowerCase(), split2[0].substring(1).toLowerCase(), "\u0001" + split1[1].trim());
                     } else { // is a private message
-                        if (config.Services.containsKey(split2[2].toLowerCase())) // you're talking to me
+                        if (Configuration.getSvc().containsKey(split2[2].toLowerCase())) // you're talking to me
                         {
-                            config.Services.get(split2[2].toLowerCase()).handle(split2[0].substring(1).toLowerCase(), split2[0].substring(1).toLowerCase(), split1[1].trim());
+                            Configuration.getSvc().get(split2[2].toLowerCase()).handle(split2[0].substring(1).toLowerCase(), split2[0].substring(1).toLowerCase(), split1[1].trim());
                         }
                         if (split2[2].contains("@")) // fully qualified
-                            if (config.Services.containsKey(split2[2].toLowerCase().subSequence(0, split2[2].indexOf("@")))) // you're talking to me
+                            if (Configuration.getSvc().containsKey(split2[2].toLowerCase().subSequence(0, split2[2].indexOf("@")))) // you're talking to me
                             {
-                                config.Services.get(split2[2].toLowerCase().subSequence(0, split2[2].indexOf("@"))).handle(split2[0].substring(1).toLowerCase(), split2[0].substring(1).toLowerCase(), "FQDN" + split1[1].trim());
+                                Configuration.getSvc().get(split2[2].toLowerCase().subSequence(0, split2[2].indexOf("@"))).handle(split2[0].substring(1).toLowerCase(), split2[0].substring(1).toLowerCase(), "FQDN" + split1[1].trim());
                             }
                     }
                 }
@@ -320,9 +320,9 @@ public class bahamut extends bProtocol {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (!config.Database.Users.containsKey(servicename.toLowerCase())) // we had better not already exist. grumble
+        if (!Storage.Users.containsKey(servicename.toLowerCase())) // we had better not already exist. grumble
         {
-            config.Database.Users.put(servicename.toLowerCase(), new Client("", "", servicename, config.Config.get("hostname"), ""));
+            Storage.Users.put(servicename.toLowerCase(), new Client("", "", servicename, config.Config.get("hostname"), ""));
         }
         setauthed(who, config, servicename);
     }
@@ -335,18 +335,18 @@ public class bahamut extends bProtocol {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (!config.Database.Channels.containsKey(where.toLowerCase())) // we're making this channel by joining it
+        if (!Storage.Channels.containsKey(where.toLowerCase())) // we're making this channel by joining it
         {
             Map<Client, String> blah = new HashMap<Client, String>();
-            blah.put(config.Database.Users.get(servicename.toLowerCase()), "+o");
-            config.Database.Channels.put(where.toLowerCase(), new Channel((int) (System.currentTimeMillis() / 1000), where, modes, blah));
+            blah.put(Storage.Users.get(servicename.toLowerCase()), "+o");
+            Storage.Channels.put(where.toLowerCase(), new Channel((int) (System.currentTimeMillis() / 1000), where, modes, blah));
         } else { // gotta update the channel...
-            Map<Client, String> blah = config.Database.Channels.get(where.toLowerCase()).clientmodes;
-            int t = config.Database.Channels.get(where.toLowerCase()).ts;
-            String m = config.Database.Channels.get(where.toLowerCase()).modes;
-            blah.put(config.Database.Users.get(servicename.toLowerCase()), "+o");
-            config.Database.Channels.remove(where.toLowerCase());
-            config.Database.Channels.put(where.toLowerCase(), new Channel(t, where, m, blah));
+            Map<Client, String> blah = Storage.Channels.get(where.toLowerCase()).clientmodes;
+            int t = Storage.Channels.get(where.toLowerCase()).ts;
+            String m = Storage.Channels.get(where.toLowerCase()).modes;
+            blah.put(Storage.Users.get(servicename.toLowerCase()), "+o");
+            Storage.Channels.remove(where.toLowerCase());
+            Storage.Channels.put(where.toLowerCase(), new Channel(t, where, m, blah));
         }
     }
 
@@ -381,7 +381,7 @@ public class bahamut extends bProtocol {
     public void diegraceful(String message) {
         if (message.trim().equals("")) diegraceful(); // no empty messages
 
-        for (Map.Entry<String, Service> Serve : config.Services.entrySet()) {
+        for (Map.Entry<String, Service> Serve : Configuration.getSvc().entrySet()) {
             Serve.getValue().diegraceful(message); // quit each
         }
         try {
@@ -415,13 +415,13 @@ public class bahamut extends bProtocol {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Map<Client, String> blah = config.Database.Channels.get(chan.toLowerCase()).clientmodes;
-        int t = config.Database.Channels.get(chan.toLowerCase()).ts;
-        String m = config.Database.Channels.get(chan.toLowerCase()).modes;
-        blah.remove(config.Database.Users.get(me.getname().toLowerCase()));
-        config.Database.Channels.remove(chan.toLowerCase());
+        Map<Client, String> blah = Storage.Channels.get(chan.toLowerCase()).clientmodes;
+        int t = Storage.Channels.get(chan.toLowerCase()).ts;
+        String m = Storage.Channels.get(chan.toLowerCase()).modes;
+        blah.remove(Storage.Users.get(me.getname().toLowerCase()));
+        Storage.Channels.remove(chan.toLowerCase());
         if (blah.size() > 0) // only put it back if it still has users
-            config.Database.Channels.put(chan.toLowerCase(), new Channel(t, chan, m, blah));
+            Storage.Channels.put(chan.toLowerCase(), new Channel(t, chan, m, blah));
     }
 
     public void gline(Service me, Configuration conf, Client who, String why) {
@@ -440,6 +440,22 @@ public class bahamut extends bProtocol {
             e.printStackTrace();
         }
     }
+    public void kick(Service me, String who, String where, String why){
+       //:Kuja KICK #debug NuclearFriend :rejoin
+        try {
+            Outgoing(":" + me.getname() + " KICK " + where + " " + who + " :" + why);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void invite(Service me, String who, String where){
+       // :SrvOper invite nocebo #test
+        try {
+            Outgoing(":" + me.getname() + " INVITE " + who + " " + where);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
 
-//:Kuja KICK #debug NuclearFriend :rejoin

@@ -17,12 +17,12 @@
  */
 package ecks.services.modules.SrvAuth;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
+import ecks.Configuration;
+import ecks.protocols.Protocol;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
-import ecks.protocols.Protocol;
-import ecks.Configuration;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
 public class Whois extends bCommand {
     public final CommandDesc Desc = new CommandDesc("whois", 1, true, CommandDesc.access_levels.A_HELPER, "Gives you information about a user");

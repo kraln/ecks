@@ -25,6 +25,7 @@ import ecks.protocols.Protocol;
 import ecks.Configuration;
 import ecks.util;
 import ecks.Logging;
+import ecks.Storage;
 
 public class Access extends bCommand {
     public final CommandDesc Desc = new CommandDesc("access", 2, true, CommandDesc.access_levels.A_PENDING, "Shows access of user in a channel", "[channel] [user]");
@@ -72,9 +73,9 @@ public class Access extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
-                if (c.getDB().Users.containsKey(whom)) {
-                    if (c.getDB().Users.get(whom).authname != null) {
-                        String aname = c.getDB().Users.get(whom).authname;
+                if (Storage.Users.containsKey(whom)) {
+                    if (Storage.Users.get(whom).authname != null) {
+                        String aname = Storage.Users.get(whom).authname;
                         if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
 
                             String alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(aname).toString();

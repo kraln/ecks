@@ -41,7 +41,7 @@ public class Help extends bCommand {
         for(Map.Entry<String,CommandModule> z : who.getCommands().entrySet())
         {
             CommandModule cm = z.getValue();
-            if (cm.getDesc().Required_Access.ordinal() <= ((SrvAuth)c.Services.get(c.authservice)).checkAccess(user.toLowerCase()).ordinal())
+            if (cm.getDesc().Required_Access.ordinal() <= ((SrvAuth)Configuration.getSvc().get(Configuration.authservice)).checkAccess(user.toLowerCase()).ordinal())
             {
                 if(!cm.getName().startsWith("\u0001"))
                 {

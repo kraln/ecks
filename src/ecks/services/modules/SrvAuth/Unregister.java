@@ -17,13 +17,13 @@
  */
 package ecks.services.modules.SrvAuth;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
+import ecks.Configuration;
+import ecks.Storage;
+import ecks.protocols.Protocol;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
-import ecks.services.SrvAuth_user;
-import ecks.protocols.Protocol;
-import ecks.Configuration;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 import ecks.util;
 
 public class Unregister extends bCommand {
@@ -40,10 +40,10 @@ public class Unregister extends bCommand {
         if (args.length == 1) {
             if (util.sanitize(tU)) {
                 if (temp.getUsers().containsKey(tU)) {
-                    if ((temp.getUsers().get(c.getDB().Users.get(user).authname)).getAccess().ordinal() > (temp.getUsers().get(tU).getAccess().ordinal())) // we can only delete people lower than us
+                    if ((temp.getUsers().get(Storage.Users.get(user).authname)).getAccess().ordinal() > (temp.getUsers().get(tU).getAccess().ordinal())) // we can only delete people lower than us
                     {
                         temp.getUsers().remove(tU); // drop the account
-                        // c.getDB().Users.get(tU).authname = null; // user is no longer authed
+                        // Storage.Users.get(tU).authname = null; // user is no longer authed
                         p.PrivMessage(who, replyto, "User account removed.");
                     } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 User has equal/higher access than you!");
                 } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 No such username is registered");
