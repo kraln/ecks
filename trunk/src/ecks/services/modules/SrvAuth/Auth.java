@@ -20,6 +20,7 @@ package ecks.services.modules.SrvAuth;
 import ecks.Configuration;
 import ecks.Storage;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
 import ecks.services.modules.CommandDesc;
@@ -32,20 +33,20 @@ public class Auth extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         SrvAuth temp = ((SrvAuth) who);
         if (arguments.split(" ").length == 2) {
-            if (Storage.Users.get(user).authname == null) {
+            if (Generic.Users.get(user).authhandle == null) {
                 if (temp.getUsers().containsKey(arguments.split(" ")[0].toLowerCase())) { // if the username exists
                     if (temp.chkpass(arguments.split(" ")[1], arguments.split(" ")[0].toLowerCase())) { // password matches
-                        Storage.Users.get(user).authname = arguments.split(" ")[0].toLowerCase();
-                        p.setauthed(who,c,Storage.Users.get(user).uid);
-                        p.Notice(who, replyto, "\u0002" + Storage.Users.get(user).uid + ":\u0002 Welcome back!");
+                        Generic.Users.get(user).authhandle = arguments.split(" ")[0].toLowerCase();
+                        Generic.curProtocol.srvSetAuthed(who,Generic.Users.get(user).uid);
+                        Generic.curProtocol.outNOTICE(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Welcome back!");
                         
-                    } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid Password!");
-                } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Username not found!");
-            } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You are already logged in!");
-        } else p.PrivMessage(who, replyto, "\u0002Usage:\u0002 auth [username] [password]!");
+                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Password!");
+                } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Username not found!");
+            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You are already logged in!");
+        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Usage:\u0002 auth [username] [password]!");
 
     }
 }

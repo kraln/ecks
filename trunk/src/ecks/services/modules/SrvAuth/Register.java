@@ -20,6 +20,7 @@ package ecks.services.modules.SrvAuth;
 import ecks.Configuration;
 import ecks.Storage;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
 import ecks.services.SrvAuth_user;
@@ -34,11 +35,11 @@ public class Register extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         SrvAuth temp = ((SrvAuth) who);
         String args[] = arguments.split(" ");
         if (args.length == 3) {
-            if (Storage.Users.get(user).authname == null) {
+            if (Generic.Users.get(user).authhandle == null) {
                 String u = args[0].toLowerCase();
                 if (util.sanitize(u)) {
                     if (!temp.getUsers().containsKey(u)) {
@@ -50,21 +51,21 @@ public class Register extends bCommand {
                                 if (!(temp.getUsers().size()==0))
                                 {
                                     temp.getUsers().put(u, new SrvAuth_user(u, pw, e, CommandDesc.access_levels.A_PENDING));
-                                    Storage.Users.get(user).authname = u.trim().toLowerCase(); // user is now authed
+                                    Generic.Users.get(user).authhandle = u.trim().toLowerCase(); // user is now authed
                                     String tCookie = util.makeCookie();
                                     temp.getUsers().get(u).setMeta("cookie", tCookie);
                                     util.SendRegMail(e, tCookie);
-                                    p.PrivMessage(who, replyto, "\u0002" + Storage.Users.get(user).uid + ":\u0002 Registration Succeeded!");
+                                    Generic.curProtocol.outPRVMSG(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Registration Succeeded!");
                                 } else { // first registration is an SRA
                                     temp.getUsers().put(u, new SrvAuth_user(u, pw, e, CommandDesc.access_levels.A_SRA));
-                                    Storage.Users.get(user).authname = u.trim().toLowerCase(); // user is now authed
-                                    p.PrivMessage(who, replyto, "\u0002" + Storage.Users.get(user).uid + ":\u0002 Registration Succeeded! You are now an SRA!");
+                                    Generic.Users.get(user).authhandle = u.trim().toLowerCase(); // user is now authed
+                                    Generic.curProtocol.outPRVMSG(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Registration Succeeded! You are now an SRA!");
                                 }
-                            } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid Email Address");
-                        } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Password contains invalid characters");
-                    } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Username is already registered.");
-                } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Username contains invalid characters");
-            } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You are already logged in!");
-        } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: register [username] [password] [email]");
+                            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Email Address");
+                        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Password contains invalid characters");
+                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Username is already registered.");
+                } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Username contains invalid characters");
+            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You are already logged in!");
+        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: register [username] [password] [email]");
     }
 }

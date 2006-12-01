@@ -25,12 +25,11 @@ import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
 import sun.misc.BASE64Encoder;
+import ecks.Threads.EmailThread;
 
 public class util {
 
@@ -50,6 +49,11 @@ public class util {
 
     public static synchronized String pad(String s, int n) {
         return paddingString(s, n, ' ', false);
+    }
+
+    public static String getTS()
+    {
+        return String.valueOf(System.currentTimeMillis() / 1000);
     }
 
     public static synchronized String paddingString(String s, int n, char c, boolean paddingLeft) {
@@ -81,7 +85,7 @@ public class util {
     }
 
     public static String getVersion() {
-        return "0.3.1A";
+        return "0.4A";
     }
 
     public static boolean checkemail(String input) {
@@ -97,7 +101,7 @@ public class util {
         startThread(new Thread(new EmailThread(to, code))).start();
     }
 
-    protected static String readFileAsString(String filePath)
+    public static String readFileAsString(String filePath)
             throws java.io.IOException {
         StringBuffer sb = new StringBuffer(1024);
         BufferedReader reader = new BufferedReader(new FileReader(filePath));

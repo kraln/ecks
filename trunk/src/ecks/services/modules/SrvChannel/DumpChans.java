@@ -21,6 +21,7 @@ import ecks.services.modules.bCommand;
 import ecks.services.modules.CommandDesc;
 import ecks.services.*;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 
 import java.util.Map;
@@ -28,10 +29,10 @@ import java.util.Map;
 public class DumpChans extends bCommand {
     public final CommandDesc Desc = new CommandDesc("dumpchans", 0, true, CommandDesc.access_levels.A_SRA, "Dumps registered channels.");
     public CommandDesc getDesc() { return Desc; }
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         for(Map.Entry<String, SrvChannel_channel> t : ((SrvChannel) who).getChannels().entrySet())
         {
-            p.PrivMessage(who, replyto, "\u0002Entry\u0002 " + t.toString());
+            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Entry\u0002 " + t.toString());
         }
     }
 }

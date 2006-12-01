@@ -17,12 +17,11 @@
  */
 package ecks.services.modules.SrvAuth;
 
-import ecks.Configuration;
-import ecks.protocols.Protocol;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
 import ecks.services.modules.CommandDesc;
 import ecks.services.modules.bCommand;
+import ecks.protocols.Generic;
 
 public class WhoAmi extends bCommand {
     public final CommandDesc Desc = new CommandDesc("whoami", 0, true, CommandDesc.access_levels.A_NONE, "Gives you information about yourself, including services info");
@@ -31,16 +30,16 @@ public class WhoAmi extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
-        if (c.Database.Users.containsKey(user.toLowerCase())) {
-            if (c.Database.Users.get(user.toLowerCase()).authname != null) {
-                p.Notice(who, user, "\u0002User Info:\u0002 " + c.Database.Users.get(user.trim().toLowerCase()));
-                p.Notice(who, user, "\u0002Services Info:\u0002 " + ((SrvAuth) who).getUsers().get(c.Database.Users.get(user.trim().toLowerCase()).authname));
+    public void handle_command(Service who, String user, String replyto, String arguments) {
+        if (Generic.Users.containsKey(user.toLowerCase())) {
+            if (Generic.Users.get(user.toLowerCase()).authhandle != null) {
+                Generic.curProtocol.outNOTICE(who, user, "\u0002User Info:\u0002 " + Generic.Users.get(user.trim().toLowerCase()));
+                Generic.curProtocol.outNOTICE(who, user, "\u0002Services Info:\u0002 " + ((SrvAuth) who).getUsers().get(Generic.Users.get(user.trim().toLowerCase()).authhandle));
             } else {
-                p.Notice(who, user, "\u0002User Info:\u0002 " + c.Database.Users.get(user.trim().toLowerCase()));
-                p.Notice(who, user, "\u0002Services Info:\u0002 Not logged in.");
+                Generic.curProtocol.outNOTICE(who, user, "\u0002User Info:\u0002 " + Generic.Users.get(user.trim().toLowerCase()));
+                Generic.curProtocol.outNOTICE(who, user, "\u0002Services Info:\u0002 Not logged in.");
             }
-        } else p.Notice(who, user, "\u0002Error:\u0002 You don't exist! (this is a bug)");
+        } else Generic.curProtocol.outNOTICE(who, user, "\u0002Error:\u0002 You don't exist! (this is a bug)");
 
     }
 }

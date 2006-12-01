@@ -16,15 +16,20 @@
  *
  */
 
-package ecks;
+package ecks.RPC;
+
+import ecks.protocols.Generic;
+import ecks.Logging;
+import ecks.Configuration;
+
 public class RPCHandler {
     public int getUserCount() {
         Logging.info("RPC", "Got UserCount Request!");
-        return Storage.Users.size();
+        return Generic.Users.size();
     }
     public int getChanCount() {
         Logging.info("RPC", "Got ChanCount Request!");
-        return Storage.Channels.size();
+        return Generic.Channels.size();
     }
     public int getRegUserCount() {
         Logging.info("RPC", "Got RegUserCount Request!");
@@ -42,8 +47,8 @@ public class RPCHandler {
     {
         Logging.info("RPC", "Got ChanUserCount Request!");
         Logging.verbose("RPC", "Request was for channel: " + whatchan);
-        if (Storage.Channels.containsKey(whatchan.toLowerCase()))
-            return Storage.Channels.get(whatchan.toLowerCase()).clientmodes.size();
+        if (Generic.Channels.containsKey(whatchan.toLowerCase()))
+            return Generic.Channels.get(whatchan.toLowerCase()).clientmodes.size();
         return -1;
     }
 

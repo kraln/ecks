@@ -23,6 +23,7 @@ import ecks.services.Service;
 import ecks.services.SrvChannel_channel;
 import ecks.services.SrvChannel;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 import ecks.Storage;
 
@@ -33,7 +34,7 @@ public class ChUser extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
 
         String whatchan = "";
         String whom = "";
@@ -61,7 +62,7 @@ public class ChUser extends bCommand {
                     try {
                         newacc = SrvChannel_channel.ChanAccess.valueOf("C_" + args[1].toUpperCase());
                     } catch (IllegalArgumentException iae) {
-                        p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid level.");
+                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid level.");
                         return;
                     }
                 }
@@ -72,7 +73,7 @@ public class ChUser extends bCommand {
                     try {
                         newacc = SrvChannel_channel.ChanAccess.valueOf("C_" + args[2].toUpperCase());
                     } catch (IllegalArgumentException iae) {
-                        p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid level.");
+                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid level.");
                         return;
                     }
                 } else if (args[1].startsWith("#")) {
@@ -81,11 +82,11 @@ public class ChUser extends bCommand {
                     try {
                         newacc = SrvChannel_channel.ChanAccess.valueOf("C_" + args[2].toUpperCase());
                     } catch (IllegalArgumentException iae) {
-                        p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid level.");
+                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid level.");
                         return;
                     }
                 } else {
-                    p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid arguments");
+                    Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid arguments");
                     return;
                 }
             }
@@ -97,30 +98,30 @@ public class ChUser extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
-                if (Storage.Users.containsKey(whom)) {
-                    if (Storage.Users.get(whom).authname != null) {
-                        if (Storage.Users.get(user).authname != null) {
-                            if (!Storage.Users.get(user).authname.equals(Storage.Users.get(whom).authname)) {
-                                String aname = Storage.Users.get(user).authname;
-                                String bname = Storage.Users.get(whom).authname;
+                if (Generic.Users.containsKey(whom)) {
+                    if (Generic.Users.get(whom).authhandle != null) {
+                        if (Generic.Users.get(user).authhandle != null) {
+                            if (!Generic.Users.get(user).authhandle.equals(Generic.Users.get(whom).authhandle)) {
+                                String aname = Generic.Users.get(user).authhandle;
+                                String bname = Generic.Users.get(whom).authhandle;
                                 if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
                                     if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(bname)) {
-                                        SrvChannel_channel.ChanAccess alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(Storage.Users.get(user).authname);
-                                        SrvChannel_channel.ChanAccess blevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(Storage.Users.get(whom).authname);
+                                        SrvChannel_channel.ChanAccess alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(Generic.Users.get(user).authhandle);
+                                        SrvChannel_channel.ChanAccess blevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(Generic.Users.get(whom).authhandle);
                                         if (alevel.ordinal() > blevel.ordinal()) {
                                             if (newacc.ordinal() < alevel.ordinal()) {
-                                                ((SrvChannel) who).getChannels().get(whatchan).getUsers().remove(Storage.Users.get(whom).authname);
-                                                ((SrvChannel) who).getChannels().get(whatchan).getUsers().put(Storage.Users.get(whom).authname, newacc);
-                                                p.PrivMessage(who, replyto, "User Changed!");
-                                            } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You cannot change a user to higher access than yourself!");
-                                        } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You cannot change a with higher access than yourself!");
-                                    } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 User does not have access to channel!");
-                                } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You have no access to channel!");
-                            } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You cannot change yourself!");
-                        } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You are not authed!");
-                    } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 User is not authed!");
-                } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 No such user!");
-            } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
-        } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Not a channel!");
+                                                ((SrvChannel) who).getChannels().get(whatchan).getUsers().remove(Generic.Users.get(whom).authhandle);
+                                                ((SrvChannel) who).getChannels().get(whatchan).getUsers().put(Generic.Users.get(whom).authhandle, newacc);
+                                                Generic.curProtocol.outPRVMSG(who, replyto, "User Changed!");
+                                            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You cannot change a user to higher access than yourself!");
+                                        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You cannot change a with higher access than yourself!");
+                                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User does not have access to channel!");
+                                } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You have no access to channel!");
+                            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You cannot change yourself!");
+                        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You are not authed!");
+                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User is not authed!");
+                } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 No such user!");
+            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
+        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a channel!");
     }
 }

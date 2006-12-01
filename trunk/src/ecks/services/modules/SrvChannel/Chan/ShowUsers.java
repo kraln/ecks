@@ -23,6 +23,7 @@ import ecks.services.Service;
 import ecks.services.SrvChannel_channel;
 import ecks.services.SrvChannel;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 import ecks.util;
 
@@ -35,7 +36,7 @@ public class ShowUsers extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         String whatchan = "";
         if (arguments.length() > 1)
             whatchan = arguments;
@@ -46,12 +47,12 @@ public class ShowUsers extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
-                p.PrivMessage(who, user, "\u0002" + util.pad("USER",12) + "\u0002 " + "ACCESS");
-                p.PrivMessage(who, user, "------------------------------");
+                Generic.curProtocol.outPRVMSG(who, user, "\u0002" + util.pad("USER",12) + "\u0002 " + "ACCESS");
+                Generic.curProtocol.outPRVMSG(who, user, "------------------------------");
                 for (Map.Entry<String, SrvChannel_channel.ChanAccess> t : ((SrvChannel) who).getChannels().get(whatchan).getUsers().entrySet()) {
-                    p.PrivMessage(who, user, "\u0002" + util.pad(t.getKey(),12) + "\u0002 " + t.getValue().toString().substring(2));
+                    Generic.curProtocol.outPRVMSG(who, user, "\u0002" + util.pad(t.getKey(),12) + "\u0002 " + t.getValue().toString().substring(2));
                 }
-            } else p.PrivMessage(who, user, "\u0002Error:\u0002 Not a registered channel!");
-        } else p.PrivMessage(who, user, "\u0002Error:\u0002 Not a channel!");
+            } else Generic.curProtocol.outPRVMSG(who, user, "\u0002Error:\u0002 Not a registered channel!");
+        } else Generic.curProtocol.outPRVMSG(who, user, "\u0002Error:\u0002 Not a channel!");
     }
 }

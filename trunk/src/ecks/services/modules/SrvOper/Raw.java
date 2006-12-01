@@ -23,6 +23,7 @@ import ecks.services.modules.CommandModule;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 import ecks.util;
 import ecks.Logging;
@@ -37,9 +38,9 @@ public class Raw extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         try {
-            p.Outgoing(arguments);
+            Generic.curProtocol.Outgoing(arguments);
             Logging.warn("SRVOPER", user + " issued raw command!");
             Logging.info("SRVOPER RAW", arguments);
         } catch (IOException e) {

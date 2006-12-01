@@ -24,6 +24,7 @@ import ecks.services.SrvAuth;
 import ecks.services.SrvChannel;
 import ecks.services.SrvHelp;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 import ecks.util;
 import ecks.Logging;
@@ -35,7 +36,7 @@ public class Unregister extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         // todo: make this check channel for any 'protected' metadata
         SrvChannel temp = ((SrvChannel) who);
         String args[] = arguments.split(" ");
@@ -43,11 +44,11 @@ public class Unregister extends bCommand {
         if (args.length == 1) {
             if (temp.getChannels().containsKey(tU)) {
                 temp.getChannels().remove(tU); // drop the account
-                p.part(who, tU, "Channel Unregistered.");
+                Generic.srvPart(who, tU, "Channel Unregistered.");
                 Logging.info("SRVCHAN", "Channel " + tU + " unregistered by " + user + ".");
-                p.PrivMessage(who, replyto, "Channel removed.");
-            } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 No such channel is registered");
-        } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: unregister [username]");
+                Generic.curProtocol.outPRVMSG(who, replyto, "Channel removed.");
+            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 No such channel is registered");
+        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: unregister [username]");
 
     }
 }

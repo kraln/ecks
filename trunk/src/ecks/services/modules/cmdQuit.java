@@ -18,6 +18,7 @@
 package ecks.services.modules;
 
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 import ecks.Storage;
 import ecks.services.Service;
@@ -25,8 +26,8 @@ import ecks.services.Service;
 public class cmdQuit extends bCommand {
     public final CommandDesc Desc = new CommandDesc("quit", 99, true, CommandDesc.access_levels.A_SRA, "Makes your services go bye-bye.", "[reason]");
     public CommandDesc getDesc() { return Desc; }
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
-        Storage.flushDB(c);
-        p.diegraceful(arguments);
+    public void handle_command(Service who, String user, String replyto, String arguments) {
+        Storage.flushDB();
+        Generic.srvDie(arguments);
     }
 }

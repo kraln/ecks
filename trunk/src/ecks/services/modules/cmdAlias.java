@@ -19,16 +19,17 @@ package ecks.services.modules;
 
 import ecks.services.Service;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 
 public class cmdAlias extends bCommand{
     public final CommandDesc Desc = new CommandDesc("alias", 2, true, CommandDesc.access_levels.A_SRA, "Alias a command to another command", "<original command> <new command>");
     public CommandDesc getDesc() { return Desc; }
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         String args[] = arguments.split(" ");
         if (args.length==2)
         {
             who.addCommand(args[1],who.getCommands().get(args[0]));
-        } else  p.PrivMessage(who, replyto, "\u0002Error:\u0002 Usage: alias cmd newcmd");
+        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Usage: alias cmd newcmd");
     }
 }

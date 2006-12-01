@@ -23,6 +23,7 @@ import ecks.services.Service;
 import ecks.services.SrvChannel;
 import ecks.services.SrvChannel_channel;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 import ecks.util;
 import ecks.Storage;
@@ -34,7 +35,7 @@ public class Sync extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         String whatchan = "";
         String whom = "";
         String args[] = arguments.split(" ");
@@ -57,8 +58,8 @@ public class Sync extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
-                if (Storage.Users.get(whom).authname != null) {
-                    String aname = Storage.Users.get(whom).authname;
+                if (Generic.Users.get(whom).authhandle != null) {
+                    String aname = Generic.Users.get(whom).authhandle;
                     if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
                         SrvChannel_channel.ChanAccess alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(aname);
                         String newmode = "+";
@@ -66,10 +67,10 @@ public class Sync extends bCommand {
                             newmode = "+v";
                         if (alevel.ordinal() >= SrvChannel_channel.ChanAccess.C_CHANOP.ordinal())
                             newmode = "+o";
-                        p.forcemode(who,whatchan,newmode, whom);
-                    } else if(!silent) p.PrivMessage(who, replyto, "\u0002Error:\u0002 User has no access to channel!");
-                } else if(!silent) p.PrivMessage(who, replyto, "\u0002Error:\u0002 User is not authed!");
-            } else if(!silent) p.PrivMessage(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
-        } else if(!silent) p.PrivMessage(who, replyto, "\u0002Error:\u0002 Not a channel!");
+                        Generic.curProtocol.outSETMODE(who,whatchan,newmode, whom);
+                    } else if(!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has no access to channel!");
+                } else if(!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User is not authed!");
+            } else if(!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
+        } else if(!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a channel!");
     }
 }

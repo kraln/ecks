@@ -20,25 +20,29 @@ package ecks.services.modules.SrvOper;
 import ecks.services.modules.bCommand;
 import ecks.services.modules.CommandDesc;
 import ecks.services.Service;
+import ecks.protocols.Protocol;
 import ecks.protocols.Generic;
-import ecks.Utility.Client;
-import ecks.Utility.Channel;
+import ecks.Configuration;
+import ecks.Logging;
 
-import java.util.Map;
+import java.io.IOException;
 
-public class DumpInfo extends bCommand {
-    public final CommandDesc Desc = new CommandDesc("dumpinfo", 0, true, CommandDesc.access_levels.A_SRA, "Dumps the services's view of the network (users and channels). FLOOD WARNING!");
-    public CommandDesc getDesc() { return Desc; }
+public class SetLogLevel extends bCommand {
+    public final CommandDesc Desc = new CommandDesc("setloglevel", 1, true, CommandDesc.access_levels.A_SRA, "Changes the current logging level", "<new level>");
+
+    public CommandDesc getDesc() {
+        return Desc;
+    }
+
     public void handle_command(Service who, String user, String replyto, String arguments) {
-        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Users:\u0002");
-        for(Map.Entry<String, Client> t : Generic.Users.entrySet())
-        {
-            Generic.curProtocol.outPRVMSG(who, replyto, "  " + t.toString());
-        }
-        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Channels:\u0002");
-        for(Map.Entry<String, Channel> t : Generic.Channels.entrySet())
-        {
-            Generic.curProtocol.outPRVMSG(who, replyto, "  " + t.toString());
+        try {
+            Logging.myLogLevel = Logging.loglevels.valueOf(arguments);
+            Logging.warn("SRVOPER", user + " changed logging level!");
+            Logging.info("SRVOPER", "New level is :" + Logging.myLogLevel);
+            Generic.curProtocol.outPRVMSG(who, replyto, "Log level changed.");
+        } catch (Exception e) {
+            Generic.curProtocol.outPRVMSG(who, replyto, "Log levelchange Failed! " + e.getMessage());
+            Logging.error("SRVOPER", user + " tried to change the logging level, and it failed miserably.");
         }
     }
 }

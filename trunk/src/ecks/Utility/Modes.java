@@ -15,18 +15,11 @@
  * <jeff@katzonline.net>. All Rights Reserved.
  *
  */
-package ecks.services.modules;
+package ecks.Utility;
 
-import ecks.protocols.Protocol;
-import ecks.protocols.Generic;
-import ecks.Configuration;
-import ecks.util;
-import ecks.services.Service;
-
-public class cmdVersion extends bCommand{
-    public final CommandDesc Desc = new CommandDesc("version", 0, true, CommandDesc.access_levels.A_NONE, "Reports service version.");
-    public CommandDesc getDesc() { return Desc; }
-    public void handle_command(Service who, String user, String replyto, String arguments) {
-        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002" + user + ":\u0002 SrvEcks version " + util.getVersion() + "!");
-    }
+public abstract interface Modes {
+    // this class represents modes
+    void applyChanges(String newmodes);
+    boolean contains(String what);
+    String getModes();
 }

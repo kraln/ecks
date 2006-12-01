@@ -18,6 +18,9 @@
 package ecks;
 
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
+import ecks.Threads.ConnThread;
+
 import java.io.*;
 import java.net.*;
 
@@ -47,10 +50,10 @@ public class Connection {
              in = new BufferedReader (new InputStreamReader(sock.getInputStream()));
          } catch (IOException e) {
              e.printStackTrace();
-             Logging.error("CONNECTION", "Got exception. Probably couldn't bind to the port. Anyway, exception says:" + e.getMessage());
+             Logging.error("CONNECTION", "Exception! (Probably couldn't bind or timeout):" + e.getMessage());
              main.goGracefullyIntoTheNight();
          }
-         prot.setBuffers(out);
+         Generic.curProtocol.setBuffers(out);
 
          util.startThread(new Thread(new ConnThread(in,prot))).start(); // start async input thread
 

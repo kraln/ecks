@@ -18,6 +18,8 @@
 
 package ecks;
 import ecks.protocols.*;
+import ecks.Threads.DbThread;
+import ecks.RPC.RPCHandler;
 
 import java.net.InetAddress;
 import org.apache.xmlrpc.WebServer;
@@ -31,7 +33,7 @@ public class main {
         // declare our protocol
         Protocol myProto = null;
         try {
-           myProto = (Protocol) Class.forName(myConf.Config.get("protocol")).newInstance();
+           myProto = (Protocol) Class.forName(Configuration.Config.get("protocol")).newInstance();
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -40,43 +42,43 @@ public class main {
             e.printStackTrace();
         }
         assert myProto != null;
-        myProto.setConfig(myConf);
+        Generic.SetProtocol(myProto);
 
-        Logging.setup(myConf,myProto);
+        Logging.setup();
         Logging.summary("STARTUP", "Welcome to Ecks Services. Internal Version: " + util.getVersion());
         Logging.verbose("STARTUP", "Logging loaded...");
 
         //load services
-        myConf.LoadServices(myProto);
+        Configuration.LoadServices();
         Logging.info("STARTUP", "Services loaded...");
 
         // at this point, we load up the services database.
-        myConf.Database = new Storage();
+        Configuration.Database = new Storage();
 
         // load up the database
-        myConf.Database.loadDB(myConf);
+        Configuration.Database.loadDB();
         Logging.info("STARTUP", "Database loaded...");
 
         // start a thread to save the database every five minutes.
-        util.startThread(new Thread(new DbThread(myConf))).start();
+        util.startThread(new Thread(new DbThread())).start();
         Logging.info("STARTUP", "Database thread started...");
 
         // initialize the connection
         InetAddress inetT;
-        if (myConf.Config.get("localhost").toLowerCase().equals("any"))
+        if (Configuration.Config.get("localhost").toLowerCase().equals("any"))
             inetT = InetAddress.getLocalHost();
         else
-            inetT = InetAddress.getByName(myConf.Config.get("localhost"));
+            inetT = InetAddress.getByName(Configuration.Config.get("localhost"));
 
-        Connection myConnection = new Connection(myConf.Config.get("remote"), Integer.parseInt(myConf.Config.get("port")),myConf.Config.get("localport"), inetT, myProto);
+        Connection myConnection = new Connection(Configuration.Config.get("remote"), Integer.parseInt(Configuration.Config.get("port")),Configuration.Config.get("localport"), inetT, myProto);
 
         myConnection.Connect(); // cross our fingers and connect
         Logging.info("STARTUP", "Connection attempted...");
 
-        if (myConf.Config.get("localport").equals("any"))
+        if (Configuration.Config.get("localport").equals("any"))
             myConf.RPCServer = new WebServer(8081);
         else
-            myConf.RPCServer = new WebServer(Integer.parseInt(myConf.Config.get("localport"))+1,inetT);
+            myConf.RPCServer = new WebServer(Integer.parseInt(Configuration.Config.get("localport"))+1,inetT);
 
         myConf.RPCServer.addHandler("ecks", new RPCHandler());
         myConf.RPCServer.start();

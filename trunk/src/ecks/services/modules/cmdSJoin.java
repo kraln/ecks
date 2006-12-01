@@ -18,13 +18,14 @@
 package ecks.services.modules;
 
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 import ecks.services.Service;
 
 public class cmdSJoin extends bCommand{
     public final CommandDesc Desc = new CommandDesc("sjoin", 1, true, CommandDesc.access_levels.A_OPER, "Forces services agent into a channel.", "<channel>");
     public CommandDesc getDesc() { return Desc; }
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
-        p.SJoin(who.getname(), arguments, "+");
+    public void handle_command(Service who, String user, String replyto, String arguments) {
+        Generic.curProtocol.srvJoin(who, arguments, "+");
     }
 }

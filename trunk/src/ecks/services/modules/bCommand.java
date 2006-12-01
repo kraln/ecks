@@ -26,5 +26,5 @@ public abstract class bCommand implements CommandModule{
     public String getName() { return getDesc().command; }
     public abstract CommandDesc getDesc();
 
-    public abstract void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c);
+    public abstract void handle_command(Service who, String user, String replyto, String arguments);
 }

@@ -18,14 +18,16 @@
 package ecks.services.modules;
 
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
+import ecks.Storage;
 import ecks.services.Service;
 
 public class cmdFlushDB extends bCommand{
     public final CommandDesc Desc = new CommandDesc("flushdb", 0, true, CommandDesc.access_levels.A_SRA, "Forces a write of the services database to disk.");
     public CommandDesc getDesc() { return Desc; }
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
-        c.Database.flushDB(c);
-        p.PrivMessage(who, replyto, "\u0002" + user + ":\u0002 Services database flushed to disk!");
+    public void handle_command(Service who, String user, String replyto, String arguments) {
+        Storage.flushDB();
+        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002" + user + ":\u0002 Services database flushed to disk!");
     }
 }

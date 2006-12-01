@@ -21,6 +21,7 @@ import ecks.Configuration;
 import ecks.Logging;
 import ecks.Storage;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
 import ecks.services.modules.CommandDesc;
@@ -34,34 +35,34 @@ public class Confirm extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         SrvAuth temp = ((SrvAuth) who);
-        String uTemp = Storage.Users.get(user).authname;
+        String uTemp = Generic.Users.get(user).authhandle;
         if (arguments.length() > 1) {
             if (uTemp != null) {
-                if (((temp.getUsers().get(Storage.Users.get(user).authname)).getAccess() == Desc.Required_Access) || (temp.getUsers().get(Storage.Users.get(user).authname)).getAccess().ordinal() >= CommandDesc.access_levels.A_HELPER.ordinal() ) {
+                if (((temp.getUsers().get(Generic.Users.get(user).authhandle)).getAccess() == Desc.Required_Access) || (temp.getUsers().get(Generic.Users.get(user).authhandle)).getAccess().ordinal() >= CommandDesc.access_levels.A_HELPER.ordinal() ) {
                     if (temp.getUsers().containsKey(uTemp)) {
                         if (util.sanitize(arguments)) {
-                            if (temp.getUsers().get(uTemp).getAllMeta().containsKey("cookie") || (temp.getUsers().get(Storage.Users.get(user).authname)).getAccess().ordinal() >= CommandDesc.access_levels.A_HELPER.ordinal() ) {
+                            if (temp.getUsers().get(uTemp).getAllMeta().containsKey("cookie") || (temp.getUsers().get(Generic.Users.get(user).authhandle)).getAccess().ordinal() >= CommandDesc.access_levels.A_HELPER.ordinal() ) {
                                 if (temp.getUsers().get(uTemp).getMeta("cookie").equals(arguments)) {
                                     temp.getUsers().get(uTemp).update(CommandDesc.access_levels.A_AUTHED);
                                     temp.getUsers().get(uTemp).rmMeta("cookie");
-                                    p.PrivMessage(who, replyto, "\u0002" + Storage.Users.get(user).uid + ":\u0002 Your account has been confirmed!");
+                                    Generic.curProtocol.outPRVMSG(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Your account has been confirmed!");
                                 } else if (temp.getUsers().get(uTemp).getAccess().ordinal() >= CommandDesc.access_levels.A_HELPER.ordinal()) {
                                 // is a helper and is confirming account for user
                                     if (temp.getUsers().containsKey(arguments.toLowerCase()))
                                     {
                                         temp.getUsers().get(arguments.toLowerCase()).update(CommandDesc.access_levels.A_AUTHED);
                                         temp.getUsers().get(arguments.toLowerCase()).rmMeta("cookie");
-                                        p.PrivMessage(who, arguments.toLowerCase(), "\u0002" + Storage.Users.get(arguments.toLowerCase()).uid + ":\u0002 The account has been confirmed!");
+                                        Generic.curProtocol.outPRVMSG(who, arguments.toLowerCase(), "\u0002" + Generic.Users.get(arguments.toLowerCase()).uid + ":\u0002 The account has been confirmed!");
                                         Logging.warn("SRVAUTH", "Username " + arguments + " had email confirmed by " + user + ".");
-                                    } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 That user doesn't exist!");
-                                } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Your cookie is wrong!");
-                            } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You don't have a cookie!");
-                        } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Your cookie contains invalid characters!");
-                    } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Your account doesn't exist! (This is a bug)");
-                } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Your account isn't pending!");
-            } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You're not logged in!");
-        } else p.PrivMessage(who, replyto, "\u0002Usage:\u0002 confirm [yourcookie]");
+                                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 That user doesn't exist!");
+                                } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Your cookie is wrong!");
+                            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You don't have a cookie!");
+                        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Your cookie contains invalid characters!");
+                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Your account doesn't exist! (This is a bug)");
+                } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Your account isn't pending!");
+            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You're not logged in!");
+        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Usage:\u0002 confirm [yourcookie]");
     }
 }

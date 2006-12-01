@@ -21,6 +21,7 @@ import ecks.services.modules.bCommand;
 import ecks.services.modules.CommandDesc;
 import ecks.services.*;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 import ecks.Logging;
 import ecks.Storage;
@@ -32,18 +33,18 @@ public class Register extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         SrvHelp temp = ((SrvHelp) who);
         String args[] = arguments.split(" ");
         if (args.length == 1) {
                     String ch = args[0].toLowerCase();
                     if (!temp.getChannels().containsKey(ch)) {
                         temp.getChannels().put(ch, new SrvHelp_channel(ch));
-                        p.PrivMessage(who, replyto, "\u0002" + Storage.Users.get(user).uid + ":\u0002 Registration Succeeded!");
+                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Registration Succeeded!");
                         Logging.info("SRVHELP", "Channel " + ch + " registered by " + user + ".");
-                        p.SJoin(who.getname(), ch, "+stn");
-                        p.forcemode(who, ch, "+o", who.getname());
-                    } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Channel is already registered.");
-        } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: register [channel]");
+                        Generic.curProtocol.srvJoin(who, ch, "+stn");
+                        Generic.curProtocol.outSETMODE(who, ch, "+o", who.getname());
+                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Channel is already registered.");
+        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: register [channel]");
     }
 }

@@ -18,6 +18,7 @@
 package ecks;
 
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 
 import java.io.*;
 
@@ -28,8 +29,6 @@ public class Logging {
     public static loglevels myLogLevel;
     static boolean inchan;
     static Writer out;
-    static Protocol myP;
-    static Configuration myC;
     /*
 
     This class should handle all logging. Duh.
@@ -40,24 +39,22 @@ public class Logging {
            myLogLevel = loglevels.D_NONE;
     }
 
-    public static void setup(Configuration c, Protocol p)
+    public static void setup()
     {
-        myLogLevel = loglevels.valueOf(c.Config.get("debuglevel"));
-        boolean stdio = c.Config.get("debugdevice").equals("stdio");
+        myLogLevel = loglevels.valueOf(Configuration.Config.get("debuglevel"));
+        boolean stdio = Configuration.Config.get("debugdevice").equals("stdio");
         try {
             if (stdio) {
                 out = new OutputStreamWriter(System.out);
             } else {
-                out = new BufferedWriter(new FileWriter(c.Config.get("debugdevice")));
+                out = new BufferedWriter(new FileWriter(Configuration.Config.get("debugdevice")));
             }
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Failed to create logging device. Giving up.");
             System.exit(-1); // no logging - give up
         }
-        inchan = !c.Config.get("debugchan").equals("OFF");
-        myP = p;
-        myC = c;
+        inchan = !Configuration.Config.get("debugchan").equals("OFF");
     }
 
     public void finalize() throws Throwable {
@@ -84,8 +81,9 @@ public class Logging {
 
         if (inchan)
         {
-            if (myP.getState() == 4) // only do this if we're connected
-            myP.PrivMessage(myC.getSvc().get(myC.logservice), myC.Config.get("debugchan"), String.valueOf(System.currentTimeMillis() / 1000) + '\t' + util.pad(ll.toString(), 10) + '\t' + util.pad(what, 10) + '\t' + ai);
+            if (Generic.curProtocol!=null) // only do this if we have a protocol loaded
+            if (Generic.curProtocol.getState() == Protocol.States.S_ONLINE.ordinal()) // only do this if we're connected
+            Generic.curProtocol.outPRVMSG(Configuration.getSvc().get(Configuration.logservice), Configuration.Config.get("debugchan"), String.valueOf(System.currentTimeMillis() / 1000) + '\t' + util.pad(ll.toString(), 10) + '\t' + util.pad(what, 10) + '\t' + ai);
         }
         out.write(String.valueOf(System.currentTimeMillis() / 1000) + '\t' + util.pad(ll.toString(),10) + '\t' + util.pad(what,10) + '\t' + ai+ "\r\n");
         out.flush();
