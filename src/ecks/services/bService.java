@@ -23,33 +23,19 @@ import java.util.HashMap;
 import ecks.*;
 import ecks.services.modules.CommandModule;
 import ecks.services.modules.CommandDesc;
-import ecks.services.modules.bCommand;
-import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import org.w3c.dom.NodeList;
 
 public abstract class bService implements Service {
-    Configuration config = null;
-    Protocol proto = null;
     public Map<String, CommandModule> Commands;
-    String name = "Srv";
-
     public bService() {
         Commands = new HashMap<String, CommandModule>();
     }
 
-    public void Initialize(Configuration c, Protocol p, String n) {
-        config = c;
-        proto = p;
-        name = n;
-    }
-
     public void introduce() {
-        proto.Introduce(name, this);
+        Generic.srvIntroduce( this);
     }
 
-    public String getname() {
-        return name;
-    }
     public abstract void setname(String nname);
 
     public void handle(String user, String replyto, String command) {
@@ -74,19 +60,19 @@ public abstract class bService implements Service {
                     {
                         CommandDesc.access_levels req = Commands.get(cmd.toLowerCase()).getDesc().Required_Access;
                         String handle = null;
-                        if (Storage.Users.containsKey(user.toLowerCase()))
-                            handle = Storage.Users.get(user.toLowerCase()).authname;
+                        if (Generic.Users.containsKey(user.toLowerCase()))
+                            handle = Generic.Users.get(user.toLowerCase()).authhandle;
                         CommandDesc.access_levels cur = ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).checkAccess(handle);
                         if ((handle != null) || (req.ordinal() == 0)) { // we're authed, or the command doesn't care
                             if (cur.ordinal() >= req.ordinal()) { // if we have the access
                                 Logging.verbose("SERVICE", "Handling command: " + cmd + ", for user: " + user + ".");
-                                Commands.get(cmd.toLowerCase()).handle_command(this, user.toLowerCase(), replyto, command.substring(cmd.length()).trim(), proto, config); // run command
-                            } else proto.PrivMessage(this, replyto, "\u0002Error:\u0002 Not enough access!");
-                        } else proto.PrivMessage(this, replyto, "\u0002Error:\u0002 You're not authed!");
-                    } else Commands.get(cmd.toLowerCase()).handle_command(this, user, replyto, command.substring(cmd.length()).trim(), proto, config); // just do it without checking levels
-                } else proto.PrivMessage(this, replyto, "\u0002Error:\u0002 Too many arguments!");
-            } else proto.PrivMessage(this, replyto, "\u0002Error:\u0002 That command is unavailable in-channel!");
-        } else proto.PrivMessage(this, replyto, "\u0002Error:\u0002 Unknown Command!");
+                                Commands.get(cmd.toLowerCase()).handle_command(this, user.toLowerCase(), replyto, command.substring(cmd.length()).trim()); // run command
+                            } else Generic.curProtocol.outPRVMSG(this, replyto, "\u0002Error:\u0002 Not enough access!");
+                        } else Generic.curProtocol.outPRVMSG(this, replyto, "\u0002Error:\u0002 You're not authed!");
+                    } else Commands.get(cmd.toLowerCase()).handle_command(this, user, replyto, command.substring(cmd.length()).trim()); // just do it without checking levels
+                } else Generic.curProtocol.outPRVMSG(this, replyto, "\u0002Error:\u0002 Too many arguments!");
+            } else Generic.curProtocol.outPRVMSG(this, replyto, "\u0002Error:\u0002 That command is unavailable in-channel!");
+        } else Generic.curProtocol.outPRVMSG(this, replyto, "\u0002Error:\u0002 Unknown Command!");
         } catch (NullPointerException NPE)
         {
             Logging.error("SERVICE", "Caught NPE in command.");
@@ -95,8 +81,8 @@ public abstract class bService implements Service {
         }
     }
 
-    public void diegraceful(String message) {
-        proto.die(this, message);
+    public void die(String message) {
+        Generic.srvDie(message);
     }
 
     public void addCommand(String cmdName, CommandModule newCmd) {

@@ -18,26 +18,27 @@
 package ecks.services.modules;
 
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 import ecks.services.Service;
 
 public class cmdLoadModule extends bCommand{
     public final CommandDesc Desc = new CommandDesc("loadmod", 1, true, CommandDesc.access_levels.A_SRA, "Load a module.", "<path to module>");
     public CommandDesc getDesc() { return Desc; }
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         try {
             who.addCommand(((CommandModule) Class.forName(arguments).newInstance()).getName().toLowerCase(), (CommandModule) Class.forName(arguments).newInstance());
-            p.PrivMessage(who, replyto, "\u0002Loading:\u0002 Success!");
+            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Loading:\u0002 Success!");
         } catch (ClassCastException e) {
             e.printStackTrace();
-            p.PrivMessage(who, replyto, "\u0002Error:\u0002 That's not one of my modules!");            
+            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 That's not one of my modules!");
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            p.PrivMessage(who, replyto, "\u0002Error:\u0002 Module not found.");
+            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Module not found.");
         }
     }
 }

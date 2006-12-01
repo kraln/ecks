@@ -23,6 +23,7 @@ import ecks.services.Service;
 import ecks.services.SrvChannel;
 import ecks.services.SrvChannel_channel;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 import ecks.util;
 import ecks.Logging;
@@ -35,25 +36,25 @@ public class Register extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         SrvChannel temp = ((SrvChannel) who);
         String args[] = arguments.split(" ");
         if (args.length == 2) {
-            if (Storage.Users.containsKey(args[1].toLowerCase())) {
-                if (Storage.Users.get(args[1].toLowerCase()).authname != null) {
-                    String u = Storage.Users.get(args[1].toLowerCase()).authname;
+            if (Generic.Users.containsKey(args[1].toLowerCase())) {
+                if (Generic.Users.get(args[1].toLowerCase()).authhandle != null) {
+                    String u = Generic.Users.get(args[1].toLowerCase()).authhandle;
                     String ch = args[0].toLowerCase();
                     if (!temp.getChannels().containsKey(ch)) {
                         temp.getChannels().put(ch, new SrvChannel_channel(ch, u));
                         temp.getChannels().get(ch).getUsers().put(u, SrvChannel_channel.ChanAccess.C_OWNER);
-                        p.PrivMessage(who, replyto, "\u0002" + Storage.Users.get(user).uid + ":\u0002 Registration Succeeded!");
+                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Registration Succeeded!");
                         Logging.info("SRVCHAN", "Channel " + ch + " registered by " + user + " to " +  u +  ".");
-                        p.SJoin(who.getname(), ch, "+stn");
-                        p.forcemode(who, ch, "+o", who.getname());
+                        Generic.curProtocol.srvJoin(who, ch, "+stn");
+                        Generic.curProtocol.outSETMODE(who, ch, "+o", who.getname());
                         
-                    } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Channel is already registered.");
-                } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Owner to-be is not logged in!");
-            } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 No such user is online!");
-        } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: register [channel] [user]");
+                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Channel is already registered.");
+                } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Owner to-be is not logged in!");
+            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 No such user is online!");
+        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: register [channel] [user]");
     }
 }

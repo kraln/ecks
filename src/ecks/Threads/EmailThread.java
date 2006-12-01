@@ -15,7 +15,7 @@
  * <jeff@katzonline.net>. All Rights Reserved.
  *
  */
-package ecks;
+package ecks.Threads;
 
 import com.crackj2ee.mail.MailEngine;
 import com.crackj2ee.mail.MxConfig;
@@ -24,10 +24,13 @@ import com.crackj2ee.mail.MailListenerAdapter;
 
 import java.io.IOException;
 
+import ecks.util;
+import ecks.Logging;
+
 public class EmailThread implements Runnable {
     String to;
     String code;
-    EmailThread(String t, String c)
+    public EmailThread(String t, String c)
     {
         to = t;
         code = c;

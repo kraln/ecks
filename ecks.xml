@@ -49,11 +49,11 @@
 		
 		protocol=
 		Valid parameters are names of protocol classes.
-		Currently, we only speak tsora_6.
+		Currently, we only speak ngfqircd (a dialect of bahamut)
 
 		Connection-related stuff (numeric, etc) goes in here too.
 	-->
-	<uplink protocol="ecks.protocols.bahamut">
+	<uplink protocol="ecks.protocols.ngfqircd">
 
 		<!-- hostname: Who we are, and what we link as. -->
 		<hostname value="services.ecks" />
@@ -63,14 +63,14 @@
 
 			value is the remote hostname. 
 		-->
-		<remote value="127.127.127.127" />
+		<remote value="255.255.255.255" />
 
 		<!--
 			port:	what port we're connecting to
 
 			value is the port 
 		-->
-        <port value="8888" />
+        <port value="6699" />
 
         <!--
 			localport:	what port we're connecting from
@@ -123,6 +123,8 @@
             <command value="ecks.services.modules.SrvChannel.Chan.ChUser" />
             <command value="ecks.services.modules.SrvChannel.Chan.Sync" />
             <command value="ecks.services.modules.SrvChannel.Chan.DeSync" />
+            <command value="ecks.services.modules.SrvChannel.Chan.Kick" />
+            <command value="ecks.services.modules.SrvChannel.Chan.Invite" />
         </modules>
 	</service>
 	<service class="ecks.services.SrvAuth" name="SrvAuth">
@@ -141,6 +143,7 @@
             <command value="ecks.services.modules.SrvAuth.WhoAmi" />
             <command value="ecks.services.modules.SrvAuth.Promote" />
             <command value="ecks.services.modules.SrvAuth.DumpUsers" />
+            <command value="ecks.services.modules.SrvAuth.ChangePass" />
         </modules>
 	</service>
     	<service class="ecks.services.SrvOper" name="SrvOper">
@@ -158,6 +161,7 @@
             <command value="ecks.services.modules.SrvOper.Help" />
             <command value="ecks.services.modules.SrvOper.Raw" />
             <command value="ecks.services.modules.SrvOper.DumpInfo" />
+            <command value="ecks.services.modules.SrvOper.SetLogLevel" />
         </modules>
      	</service>
     	<service class="ecks.services.SrvHelp" name="SrvHelp">

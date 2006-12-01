@@ -20,6 +20,8 @@ package ecks.services;
 import ecks.services.modules.CommandDesc;
 import ecks.util;
 import ecks.Logging;
+import ecks.Configuration;
+import ecks.protocols.Generic;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -27,18 +29,21 @@ import java.util.HashMap;
 import org.w3c.dom.*;
 
 public class  SrvAuth extends bService {
-    String name = "SrvAuth";
+    public String name = "SrvAuth";
     public Map<String, SrvAuth_user> Users;
 
     public void introduce() {
-        config.authservice = name.toLowerCase(); // I lay claim to users
-        proto.Introduce(name, this);
-        if(!(config.Config.get("debugchan").equals("OFF")))
-            proto.SJoin(name, config.Config.get("debugchan"), "+stn");
+        Configuration.authservice = name.toLowerCase(); // I lay claim to users
+        Generic.srvIntroduce(this);
+        if(!(Configuration.Config.get("debugchan").equals("OFF")))
+            Generic.srvJoin(this, Configuration.Config.get("debugchan"), "+stn");
     }
 
     public boolean chkpass(String pwd, String user) { return Users.get(user).password.equals(util.hash(pwd));  }
+
+    public String getname() { return name; }
     public void setname(String nname) { name = nname; }
+
     public CommandDesc.access_levels checkAccess(String user)
     {
         if (Users.containsKey(user))
@@ -54,7 +59,7 @@ public class  SrvAuth extends bService {
             super.handle(user.toLowerCase(), replyto.toLowerCase(), command);
         else {
             if (cmd.toLowerCase().equals("auth") || cmd.toLowerCase().equals("register") || cmd.toLowerCase().equals("changepass"))
-                proto.PrivMessage(this, replyto, "\u0002Error:\u0002 You \u0002*MUST*\u0002 /msg " + this.getname() + "@" + this.config.Config.get("hostname") + " " + cmd + "!");
+                Generic.curProtocol.outPRVMSG(this, replyto, "\u0002Error:\u0002 You \u0002*MUST*\u0002 /msg " + this.getname() + "@" + Configuration.Config.get("hostname") + " " + cmd + "!");
             else
                 super.handle(user.toLowerCase(), replyto.toLowerCase(), command);
         }

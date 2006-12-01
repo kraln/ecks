@@ -18,13 +18,14 @@
 package ecks.services.modules;
 
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 import ecks.services.Service;import ecks.Storage;
 
 public class cmdPing extends bCommand{
     public final CommandDesc Desc = new CommandDesc("ping", 0, true, CommandDesc.access_levels.A_NONE, "Checks your connectivity.");
     public CommandDesc getDesc() { return Desc; }
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
-        p.PrivMessage(who, replyto, "\u0002" + Storage.Users.get(user).uid + ":\u0002 Pong!");
+    public void handle_command(Service who, String user, String replyto, String arguments) {
+        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Pong!");
     }
 }

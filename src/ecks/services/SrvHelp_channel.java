@@ -17,7 +17,7 @@
  */
 package ecks.services;
 
-import ecks.Client;
+import ecks.Utility.Client;
 
 import java.util.*;
 

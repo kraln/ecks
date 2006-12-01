@@ -22,6 +22,7 @@ import ecks.services.modules.CommandDesc;
 import ecks.services.Service;
 import ecks.services.SrvHelp;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 import ecks.util;
 
@@ -32,7 +33,7 @@ public class DeSync extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         String whatchan = "";
         String whom = "";
         String args[] = arguments.split(" ");
@@ -55,12 +56,12 @@ public class DeSync extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvHelp) who).getChannels().containsKey(whatchan)) {
-                if (((SrvHelp) who).getChannels().get(whatchan).queue.contains(c.Database.Users.get(whom)))
+                if (((SrvHelp) who).getChannels().get(whatchan).queue.contains(Generic.Users.get(whom)))
                 {
-                    p.PrivMessage(who, whom, "Your help request has been abandoned.");
-                    ((SrvHelp) who).getChannels().get(whatchan).queue.remove(c.Database.Users.get(whom));
+                    Generic.curProtocol.outPRVMSG(who, whom, "Your help request has been abandoned.");
+                    ((SrvHelp) who).getChannels().get(whatchan).queue.remove(Generic.Users.get(whom));
                 }
-            } else if(!silent) p.PrivMessage(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
-        } else if(!silent) p.PrivMessage(who, replyto, "\u0002Error:\u0002 Not a channel!");
+            } else if(!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
+        } else if(!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a channel!");
     }
 }

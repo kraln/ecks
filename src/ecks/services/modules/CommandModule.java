@@ -26,6 +26,6 @@ public interface CommandModule {
 
     public String getName();
     public CommandDesc getDesc();
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c);
+    public void handle_command(Service who, String user, String replyto, String arguments);
 
 }

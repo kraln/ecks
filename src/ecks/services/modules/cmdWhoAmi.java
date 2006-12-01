@@ -18,16 +18,17 @@
 package ecks.services.modules;
 
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 import ecks.services.Service;
 
 public class cmdWhoAmi extends bCommand{
     public final CommandDesc Desc = new CommandDesc("whoami", 0, true, CommandDesc.access_levels.A_NONE, "Gives you information about yourself");
     public CommandDesc getDesc() { return Desc; }
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
-        if (c.Database.Users.containsKey(user.toLowerCase()))
-                    p.Notice(who, user, "\u0002Info:\u0002 " + c.Database.Users.get(user.toLowerCase()));
+    public void handle_command(Service who, String user, String replyto, String arguments) {
+        if (Generic.Users.containsKey(user.toLowerCase()))
+                    Generic.curProtocol.outNOTICE(who, user, "\u0002Info:\u0002 " + Generic.Users.get(user.toLowerCase()));
                 else
-                    p.Notice(who, user, "\u0002Error:\u0002 You don't exist! (this is a bug)");
+                    Generic.curProtocol.outNOTICE(who, user, "\u0002Error:\u0002 You don't exist! (this is a bug)");
     }
 }

@@ -21,6 +21,7 @@ import ecks.Configuration;
 import ecks.Logging;
 import ecks.Storage;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
 import ecks.services.modules.CommandDesc;
@@ -34,13 +35,13 @@ public class ChangePass extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         SrvAuth temp = ((SrvAuth) who);
-        String uTemp = Storage.Users.get(user).authname;
+        String uTemp = Generic.Users.get(user).authhandle;
         String args[] = arguments.split(" ");
 
         if (args.length != 2) {
-            p.PrivMessage(who, replyto, "\u0002Usage:\u0002 changepass <old> <new>");
+            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Usage:\u0002 changepass <old> <new>");
             return;
         }
 
@@ -49,15 +50,15 @@ public class ChangePass extends bCommand {
             // changepass username newpassword
             if (temp.getUsers().containsKey(args[0])) {
                 temp.getUsers().get(args[0]).cngpass(args[1]);
-                p.PrivMessage(who, replyto, "Password Changed!");
+                Generic.curProtocol.outPRVMSG(who, replyto, "Password Changed!");
                 Logging.warn("SRVAUTH", user + " changed password for username: " + args[0]);
-            } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 No such username exists!");
+            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 No such username exists!");
         } else { // we're not a helper. vette old password
             // changepass oldpass newpass
             if (temp.chkpass(args[0], user)) {
                 temp.getUsers().get(uTemp).cngpass(args[1]);
-                p.PrivMessage(who, replyto, "Password Changed!");
-            } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Old password incorrect!");
+                Generic.curProtocol.outPRVMSG(who, replyto, "Password Changed!");
+            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Old password incorrect!");
         }
     }
 }

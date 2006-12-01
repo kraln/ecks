@@ -34,11 +34,11 @@ import ecks.services.Service;
 import ecks.services.modules.CommandModule;
 
 public class Configuration {
-    public Map<String, String> Config;
+    public static Map<String, String> Config;
     static Map<String, Service> Services;
     public static Storage Database;
     public WebServer RPCServer;
-    Object cp;
+    static Object cp;
     public static String authservice;
     public static String chanservice;
     public static String logservice; // what service ends up logging in-chan
@@ -47,7 +47,7 @@ public class Configuration {
         Config = new HashMap<String, String>();
         Services = new HashMap<String, Service>();
         Database = new Storage();
-        cp = new ConfParse(this);
+        cp = new ConfParse();
         authservice = "";
         chanservice = "";
         logservice = "";
@@ -63,8 +63,8 @@ public class Configuration {
         return Services;
     }
 
-    void LoadServices(Protocol talkto) {
-        ((ConfParse) cp).parseDocument2(this, talkto);
+    static void LoadServices() {
+        ((ConfParse) cp).parseDocument2();
     }
 }
 
@@ -72,9 +72,9 @@ class ConfParse {
 
     Document dom;
 
-    public ConfParse(Configuration towhere) {
+    public ConfParse() {
         parseXmlFile();
-        parseDocument(towhere);
+        parseDocument();
     }
 
     // load and parse XML file into DOM
@@ -92,29 +92,29 @@ class ConfParse {
         }
     }
 
-    private void parseDocument(Configuration conf) {
+    private void parseDocument() {
         Element docEle = dom.getDocumentElement();
         NodeList zl;
         Element el;
 
         zl = docEle.getElementsByTagName("debuglevel");
         el = (Element) zl.item(0);
-        conf.Config.put("debuglevel", el.getAttribute("value"));
+        Configuration.Config.put("debuglevel", el.getAttribute("value"));
 
         zl = docEle.getElementsByTagName("debugdevice");
         el = (Element) zl.item(0);
-        conf.Config.put("debugdevice", el.getAttribute("value"));
+        Configuration.Config.put("debugdevice", el.getAttribute("value"));
 
         zl = docEle.getElementsByTagName("debugchan");
         el = (Element) zl.item(0);
-        conf.Config.put("debugchan", el.getAttribute("value"));
+        Configuration.Config.put("debugchan", el.getAttribute("value"));
 
         zl = docEle.getElementsByTagName("joinchannels");
         el = (Element) zl.item(0);
-        conf.Config.put("joinchannels", el.getAttribute("value"));
+        Configuration.Config.put("joinchannels", el.getAttribute("value"));
 
         NodeList nl = docEle.getElementsByTagName("uplink");
-        conf.Config.put("protocol", ((Element) nl.item(0)).getAttribute("protocol"));
+        Configuration.Config.put("protocol", ((Element) nl.item(0)).getAttribute("protocol"));
 
         NodeList cnod = nl.item(0).getChildNodes();
         for (int i = 0; i < cnod.getLength(); i++) {
@@ -125,15 +125,15 @@ class ConfParse {
                 mval = (cnod.item(i)).getAttributes().getNamedItem("value").getNodeValue();
 
             } catch (NullPointerException N) {
-
+                 //
             }
             if (!mname.equals("#text") && !mname.equals("#comment")) {
-                conf.Config.put(mname, mval);
+                Configuration.Config.put(mname, mval);
             }
         }
     }
 
-    public void parseDocument2(Configuration conf, Protocol proto) {
+    public void parseDocument2() {
         Element docEle = dom.getDocumentElement();
 
         NodeList nl = docEle.getElementsByTagName("service");
@@ -141,13 +141,13 @@ class ConfParse {
         for (int i = 0; i < nl.getLength(); i++) {
             String newSvc = ((Element) nl.item(i)).getAttribute("name");
             try {
-                conf.Services.put(
+                Configuration.Services.put(
                         newSvc.toLowerCase(),
                         (Service) Class.forName(
                                 ((Element) nl.item(i)).getAttribute("class")
                         ).newInstance()
                 );
-                conf.Services.get(newSvc.toLowerCase()).setname(newSvc);
+                Configuration.Services.get(newSvc.toLowerCase()).setname(newSvc);
             } catch (InstantiationException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
@@ -166,7 +166,7 @@ class ConfParse {
                 for (int iz = 0; iz < nle.getLength(); iz++) {
                     try {
                         // I dare you to understand what this line does in one go. I can't.
-                        conf.Services.get(newSvc.toLowerCase()).addCommand(((CommandModule) Class.forName(((Element) nle.item(iz)).getAttribute("value")).newInstance()).getName().toLowerCase(), (CommandModule) Class.forName(((Element) nle.item(iz)).getAttribute("value")).newInstance());
+                        Configuration.Services.get(newSvc.toLowerCase()).addCommand(((CommandModule) Class.forName(((Element) nle.item(iz)).getAttribute("value")).newInstance()).getName().toLowerCase(), (CommandModule) Class.forName(((Element) nle.item(iz)).getAttribute("value")).newInstance());
                         Logging.verbose("CONFIGURATION", "Loading command module " + ((Element) nle.item(iz)).getAttribute("value") + " for service " + newSvc + ".");
                     } catch (InstantiationException e) {
                         e.printStackTrace();

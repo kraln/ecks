@@ -18,19 +18,23 @@
 package ecks.services;
 
 import org.w3c.dom.NodeList;
+import ecks.Configuration;
+import ecks.protocols.Generic;
 
 public class SrvOper extends bService {
-    String name = "SrvOper";
+    public String name = "SrvOper";
 
     public void introduce() {
-        config.logservice = name.toLowerCase(); // I lay claim to logging
-        proto.Introduce(name, this);
-        if(!(config.Config.get("debugchan").equals("OFF")))
+        Configuration.logservice = name.toLowerCase(); // I lay claim to logging
+        Generic.srvIntroduce(this);
+        if(!(Configuration.Config.get("debugchan").equals("OFF")))
         {
-            proto.SJoin(name, config.Config.get("debugchan"), "+stn");
-            proto.forcemode(this, config.Config.get("debugchan"), "+o", name);
+            Generic.curProtocol.srvJoin(this, Configuration.Config.get("debugchan"), "+stn");
+            Generic.curProtocol.outSETMODE(this, Configuration.Config.get("debugchan"), "+o", name);
         }
     }
+
+    public String getname() { return name; }
     public void setname(String nname) { name = nname; }
     public String getSRVDB() {
         return "";
@@ -38,17 +42,17 @@ public class SrvOper extends bService {
     
     public void loadSRVDB(NodeList XMLin)
     {
-
+        // I don't have a database yet
     }
 
     public void handle(String user, String replyto, String command) {
         // todo: actually handle user mode updates...
         String cmd = command.split(" ")[0];
-        if (config.Database.Users.get(user.toLowerCase()).modes.contains("o")) // if we're an oper
+        if (Generic.Users.get(user.toLowerCase()).modes.contains("o")) // if we're an oper
             super.handle(user.toLowerCase(), replyto.toLowerCase(), command);
         else {
             if (!cmd.toLowerCase().equals("oper")) // let people oper using us
-                proto.PrivMessage(this, replyto, "\u0002Error:\u0002 You \u0002*MUST*\u0002 be an IRCop to use this service!");
+                Generic.curProtocol.outPRVMSG(this, replyto, "\u0002Error:\u0002 You \u0002*MUST*\u0002 be an IRCop to use this service!");
             else
                 super.handle(user.toLowerCase(), replyto.toLowerCase(), command);
         }

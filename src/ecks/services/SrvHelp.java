@@ -26,26 +26,31 @@ import java.util.List;
 
 import ecks.util;
 import ecks.Logging;
+import ecks.Configuration;
+import ecks.protocols.Generic;
 
 public class SrvHelp extends bService {
-    String name = "SrvHelp";
+    public String name = "SrvHelp";
     public Map<String, SrvHelp_channel> Channels;
 
     public void introduce() {
-        proto.Introduce(name, this);
-        if(!(config.Config.get("debugchan").equals("OFF")))
+        Generic.srvIntroduce(this);
+        if(!(Configuration.Config.get("debugchan").equals("OFF")))
         {
-            proto.SJoin(name, config.Config.get("debugchan"), "+stn");
-            proto.forcemode(this, config.Config.get("debugchan"), "+o", name);
+            Generic.curProtocol.srvJoin(this, Configuration.Config.get("debugchan"), "+stn");
+            Generic.curProtocol.outSETMODE(this, Configuration.Config.get("debugchan"), "+o", name);
         }
-        if (config.Config.get("joinchannels").equals("YES")) // if we are set to...
-        for(String chan : Channels.keySet()) // ... join registered help channels
+        if (Configuration.Config.get("joinchannels").equals("YES")) // if we are set to...
+        for(String chan : Channels.keySet()) // ... join registered channels
         {
-            proto.SJoin(name, chan, "+stn");
-            proto.forcemode(this, chan, "+o", name);
+            Generic.curProtocol.srvJoin(this, chan, "+stn");
+            Generic.curProtocol.outSETMODE(this, chan, "+o", name);
         }
     }
+
+    public String getname() { return name; }
     public void setname(String nname) { name = nname; }
+
     public Map<String,SrvHelp_channel> getChannels()
     {
         return Channels;

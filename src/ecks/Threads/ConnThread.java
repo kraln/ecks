@@ -15,9 +15,11 @@
  * <jeff@katzonline.net>. All Rights Reserved.
  *
  */
-package ecks;
+package ecks.Threads;
 
 import ecks.protocols.Protocol;
+import ecks.Logging;
+import ecks.util;
 
 import java.io.*;
 import java.net.*;
@@ -25,11 +27,11 @@ import java.nio.channels.ClosedByInterruptException;
 
 public class ConnThread implements Runnable {
 
-    // my entire existence is to provide psudo non-blocking (input) reads
+    // Send incoming lines, one at a time, to the protocol handler.
 
     BufferedReader stream;
     Protocol handoff;
-    ConnThread(BufferedReader in, Protocol p){ stream = in; handoff = p; }
+    public ConnThread(BufferedReader in, Protocol p){ stream = in; handoff = p; }
 
     public void run()
     {
@@ -43,11 +45,19 @@ public class ConnThread implements Runnable {
               break;
           } catch (NullPointerException npe) {
               npe.printStackTrace();
-              Logging.error("CONNTHREAD", "Uplink closed connection!");
-              break; // connection terminated. likely, our uplink cored.
+              Logging.error("CONNTHREAD", "Null pointer exception!");
+              if (stream == null)
+              {
+                    Logging.error("CONNTHREAD", "Upstream is null; Server closed connection.");
+                    break; // connection terminated. likely, our uplink cored.
+              }
           } catch (IOException e) {
               e.printStackTrace();
               break;
+          } catch (Exception e) {
+              e.printStackTrace();
+              Logging.error("CONNTHREAD", "Thread got exception!");
+              Logging.info("CONNTHREAD", e.getMessage());
           }
 
           if(Thread.interrupted())

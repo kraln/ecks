@@ -24,6 +24,7 @@ import ecks.services.SrvChannel;
 import ecks.services.SrvChannel_channel;
 import ecks.services.SrvHelp;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 import ecks.util;
 import ecks.Storage;
@@ -35,7 +36,7 @@ public class Sync extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         String whatchan = "";
         String whom = "";
         String args[] = arguments.split(" ");
@@ -59,14 +60,14 @@ public class Sync extends bCommand {
         if (whatchan.startsWith("#")) {
             if (((SrvHelp) who).getChannels().containsKey(whatchan)) {
                 if (( (SrvChannel)Configuration.getSvc().get(Configuration.chanservice)).getChannels().containsKey(whatchan))
-                    if (Storage.Users.containsKey(whom))
-                        if (!((SrvChannel)Configuration.getSvc().get(Configuration.chanservice)).getChannels().get(whatchan).getUsers().containsKey(Storage.Users.get(whom).authname))
+                    if (Generic.Users.containsKey(whom))
+                        if (!((SrvChannel)Configuration.getSvc().get(Configuration.chanservice)).getChannels().get(whatchan).getUsers().containsKey(Generic.Users.get(whom).authhandle))
                         // if you have access to the channel you don't get it.
                         {
-                            ((SrvHelp) who).getChannels().get(whatchan).queue.add(Storage.Users.get(whom));
-                            p.PrivMessage(who, whom, "Welcome to " + whatchan + ", " + whom + ". Your are in position #" + ((SrvHelp) who).getChannels().get(whatchan).queue.indexOf(Storage.Users.get(whom)) + ". Please wait patiently until one of the channel operators responds to you.");
+                            ((SrvHelp) who).getChannels().get(whatchan).queue.add(Generic.Users.get(whom));
+                            Generic.curProtocol.outPRVMSG(who, whom, "Welcome to " + whatchan + ", " + whom + ". Your are in position #" + ((SrvHelp) who).getChannels().get(whatchan).queue.indexOf(Generic.Users.get(whom)) + ". Please wait patiently until one of the channel operators responds to you.");
                         }
-            } else if(!silent) p.PrivMessage(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
-        } else if(!silent) p.PrivMessage(who, replyto, "\u0002Error:\u0002 Not a channel!");
+            } else if(!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
+        } else if(!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a channel!");
     }
 }

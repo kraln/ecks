@@ -15,31 +15,37 @@
  * <jeff@katzonline.net>. All Rights Reserved.
  *
  */
-package ecks;
+package ecks.Utility;
+import ecks.Utility.Modes;
+import ecks.Utility.Client;
+
 import java.util.Map;
 import java.util.HashMap;
 
 public class Channel {
     public String name;
     public int ts;
-    public String modes;
-    public Map<Client, String> clientmodes;
+    public String topic;
+    public int tts;
+    public ChanModes modes;
+    public Map<Client, UserModes> clientmodes;
 
     public Channel(){}
-    public Channel(int t, String n, String m)
+    public Channel(int t, String n, ChanModes m)
     {
-        ts = t; name = n; modes =m;
-        clientmodes=new HashMap<Client,String>();
+        ts = t; name = n; modes = m;
+        clientmodes=new HashMap<Client,UserModes>();
     }
-    public Channel(int t, String n, String m, Map<Client, String> cm)
+    public Channel(int t, String n, ChanModes m, Map<Client, UserModes> cm)
     {
         ts = t;
         name = n;
         modes = m;
         clientmodes = cm;
+        topic = "";
     }
     public String toString()
     {
-        return name + ": " + ts + " " + modes + " occupied by " + clientmodes.size() + " users.";
+        return name + ": " + ts + " " + modes.getModes() + " occupied by " + clientmodes.size() + " users. Topic is: " + topic;
     }
 }

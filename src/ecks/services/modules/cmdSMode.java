@@ -18,13 +18,14 @@
 package ecks.services.modules;
 
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 import ecks.services.Service;
 
 public class cmdSMode extends bCommand{
     public final CommandDesc Desc = new CommandDesc("smode", 3, true, CommandDesc.access_levels.A_SRA, "Forces services to set a mode.", "[channel <user>|channel] <mode>");
     public CommandDesc getDesc() { return Desc; }
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
-        p.forcemode(who, arguments, "", "");
+    public void handle_command(Service who, String user, String replyto, String arguments) {
+        Generic.curProtocol.outSETMODE(who, arguments, "", "");
     }
 }

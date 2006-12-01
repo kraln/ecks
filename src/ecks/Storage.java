@@ -34,10 +34,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Document;
 
 public class Storage {
-    public static Map<String, Client> Users = new HashMap<String, Client>();
-    public static Map<String, Channel> Channels = new HashMap<String, Channel>();
-
-    public void loadDB(Configuration conf) {
+    public void loadDB() {
         Document dom = null;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
@@ -61,9 +58,9 @@ public class Storage {
         if ((zl != null) && zl.getLength() > 0) {
             for (int i = 0; i < zl.getLength(); i++) {
                 el = (Element) zl.item(i);
-                if (conf.Services.containsKey(el.getAttribute("name").toLowerCase())) {
+                if (Configuration.Services.containsKey(el.getAttribute("name").toLowerCase())) {
                     Logging.verbose("DATABASE", el.getAttribute("name") + " Loading database...");
-                    conf.getSvc().get(el.getAttribute("name").toLowerCase()).loadSRVDB(el.getChildNodes());
+                    Configuration.getSvc().get(el.getAttribute("name").toLowerCase()).loadSRVDB(el.getChildNodes());
                     Logging.verbose("DATABASE", el.getAttribute("name") + " Loading complete...");
                 }
             }
@@ -74,9 +71,9 @@ public class Storage {
 
     }
 
-    public static synchronized void flushDB(Configuration conf) {
+    public static synchronized void flushDB() {
         String out = "";
-        for (Map.Entry<String, Service> Serve : conf.Services.entrySet()) {
+        for (Map.Entry<String, Service> Serve : Configuration.Services.entrySet()) {
             out = out + Serve.getValue().getSRVDB(); // get well-formed xml from each
         }
         out = out.trim();

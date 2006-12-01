@@ -20,6 +20,7 @@ package ecks.services.modules.SrvAuth;
 import ecks.Configuration;
 import ecks.Storage;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
 import ecks.services.modules.CommandDesc;
@@ -33,21 +34,21 @@ public class Unregister extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         SrvAuth temp = ((SrvAuth) who);
         String args[] = arguments.split(" ");
         String tU = args[0].toLowerCase();
         if (args.length == 1) {
             if (util.sanitize(tU)) {
                 if (temp.getUsers().containsKey(tU)) {
-                    if ((temp.getUsers().get(Storage.Users.get(user).authname)).getAccess().ordinal() > (temp.getUsers().get(tU).getAccess().ordinal())) // we can only delete people lower than us
+                    if ((temp.getUsers().get(Generic.Users.get(user).authhandle)).getAccess().ordinal() > (temp.getUsers().get(tU).getAccess().ordinal())) // we can only delete people lower than us
                     {
                         temp.getUsers().remove(tU); // drop the account
-                        // Storage.Users.get(tU).authname = null; // user is no longer authed
-                        p.PrivMessage(who, replyto, "User account removed.");
-                    } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 User has equal/higher access than you!");
-                } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 No such username is registered");
-            } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid username.");
-        } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: unregister [username]");
+                        // Generic.Users.get(tU).authhandle = null; // user is no longer authed
+                        Generic.curProtocol.outPRVMSG(who, replyto, "User account removed.");
+                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has equal/higher access than you!");
+                } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 No such username is registered");
+            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid username.");
+        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: unregister [username]");
     }
 }

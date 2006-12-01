@@ -23,6 +23,7 @@ import ecks.services.Service;
 import ecks.services.SrvChannel_channel;
 import ecks.services.SrvChannel;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;import ecks.Storage;
 
 public class DelUser extends bCommand {
@@ -32,7 +33,7 @@ public class DelUser extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         /*
             deluser jeff
             deluser #chan jeff
@@ -58,7 +59,7 @@ public class DelUser extends bCommand {
                     whom = args[0];
                     whatchan = args[1];
                 } else {
-                    p.PrivMessage(who, replyto, "\u0002Error:\u0002 Must specify a channel!");
+                    Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Must specify a channel!");
                     return;
                 }
             }
@@ -69,24 +70,24 @@ public class DelUser extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
-                if (Storage.Users.containsKey(whom)) {
-                    if (Storage.Users.get(whom).authname != null) {
-                        if (Storage.Users.get(user).authname != null) {
-                            String aname = Storage.Users.get(user).authname;
+                if (Generic.Users.containsKey(whom)) {
+                    if (Generic.Users.get(whom).authhandle != null) {
+                        if (Generic.Users.get(user).authhandle != null) {
+                            String aname = Generic.Users.get(user).authhandle;
                             if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
-                                if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(Storage.Users.get(whom).authname)) {
+                                if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(Generic.Users.get(whom).authhandle)) {
                                     SrvChannel_channel.ChanAccess alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(aname);
-                                    SrvChannel_channel.ChanAccess blevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(Storage.Users.get(whom).authname);
+                                    SrvChannel_channel.ChanAccess blevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(Generic.Users.get(whom).authhandle);
                                     if (blevel.ordinal() < alevel.ordinal()) {
-                                        ((SrvChannel) who).getChannels().get(whatchan).getUsers().remove(Storage.Users.get(whom).authname);
-                                        p.PrivMessage(who, replyto, "User Removed!");
-                                    } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You cannot remove a user of higher access than yourself!");
-                                } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 User already has no access to channel!");
-                            } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You have no access to channel!");
-                        } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 You are not authed!");
-                    } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 User is not authed!");
-                } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 User does not exist!");
-            } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
-        } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Not a channel!");
+                                        ((SrvChannel) who).getChannels().get(whatchan).getUsers().remove(Generic.Users.get(whom).authhandle);
+                                        Generic.curProtocol.outPRVMSG(who, replyto, "User Removed!");
+                                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You cannot remove a user of higher access than yourself!");
+                                } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User already has no access to channel!");
+                            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You have no access to channel!");
+                        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You are not authed!");
+                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User is not authed!");
+                } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User does not exist!");
+            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
+        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a channel!");
     }
 }

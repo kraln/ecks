@@ -18,16 +18,17 @@
 package ecks.services.modules;
 
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 import ecks.services.Service;
 
 public class cmdWhois extends bCommand{
     public final CommandDesc Desc = new CommandDesc("whois", 1, true, CommandDesc.access_levels.A_HELPER, "Gives you information about a user", "<user>");
     public CommandDesc getDesc() { return Desc; }
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
-        if (c.Database.Users.containsKey(arguments.toLowerCase()))
-                    p.Notice(who, user, "\u0002User:\u0002 " + c.Database.Users.get(arguments.trim().toLowerCase()));
+    public void handle_command(Service who, String user, String replyto, String arguments) {
+        if (Generic.Users.containsKey(arguments.toLowerCase()))
+                    Generic.curProtocol.outNOTICE(who, user, "\u0002User:\u0002 " + Generic.Users.get(arguments.trim().toLowerCase()));
                 else
-                    p.Notice(who, user, "\u0002Error:\u0002 No such user exists!");
+                    Generic.curProtocol.outNOTICE(who, user, "\u0002Error:\u0002 No such user exists!");
     }
 }

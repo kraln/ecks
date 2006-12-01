@@ -23,6 +23,7 @@ import ecks.services.Service;
 import ecks.services.SrvChannel;
 import ecks.services.SrvChannel_channel;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 
 public class DeSync extends bCommand {
@@ -32,7 +33,7 @@ public class DeSync extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         String whatchan = "";
         String whom = "";
         String args[] = arguments.split(" ");
@@ -56,8 +57,8 @@ public class DeSync extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
-                p.forcemode(who,whatchan,"-ov", whom + " " + whom);
-            } else if (!silent) p.PrivMessage(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
-        } else if (!silent) p.PrivMessage(who, replyto, "\u0002Error:\u0002 Not a channel!");
+                Generic.curProtocol.outSETMODE(who,whatchan,"-ov", whom + " " + whom);
+            } else if (!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
+        } else if (!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a channel!");
     }
 }

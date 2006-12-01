@@ -22,6 +22,7 @@ import ecks.services.modules.CommandDesc;
 import ecks.services.Service;
 import ecks.services.SrvChannel;
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Configuration;
 import ecks.util;
 import ecks.Logging;
@@ -34,7 +35,7 @@ public class Access extends bCommand {
         return Desc;
     }
 
-    public void handle_command(Service who, String user, String replyto, String arguments, Protocol p, Configuration c) {
+    public void handle_command(Service who, String user, String replyto, String arguments) {
         /*
         SrvChan: access  - get my access in this channel
         Srvchan: access john - get john's access in this channel
@@ -73,18 +74,18 @@ public class Access extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
-                if (Storage.Users.containsKey(whom)) {
-                    if (Storage.Users.get(whom).authname != null) {
-                        String aname = Storage.Users.get(whom).authname;
+                if (Generic.Users.containsKey(whom)) {
+                    if (Generic.Users.get(whom).authhandle != null) {
+                        String aname = Generic.Users.get(whom).authhandle;
                         if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
 
                             String alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(aname).toString();
 
-                            p.PrivMessage(who, replyto, util.pad("\u0002" + aname + "\u0002 ", 20) + alevel.substring(2));
-                        } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 User has no access to channel!");
-                    } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 User is not authed!");
-                } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 User does not exist!");
-            } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
-        } else p.PrivMessage(who, replyto, "\u0002Error:\u0002 Not a channel!");
+                            Generic.curProtocol.outPRVMSG(who, replyto, util.pad("\u0002" + aname + "\u0002 ", 20) + alevel.substring(2));
+                        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has no access to channel!");
+                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User is not authed!");
+                } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User does not exist!");
+            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
+        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a channel!");
     }
 }
