@@ -20,6 +20,7 @@ package ecks;
 import ecks.protocols.*;
 import ecks.Threads.DbThread;
 import ecks.RPC.RPCHandler;
+import ecks.Hooks.Hooks;
 
 import java.net.InetAddress;
 import org.apache.xmlrpc.WebServer;
@@ -47,6 +48,10 @@ public class main {
         Logging.setup();
         Logging.summary("STARTUP", "Welcome to Ecks Services. Internal Version: " + util.getVersion());
         Logging.verbose("STARTUP", "Logging loaded...");
+        
+        //initialize hooks
+        Hooks.initialize();
+        Logging.verbose("STARTUP", "Hooks initialized...");
 
         //load services
         Configuration.LoadServices();

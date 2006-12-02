@@ -21,6 +21,7 @@ import ecks.services.modules.CommandDesc;
 import ecks.util;
 import ecks.Logging;
 import ecks.Configuration;
+import ecks.Hooks.Hooks;
 import ecks.protocols.Generic;
 
 import java.util.Map;
@@ -28,24 +29,31 @@ import java.util.HashMap;
 
 import org.w3c.dom.*;
 
-public class  SrvAuth extends bService {
+public class SrvAuth extends bService {
     public String name = "SrvAuth";
     public Map<String, SrvAuth_user> Users;
 
     public void introduce() {
         Configuration.authservice = name.toLowerCase(); // I lay claim to users
+        Hooks.regHook(this, Hooks.Events.E_PRIVMSG);
         Generic.srvIntroduce(this);
-        if(!(Configuration.Config.get("debugchan").equals("OFF")))
+        if (!(Configuration.Config.get("debugchan").equals("OFF")))
             Generic.srvJoin(this, Configuration.Config.get("debugchan"), "+stn");
     }
 
-    public boolean chkpass(String pwd, String user) { return Users.get(user).password.equals(util.hash(pwd));  }
+    public boolean chkpass(String pwd, String user) {
+        return Users.get(user).password.equals(util.hash(pwd));
+    }
 
-    public String getname() { return name; }
-    public void setname(String nname) { name = nname; }
+    public String getname() {
+        return name;
+    }
 
-    public CommandDesc.access_levels checkAccess(String user)
-    {
+    public void setname(String nname) {
+        name = nname;
+    }
+
+    public CommandDesc.access_levels checkAccess(String user) {
         if (Users.containsKey(user))
             return Users.get(user).services_access;
         else
@@ -69,62 +77,97 @@ public class  SrvAuth extends bService {
         Users = new HashMap<String, SrvAuth_user>();
     }
 
-    public Map<String, SrvAuth_user> getUsers()
-    {
+    public Map<String, SrvAuth_user> getUsers() {
         return Users;
     }
 
     public String getSRVDB() {
-        String tOut="";
-        tOut = tOut+ "<service class=\"" + this.getClass().getName() + "\" name=\"" + name + "\">\r\n";
+        String tOut = "";
+        tOut = tOut + "<service class=\"" + this.getClass().getName() + "\" name=\"" + name + "\">\r\n";
         for (Map.Entry<String, SrvAuth_user> usar : Users.entrySet()) {
             tOut = tOut + "\t" + "<user>\r\n";
-            tOut = tOut + "\t\t" +"<username value=\"" + util.encodeUTF(usar.getValue().username) + "\"/>\r\n";
-            tOut = tOut + "\t\t" +"<password value=\"" +util.encodeUTF(usar.getValue().password) + "\"/>\r\n";
-            tOut = tOut + "\t\t" +"<email value=\"" + util.encodeUTF(usar.getValue().email) + "\"/>\r\n";
-            tOut = tOut + "\t\t" +"<access value=\"" + usar.getValue().services_access + "\"/>\r\n";
-            tOut = tOut + "\t\t" +"<metadata>\r\n";
+            tOut = tOut + "\t\t" + "<username value=\"" + util.encodeUTF(usar.getValue().username) + "\"/>\r\n";
+            tOut = tOut + "\t\t" + "<password value=\"" + util.encodeUTF(usar.getValue().password) + "\"/>\r\n";
+            tOut = tOut + "\t\t" + "<email value=\"" + util.encodeUTF(usar.getValue().email) + "\"/>\r\n";
+            tOut = tOut + "\t\t" + "<access value=\"" + usar.getValue().services_access + "\"/>\r\n";
+            tOut = tOut + "\t\t" + "<metadata>\r\n";
             for (Map.Entry<String, String> md : usar.getValue().getAllMeta().entrySet()) {
-                tOut = tOut + "\t\t\t" +"<" + util.encodeUTF(md.getKey()) + " value=\"" + util.encodeUTF(md.getValue()) + "\"/>\r\n";
+                tOut = tOut + "\t\t\t" + "<" + util.encodeUTF(md.getKey()) + " value=\"" + util.encodeUTF(md.getValue()) + "\"/>\r\n";
             }
-            tOut = tOut + "\t\t" +"</metadata>\r\n";
+            tOut = tOut + "\t\t" + "</metadata>\r\n";
             tOut = tOut + "\t" + "</user>\r\n";
         }
-        tOut = tOut+ "</service>\r\n";
+        tOut = tOut + "</service>\r\n";
         return tOut;
     }
-    public void loadSRVDB(NodeList XMLin)
-    {
+
+    public void loadSRVDB(NodeList XMLin) {
         for (int i = 0; i < XMLin.getLength(); i++) {  // user tags
-            String uTemp, pTemp,eTemp;
+            String uTemp, pTemp, eTemp;
             CommandDesc.access_levels aTemp;
-            Map <String,String> mTemp = new HashMap<String, String>();
+            Map<String, String> mTemp = new HashMap<String, String>();
 
             NodeList t;
 
-            if (XMLin.item(i).getNodeType() != 1 ) continue;
+            if (XMLin.item(i).getNodeType() != 1) continue;
 
-            t = ((Element)XMLin.item(i)).getElementsByTagName("username");
+            t = ((Element) XMLin.item(i)).getElementsByTagName("username");
             uTemp = util.decodeUTF(t.item(0).getAttributes().getNamedItem("value").getNodeValue());
-            t = ((Element)XMLin.item(i)).getElementsByTagName("password");
+            t = ((Element) XMLin.item(i)).getElementsByTagName("password");
             pTemp = util.decodeUTF(t.item(0).getAttributes().getNamedItem("value").getNodeValue());
-            t = ((Element)XMLin.item(i)).getElementsByTagName("email");
+            t = ((Element) XMLin.item(i)).getElementsByTagName("email");
             eTemp = util.decodeUTF(t.item(0).getAttributes().getNamedItem("value").getNodeValue());
-            t = ((Element)XMLin.item(i)).getElementsByTagName("access");
+            t = ((Element) XMLin.item(i)).getElementsByTagName("access");
             aTemp = CommandDesc.access_levels.valueOf(t.item(0).getAttributes().getNamedItem("value").getNodeValue());
 
-            t = ((Element)XMLin.item(i)).getElementsByTagName("metadata").item(0).getChildNodes();
-            for (int j =0; j< t.getLength();j++) {
-                if (t.item(j).getNodeType() != 1 ) continue;
+            t = ((Element) XMLin.item(i)).getElementsByTagName("metadata").item(0).getChildNodes();
+            for (int j = 0; j < t.getLength(); j++) {
+                if (t.item(j).getNodeType() != 1) continue;
                 mTemp.put(util.decodeUTF((t.item(j)).getNodeName()), util.decodeUTF((t.item(j)).getAttributes().getNamedItem("value").getNodeValue()));
             }
 
-            Users.put(uTemp.toLowerCase().trim(), new SrvAuth_user(uTemp,pTemp,eTemp,aTemp,mTemp));
+            Users.put(uTemp.toLowerCase().trim(), new SrvAuth_user(uTemp, pTemp, eTemp, aTemp, mTemp));
         }
         Logging.info("SRVAUTH", "Loaded " + Users.size() + " registered users from database.");
     }
-    public int getcount()
-    {
+
+    public int getcount() {
         return Users.size();
     }
+
+    public void hookDispatch(Hooks.Events what, String source, String target, String args) {
+        switch (what) {
+            case E_PRIVMSG:
+                // todo: fix this up so it's not such a steaming pile of crap
+                String target2 = "", arguments = "";
+
+                                                if (target.startsWith("#")) { // is a channel message
+                    if (args.split(" ")[0].endsWith(":")) { // someone is addressing something. ie blah:
+                        target2 = args.split(" ")[0];
+                        target2 = target.substring(0,target.length()-1);
+                        arguments = args.substring(target.length() + 1).trim();
+                    }
+                } else { // is a private message
+                    target2 = target;
+                    arguments = args;
+                }
+
+                // hack hack hack
+                String temp[] = target2.split("@");
+                target2 = temp[0];
+
+                if (temp.length > 1)
+                    arguments = "FQDN" + arguments;
+
+                this.handle(
+                            source,
+                            (target2.startsWith("#")?target2:source),
+                            arguments
+                    );
+
+                break;
+            default:
+        }
+    }
+
 }
