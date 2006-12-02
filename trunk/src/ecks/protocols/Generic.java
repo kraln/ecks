@@ -168,6 +168,7 @@ public class Generic {
         // todo: hook join
         if (Channels.containsKey(channel.toLowerCase())) {
             Channels.get(channel.toLowerCase()).clientmodes.put(Users.get(user.toLowerCase()), new UserModes());
+            Users.get(user.toLowerCase()).chans.add(channel);
         } else { // services joining an empty channel
             chanBurst(ts,channel,"+nt", new String[] {user});
         }
@@ -207,6 +208,7 @@ public class Generic {
 
         if (Channels.get(channel.toLowerCase()).clientmodes.containsKey(who)) { // we had better...
             Channels.get(channel.toLowerCase()).clientmodes.remove(who);
+            who.chans.remove(channel);
         } else {
             Logging.warn("PROTOCOL", "Tried to part a user from a channel that they weren't on");
             return;

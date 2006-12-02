@@ -19,6 +19,9 @@ package ecks.Utility;
 
 import ecks.Utility.Modes;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class Client {
     // this class contains every possible bit of information we could ever have about a client
     // in practice, most ircds only send a small portion of the following
@@ -36,6 +39,7 @@ public class Client {
     public long numericip;
     public String realname;
     public String nickid;
+    public List<String> chans;
 
     public String authhandle; // for use with auth services
 
@@ -54,11 +58,12 @@ public class Client {
         realname = k;
         nickid = l;
 
+        chans = new ArrayList<String>();
         authhandle = null;
     }
 
 
-    public Client(){}
+    //public Client(){  modes = new UserModes(); chans = new ArrayList<String>(); }
     public String toString()
     {
         return uid + ": " + modes.getModes() + " " + ident + " " + host + " (" + althost + ") on " + uplink;

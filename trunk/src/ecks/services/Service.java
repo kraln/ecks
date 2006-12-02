@@ -18,6 +18,7 @@
 package ecks.services;
 
 import ecks.*;
+import ecks.Hooks.Hooks;
 import ecks.services.modules.CommandModule;
 import ecks.protocols.Protocol;
 import org.w3c.dom.NodeList;
@@ -35,6 +36,7 @@ public abstract interface Service {
     public void die(String message);
     public void addCommand (String cmdName, CommandModule newCmd);
     public Map<String, CommandModule> getCommands();
+    public void hookDispatch(Hooks.Events what, String source, String target, String args);
 
     public String getSRVDB();
     public void loadSRVDB(NodeList XMLin);

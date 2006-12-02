@@ -123,20 +123,24 @@ public class ChanModes implements Modes {
     }
     public String getModes()
     {
-        //todo: me
+
         String t ="", ca =" ";
         for (Map.Entry<Character, List> e : modes.entrySet())
         {
-            t += e.getKey();
             if (e.getValue() != null)
             {
                 List j = e.getValue();
                 for (int k = 0; k < j.size(); k++)
-                ca += j.get(k) + " ";
+                {
+                    t += e.getKey();
+                    ca += j.get(k) + " ";
+                }
+            } else {
+                t += e.getKey();
             }
         }
 
-        return "+" + t + ca;
+        return "+" + t + ca.trim();
     }
 
 }

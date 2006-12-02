@@ -23,6 +23,8 @@ import ecks.services.Service;
 
 import java.io.IOException;
 import java.io.BufferedWriter;
+import ecks.Hooks.Hooks.Events;
+import ecks.Hooks.Hooks;
 
 public class ngfqircd implements Protocol {
     BufferedWriter out; // where we send our irc commands to
@@ -114,7 +116,7 @@ public class ngfqircd implements Protocol {
             } else if (cmd.equals("NICK")) {                                                                     // NICK
 
                 if (hasSource) { // It's a rename
-                    Generic.nickRename(tokens[2], source);
+                    Generic.nickRename(source,tokens[2]);
                 } else { // It's a new client, in a burst or otherwise
                     nickSignOn(tokens, args);
                 }
@@ -141,7 +143,7 @@ public class ngfqircd implements Protocol {
                 if (tokens[2].startsWith("#")) { // is a channel mode
                 modestring = tokens[4];
                 if (tokens.length > 4)
-                    for (int i = 0; i< tokens.length; i++)
+                    for (int i = 5; i< tokens.length; i++)
                         modestring += " " + tokens[i];
                     Generic.modeChan(tokens[2], modestring);
                 } else {                         // user mode has changed
@@ -151,39 +153,8 @@ public class ngfqircd implements Protocol {
 
             } else if (cmd.equals("PRIVMSG")) {                                                               // PRIVMSG
 
-                // todo: work this stuff into hooks like I should properly.
                 //:SOURCE PRIVMSG TARGET :MESSAGE
-
-                String target = "";
-                String arguments = "";
-
-                if (tokens[2].startsWith("#")) { // is a channel message
-                    if (args.split(" ")[0].endsWith(":")) { // someone is addressing something. ie blah:
-                        target = args.split(" ")[0];
-                        target = target.substring(0,target.length()-1);
-                        arguments = args.substring(target.length() + 1).trim();
-                    }
-                } else { // is a private message
-                    target = tokens[2];
-                    arguments = args;
-                }
-                
-                // hack hack hack
-                String temp[] = target.split("@");
-                target = temp[0];
-
-                if (temp.length > 1) arguments = "FQDN" + arguments;
-
-                if (Configuration.getSvc().containsKey(target.toLowerCase()))
-                {
-                    Configuration.getSvc().get(
-                            target.toLowerCase()
-                    ).handle(
-                            source,
-                            (tokens[2].startsWith("#")?tokens[2]:source),
-                            arguments
-                    );
-                }
+                Hooks.hook(Events.E_PRIVMSG,source,tokens[2],args);
 
             } else if (cmd.equals("SJOIN")) {                                                                   // SJOIN
 

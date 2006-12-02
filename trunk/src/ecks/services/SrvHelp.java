@@ -27,6 +27,7 @@ import java.util.List;
 import ecks.util;
 import ecks.Logging;
 import ecks.Configuration;
+import ecks.Hooks.Hooks;
 import ecks.protocols.Generic;
 
 public class SrvHelp extends bService {
@@ -35,6 +36,9 @@ public class SrvHelp extends bService {
 
     public void introduce() {
         Generic.srvIntroduce(this);
+        Hooks.regHook(this, Hooks.Events.E_PRIVMSG);
+        Hooks.regHook(this, Hooks.Events.E_JOINCHAN);
+        Hooks.regHook(this, Hooks.Events.E_PARTCHAN);
         if(!(Configuration.Config.get("debugchan").equals("OFF")))
         {
             Generic.curProtocol.srvJoin(this, Configuration.Config.get("debugchan"), "+stn");
@@ -103,4 +107,39 @@ public class SrvHelp extends bService {
     {
         return Channels.size();
     }
+    public void hookDispatch(Hooks.Events what, String source, String target, String args) {
+        switch (what) {
+            case E_PRIVMSG:
+                // todo: fix this up so it's not such a steaming pile of crap
+                String target2 = "", arguments = "";
+
+                                                if (target.startsWith("#")) { // is a channel message
+                    if (args.split(" ")[0].endsWith(":")) { // someone is addressing something. ie blah:
+                        target2 = args.split(" ")[0];
+                        target2 = target.substring(0,target.length()-1);
+                        arguments = args.substring(target.length() + 1).trim();
+                    }
+                } else { // is a private message
+                    target2 = target;
+                    arguments = args;
+                }
+
+                // hack hack hack
+                String temp[] = target2.split("@");
+                target2 = temp[0];
+
+                if (temp.length > 1)
+                    arguments = "FQDN" + arguments;
+
+                this.handle(
+                            source,
+                            (target2.startsWith("#")?target2:source),
+                            arguments
+                    );
+
+                break;
+            default:
+        }
+    }
+
 }

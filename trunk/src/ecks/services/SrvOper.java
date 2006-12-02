@@ -19,6 +19,7 @@ package ecks.services;
 
 import org.w3c.dom.NodeList;
 import ecks.Configuration;
+import ecks.Hooks.Hooks;
 import ecks.protocols.Generic;
 
 public class SrvOper extends bService {
@@ -27,6 +28,7 @@ public class SrvOper extends bService {
     public void introduce() {
         Configuration.logservice = name.toLowerCase(); // I lay claim to logging
         Generic.srvIntroduce(this);
+        Hooks.regHook(this, Hooks.Events.E_PRIVMSG);
         if(!(Configuration.Config.get("debugchan").equals("OFF")))
         {
             Generic.curProtocol.srvJoin(this, Configuration.Config.get("debugchan"), "+stn");
@@ -46,7 +48,6 @@ public class SrvOper extends bService {
     }
 
     public void handle(String user, String replyto, String command) {
-        // todo: actually handle user mode updates...
         String cmd = command.split(" ")[0];
         if (Generic.Users.get(user.toLowerCase()).modes.contains("o")) // if we're an oper
             super.handle(user.toLowerCase(), replyto.toLowerCase(), command);
@@ -61,4 +62,39 @@ public class SrvOper extends bService {
     {
         return -1; // return ideally the number of opers online...
     }
+    public void hookDispatch(Hooks.Events what, String source, String target, String args) {
+        switch (what) {
+            case E_PRIVMSG:
+                // todo: fix this up so it's not such a steaming pile of crap
+                String target2 = "", arguments = "";
+
+                                                if (target.startsWith("#")) { // is a channel message
+                    if (args.split(" ")[0].endsWith(":")) { // someone is addressing something. ie blah:
+                        target2 = args.split(" ")[0];
+                        target2 = target.substring(0,target.length()-1);
+                        arguments = args.substring(target.length() + 1).trim();
+                    }
+                } else { // is a private message
+                    target2 = target;
+                    arguments = args;
+                }
+
+                // hack hack hack
+                String temp[] = target2.split("@");
+                target2 = temp[0];
+
+                if (temp.length > 1)
+                    arguments = "FQDN" + arguments;
+
+                this.handle(
+                            source,
+                            (target2.startsWith("#")?target2:source),
+                            arguments
+                    );
+
+                break;
+            default:
+        }
+    }
+
 }
