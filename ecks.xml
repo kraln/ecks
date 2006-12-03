@@ -125,6 +125,7 @@
             <command value="ecks.services.modules.SrvChannel.Chan.DeSync" />
             <command value="ecks.services.modules.SrvChannel.Chan.Kick" />
             <command value="ecks.services.modules.SrvChannel.Chan.Invite" />
+            <command value="ecks.services.modules.SrvChannel.Chan.SyncAll" />
         </modules>
 	</service>
 	<service class="ecks.services.SrvAuth" name="SrvAuth">
