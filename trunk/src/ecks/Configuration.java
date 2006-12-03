@@ -48,9 +48,9 @@ public class Configuration {
         Services = new HashMap<String, Service>();
         Database = new Storage();
         cp = new ConfParse();
-        authservice = "";
-        chanservice = "";
-        logservice = "";
+        authservice = null;
+        chanservice = null;
+        logservice = null;
     }
 
     public static Storage getDB()

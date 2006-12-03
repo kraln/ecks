@@ -19,6 +19,7 @@ package ecks.protocols;
 
 import ecks.services.Service;
 import ecks.*;
+import ecks.Hooks.Hooks;
 import ecks.Utility.*;
 
 import java.util.Map;
@@ -42,6 +43,7 @@ public class Generic {
                 Serve.getValue().introduce(); // tell all the ladies about our services
             }
         } catch (NullPointerException e) {
+            e.printStackTrace();
             Logging.warn("PROTOCOL", "Got NPE whilst bringing services agents online!");
         }
     }
@@ -49,7 +51,6 @@ public class Generic {
     public static void nickRename(String oldnick, String newnick)
     // client has renamed
     {
-        // todo: hook rename
         String oldid = oldnick.toLowerCase();
         String newid = newnick.toLowerCase();
 
@@ -63,16 +64,15 @@ public class Generic {
     public static void modeUser(String target, String modes)
     // a user changed his/her modes
     {
-        // todo hook user modes
         Users.get(target.toLowerCase()).modes.applyChanges(modes);
+        Hooks.hook(Hooks.Events.E_UMODE,null,target,modes);
 
     }
     public static void modeChan(String target, String modes)
     // a client changed a channel's modes
     {
-        // todo: hook channel modes
         Channels.get(target.toLowerCase()).modes.applyChanges(modes);
-
+        Hooks.hook(Hooks.Events.E_MODE,null,target,modes);
     }
 
 
@@ -103,7 +103,6 @@ public class Generic {
     public static void nickSignOff(String who)
     // a client has exited
     {
-        // todo: hook quit
         if (Users.containsKey(who.toLowerCase())) {
             Users.remove(who);
         } else {
@@ -113,8 +112,9 @@ public class Generic {
 
     public static void nickGotKicked(String user, String channel)
     {
-        // todo: hook kicks
+
         chanPart(user, channel); // track parts properly
+        Hooks.hook(Hooks.Events.E_KICK,channel,user,null);
         if (Configuration.getSvc().containsKey(user.toLowerCase())) {
         // they've kicked one of us. bad idea.
             Logging.info("PROTOCOL", "Service was kicked! Attempting rejoin.");
@@ -124,7 +124,6 @@ public class Generic {
 
     public static void nickGotKilled(String user)
     {
-        // todo: hook kills
         nickSignOff(user); // track quits properly
         if (Configuration.getSvc().containsKey(user.toLowerCase())) {
         // they've killed one of us. possibly wrong protocol?
@@ -134,7 +133,6 @@ public class Generic {
     }
 
     public static void chanBurst(int ts, String channel, String modes, String[] users) {
-        // todo: hook join
         ChanModes m = new ChanModes();
         Map<Client, UserModes> cm = new HashMap<Client, UserModes>();
 
@@ -159,16 +157,18 @@ public class Generic {
             Logging.error("PROTOCOL", "Attempted to add a channel that already exists");
         } else {
             Channels.put(channel.toLowerCase(), new Channel(ts, channel, m, cm));
+            for (String user : users)
+                Hooks.hook(Hooks.Events.E_JOINCHAN,channel,user,null);
             Logging.info("PROTOCOL", "Channel " + channel + " is now being tracked.");
         }
 
     }
 
     public static void chanJoin(int ts, String channel, String user) {
-        // todo: hook join
         if (Channels.containsKey(channel.toLowerCase())) {
             Channels.get(channel.toLowerCase()).clientmodes.put(Users.get(user.toLowerCase()), new UserModes());
             Users.get(user.toLowerCase()).chans.add(channel);
+            Hooks.hook(Hooks.Events.E_JOINCHAN,channel,user,"");
         } else { // services joining an empty channel
             chanBurst(ts,channel,"+nt", new String[] {user});
         }
@@ -176,11 +176,10 @@ public class Generic {
     }
 
     public static void chanTopic(int ts, String channel, String what) {
-        // todo: hook join
-
         if (Channels.containsKey(channel.toLowerCase())) {
             Channels.get(channel.toLowerCase()).topic = what;
             Channels.get(channel.toLowerCase()).tts = ts;
+            Hooks.hook(Hooks.Events.E_TOPIC,channel,what,null);
         } else {
             Logging.error("PROTOCOL", "Attempted to set a topic on a channel that does not exist");
         }
@@ -188,8 +187,6 @@ public class Generic {
     }
 
     public static void chanPart(String channel, String user) {
-        // todo: hook part
-
         if (!Channels.containsKey(channel.toLowerCase())) // we had better...
         {
             Logging.warn("PROTOCOL", "Tried to part a user from a channel that didn't exist");
@@ -209,6 +206,7 @@ public class Generic {
         if (Channels.get(channel.toLowerCase()).clientmodes.containsKey(who)) { // we had better...
             Channels.get(channel.toLowerCase()).clientmodes.remove(who);
             who.chans.remove(channel);
+            Hooks.hook(Hooks.Events.E_PARTCHAN,channel,user,null);
         } else {
             Logging.warn("PROTOCOL", "Tried to part a user from a channel that they weren't on");
             return;
