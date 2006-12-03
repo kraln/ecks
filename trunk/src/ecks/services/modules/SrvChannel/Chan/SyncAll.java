@@ -32,13 +32,12 @@ public class SyncAll extends bCommand {
     }
 
     public void handle_command(Service who, String user, String replyto, String arguments) {
-        String whatchan = "";
         String whom = "";
-        String args[] = arguments.split(" ");
 
         boolean silent = false;
         whom = user.toLowerCase();
-        // todo iterate here :
-        // while(Value chan : Generic.Users.get(whom).chans)
+        for (String chan : Generic.Users.get(whom).chans) {
+             who.handle(user,chan,"sync silent");
+        }
     }
 }
