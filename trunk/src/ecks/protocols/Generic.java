@@ -151,6 +151,7 @@ public class Generic {
                 z = Users.get(user.toLowerCase());
             }
             cm.put(z, t); // add this client -> mode mapping to channel
+
         }
 
         if (Channels.containsKey(channel.toLowerCase())) {
@@ -158,8 +159,13 @@ public class Generic {
         } else {
             Channels.put(channel.toLowerCase(), new Channel(ts, channel, m, cm));
             for (String user : users)
+            {
+                if (user.startsWith("@")) user = user.substring(1);
+                if (user.startsWith("+")) user = user.substring(1);
+                user = user.toLowerCase();
                 Hooks.hook(Hooks.Events.E_JOINCHAN,channel,user,null);
-            Logging.info("PROTOCOL", "Channel " + channel + " is now being tracked.");
+            }
+            Logging.verbose("PROTOCOL", "Channel " + channel + " is now being tracked.");
         }
 
     }
@@ -189,7 +195,7 @@ public class Generic {
     public static void chanPart(String channel, String user) {
         if (!Channels.containsKey(channel.toLowerCase())) // we had better...
         {
-            Logging.warn("PROTOCOL", "Tried to part a user from a channel that didn't exist");
+            Logging.warn("PROTOCOL", "Tried to part user " + user + "  from a channel " + channel + " that didn't exist");
             return;
         }
 
@@ -208,14 +214,14 @@ public class Generic {
             who.chans.remove(channel);
             Hooks.hook(Hooks.Events.E_PARTCHAN,channel,user,null);
         } else {
-            Logging.warn("PROTOCOL", "Tried to part a user from a channel that they weren't on");
+            Logging.warn("PROTOCOL", "Tried to part user " + user + " from channel " + channel + " that they weren't on");
             return;
         }
 
         if(Channels.get(channel.toLowerCase()).clientmodes.size() == 0) // channel is empty, remove
         {
             Channels.remove(channel.toLowerCase());
-            Logging.info("PROTOCOL", "Channel " + channel + " is no longer being tracked.");
+            Logging.verbose("PROTOCOL", "Channel " + channel + " is no longer being tracked.");
         }
 
     }

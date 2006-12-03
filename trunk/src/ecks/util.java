@@ -35,6 +35,10 @@ public class util {
 
     public static List<Thread> threads;
 
+    public static String getVersion() {
+        return "0.4A";
+    }
+
     public static Thread startThread(Thread whattostart) {
         if (threads == null) // not set
             threads = new ArrayList<Thread>();
@@ -82,10 +86,6 @@ public class util {
             return 0;  //Have no idea how to deal with those
         }
         return l;
-    }
-
-    public static String getVersion() {
-        return "0.4A";
     }
 
     public static boolean checkemail(String input) {
