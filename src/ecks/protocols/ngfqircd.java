@@ -160,7 +160,6 @@ public class ngfqircd implements Protocol {
 
                 // :SOURCE SJOIN TS #CHANNEL MODES [MODEARGS] :USERS
                 if(source.equals(myUplink)) { // user is joining a new channel
-
                     if (tokens.length>4) {
                         String ExtModes = "";
                         for (int i = 5; i < tokens.length; i++)
@@ -260,7 +259,7 @@ public class ngfqircd implements Protocol {
     {
         //NICK <nick> <hops> <TS> <umode> <user> <host> <server> <services#> <nickip>:<ircname>
         try {
-            Outgoing("NICK "
+            String o = "NICK "
                     + whom.getname()
                     + " 1 "
                     + util.getTS()
@@ -268,8 +267,23 @@ public class ngfqircd implements Protocol {
                     + whom.getname()
                     + " services "
                     + Configuration.Config.get("hostname")
-                    + " 0 1066435662 :Network Services"
-            ); 
+                    + " 0 1066435662 :Network Services";
+            Outgoing( o );
+            String[] tokens = o.split(" ");
+                    String[] newargs = { null,
+                    tokens[1],
+                    tokens[2],
+                    tokens[3],
+                    tokens[4],
+                    tokens[5],
+                    tokens[6],
+                    tokens[6],
+                    tokens[7],
+                    tokens[8],
+                    tokens[9],
+                    "Network Services",
+                    null};
+            Generic.nickSignOn( newargs );
         } catch (IOException e) {
             Logging.error("PROTOCOL", "Got IOException while introducing service: " + whom.getname());
             Logging.error("PROTOCOL", "IOE Claims: " + e.getMessage());

@@ -108,36 +108,8 @@ public class SrvHelp extends bService {
         return Channels.size();
     }
     public void hookDispatch(Hooks.Events what, String source, String target, String args) {
+        super.hookDispatch(this, what, source, target, args);
         switch (what) {
-            case E_PRIVMSG:
-                // todo: fix this up so it's not such a steaming pile of crap
-                String target2 = "", arguments = "";
-
-                                                if (target.startsWith("#")) { // is a channel message
-                    if (args.split(" ")[0].endsWith(":")) { // someone is addressing something. ie blah:
-                        target2 = args.split(" ")[0];
-                        target2 = target.substring(0,target.length()-1);
-                        arguments = args.substring(target.length() + 1).trim();
-                    }
-                } else { // is a private message
-                    target2 = target;
-                    arguments = args;
-                }
-
-                // hack hack hack
-                String temp[] = target2.split("@");
-                target2 = temp[0];
-
-                if (temp.length > 1)
-                    arguments = "FQDN" + arguments;
-
-                this.handle(
-                            source,
-                            (target2.startsWith("#")?target2:source),
-                            arguments
-                    );
-
-                break;
             default:
         }
     }
