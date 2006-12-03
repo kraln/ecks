@@ -42,7 +42,8 @@ public class Auth extends bCommand {
                         Generic.Users.get(user).authhandle = arguments.split(" ")[0].toLowerCase();
                         Generic.curProtocol.srvSetAuthed(who,Generic.Users.get(user).uid);
                         Generic.curProtocol.outNOTICE(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Welcome back!");
-                        
+                        if (Configuration.getSvc().containsKey(Configuration.chanservice))
+                            Configuration.getSvc().get(Configuration.chanservice).handle(user,user,"syncall"); // up them in all of their channels
                     } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Password!");
                 } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Username not found!");
             } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You are already logged in!");

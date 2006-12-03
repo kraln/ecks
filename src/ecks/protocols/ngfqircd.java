@@ -159,7 +159,7 @@ public class ngfqircd implements Protocol {
             } else if (cmd.equals("SJOIN")) {                                                                   // SJOIN
 
                 // :SOURCE SJOIN TS #CHANNEL MODES [MODEARGS] :USERS
-                if(source.equals(myUplink)) { // user is joining a new channel
+                if(!Generic.Users.containsKey(source.toLowerCase())) { // server is introducing channel
                     if (tokens.length>4) {
                         String ExtModes = "";
                         for (int i = 5; i < tokens.length; i++)
@@ -438,7 +438,12 @@ public class ngfqircd implements Protocol {
     
     public void outMODE(Service me, String who, String where, String what)
     {
-
+       try {
+            Outgoing("SVSMODE " + where + " " + who + " :" + what);
+        } catch (IOException e) {
+            Logging.error("PROTOCOL", "Got IOException while sending a command.");
+            Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
+        }
     }
 
     public void outTOPIC(Service me, String where, String what)
