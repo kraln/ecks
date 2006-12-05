@@ -82,7 +82,7 @@ public class Logging {
         if (inchan)
         {
             if (Generic.curProtocol!=null) // only do this if we have a protocol loaded
-            if (Generic.curProtocol.getState() == Protocol.States.S_ONLINE.ordinal()) // only do this if we're connected
+            if (Generic.curProtocol.getState().equals(Protocol.States.S_ONLINE)) // only do this if we're connected
             Generic.curProtocol.outPRVMSG(Configuration.getSvc().get(Configuration.logservice), Configuration.Config.get("debugchan"), String.valueOf(System.currentTimeMillis() / 1000) + '\t' + util.pad(ll.toString(), 10) + '\t' + util.pad(what, 10) + '\t' + ai);
         }
         out.write(String.valueOf(System.currentTimeMillis() / 1000) + '\t' + util.pad(ll.toString(),10) + '\t' + util.pad(what,10) + '\t' + ai+ "\r\n");

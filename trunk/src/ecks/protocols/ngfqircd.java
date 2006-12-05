@@ -40,8 +40,13 @@ public class ngfqircd implements Protocol {
     
     public String getModeArgs() { return modeargs; }
 
-    public int getState() {
-        return myState.ordinal();
+    public States getState() {
+        return myState;
+    }
+
+    public void setState(States newstate)
+    {
+        myState = newstate;
     }
 
     public void setBuffers(BufferedWriter o) {
@@ -132,6 +137,10 @@ public class ngfqircd implements Protocol {
             } else if (cmd.equals("KILL")) {                                                                     // KILL
 
                 Generic.nickGotKilled(tokens[2]);
+
+            } else if (cmd.equals("AWAY")) {                                                                     // AWAY
+
+               // do nothing. suppress 'unsupported command', though
 
             } else if (cmd.equals("QUIT")) {                                                                     // QUIT
 

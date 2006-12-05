@@ -94,12 +94,15 @@ public class main {
 
     public static void goGracefullyIntoTheNight()
     {
+        Generic.curProtocol.setState(Protocol.States.S_DISCONNECTING);
         Logging.warn("SHUTDOWN", "Interrupting Threads...");
         for (Thread t : util.getThreads())
             t.interrupt();
         Logging.warn("SHUTDOWN", "Stopping RPC");
         myConf.RPCServer.shutdown();
         Logging.warn("SHUTDOWN", "Goodbye."); // should put summary here.
+        for (Thread t : util.getThreads())
+            t.interrupt();
         // if we're not done by this point, something is terribly amiss
     }
 
