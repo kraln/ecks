@@ -104,6 +104,8 @@ public class Generic {
     // a client has exited
     {
         if (Users.containsKey(who.toLowerCase())) {
+            for (int j = 0; j < Users.get(who.toLowerCase()).chans.size(); j++)  // when they sign off, they take their channels with them
+                chanPart(Users.get(who.toLowerCase()).chans.get(j).toLowerCase(),who.toLowerCase());
             Users.remove(who);
         } else {
             Logging.warn("PROTOCOL", "Tried to sign off a user that didn't exist");
@@ -113,7 +115,7 @@ public class Generic {
     public static void nickGotKicked(String user, String channel)
     {
 
-        chanPart(user, channel); // track parts properly
+        chanPart(channel, user); // track parts properly
         Hooks.hook(Hooks.Events.E_KICK,channel,user,null);
         if (Configuration.getSvc().containsKey(user.toLowerCase())) {
         // they've kicked one of us. bad idea.
@@ -155,17 +157,21 @@ public class Generic {
         }
 
         if (Channels.containsKey(channel.toLowerCase())) {
-            Logging.error("PROTOCOL", "Attempted to add a channel that already exists");
+            Logging.error("PROTOCOL", "Attempted to add a channel " + channel + " that already exists. " + cm.size() + " user(s) joined.");
+            Logging.info("PROTOCOL", "Chan is: " + Channels.get(channel.toLowerCase()).toString());
+            Channels.get(channel.toLowerCase()).clientmodes.putAll(cm);
         } else {
             Channels.put(channel.toLowerCase(), new Channel(ts, channel, m, cm));
-            for (String user : users)
-            {
-                if (user.startsWith("@")) user = user.substring(1);
-                if (user.startsWith("+")) user = user.substring(1);
-                user = user.toLowerCase();
-                Hooks.hook(Hooks.Events.E_JOINCHAN,channel,user,null);
-            }
             Logging.verbose("PROTOCOL", "Channel " + channel + " is now being tracked.");
+        }
+
+        for (String user : users)
+        {
+            if (user.startsWith("@")) user = user.substring(1);
+            if (user.startsWith("+")) user = user.substring(1);
+            user = user.toLowerCase();
+            Users.get(user).chans.add(channel);
+            Hooks.hook(Hooks.Events.E_JOINCHAN,channel,user,null);
         }
 
     }
@@ -215,7 +221,8 @@ public class Generic {
             Hooks.hook(Hooks.Events.E_PARTCHAN,channel,user,null);
         } else {
             Logging.warn("PROTOCOL", "Tried to part user " + user + " from channel " + channel + " that they weren't on");
-            return;
+            Logging.info("PROTOCOL", "User is: " + who.toString());
+            Logging.info("PROTOCOL", "Chan is: " + Channels.get(channel.toLowerCase()).toString());
         }
 
         if(Channels.get(channel.toLowerCase()).clientmodes.size() == 0) // channel is empty, remove

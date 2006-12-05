@@ -46,6 +46,9 @@ public class Channel {
     }
     public String toString()
     {
-        return name + ": " + ts + " " + modes.getModes() + " occupied by " + clientmodes.size() + " users. Topic is: " + topic;
+        String c = "";
+        for (Client uname : clientmodes.keySet())
+        c += " " + uname.uid;                                                                                                                  
+        return name + ": " + ts + " " + modes.getModes() + " occupied by " + clientmodes.size() + " users. Topic is: " + topic + ". Users:" + c;
     }
 }

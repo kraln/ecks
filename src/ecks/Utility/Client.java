@@ -66,7 +66,10 @@ public class Client {
     //public Client(){  modes = new UserModes(); chans = new ArrayList<String>(); }
     public String toString()
     {
-        return uid + ": " + modes.getModes() + " " + ident + " " + host + " (" + althost + ") on " + uplink;
+        String c = "";
+        for(String ch : chans)
+        c += " " + ch;
+        return uid + ": " + modes.getModes() + " " + ident + " " + host + " (" + althost + ") on " + uplink + ". In " + chans.size() + " channels:" + c;
     }
 }
 

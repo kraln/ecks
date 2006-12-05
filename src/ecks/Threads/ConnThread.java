@@ -18,6 +18,7 @@
 package ecks.Threads;
 
 import ecks.protocols.Protocol;
+import ecks.protocols.Generic;
 import ecks.Logging;
 import ecks.util;
 
@@ -48,8 +49,9 @@ public class ConnThread implements Runnable {
               Logging.error("CONNTHREAD", "Null pointer exception!");
               if (stream == null)
               {
-                    Logging.error("CONNTHREAD", "Upstream is null; Server closed connection.");
-                    break; // connection terminated. likely, our uplink cored.
+                  Generic.curProtocol.setState(Protocol.States.S_DISCONNECTING);
+                  Logging.error("CONNTHREAD", "Upstream is null; Server closed connection.");                   
+                    break;
               }
           } catch (IOException e) {
               e.printStackTrace();
@@ -57,6 +59,12 @@ public class ConnThread implements Runnable {
           } catch (Exception e) {
               e.printStackTrace();
               Logging.error("CONNTHREAD", "Thread got exception!");
+              if (stream == null)
+              {
+                    Generic.curProtocol.setState(Protocol.States.S_DISCONNECTING);
+                    Logging.error("CONNTHREAD", "Upstream is null; Server closed connection.");
+                    break;
+              }
               Logging.info("CONNTHREAD", e.getMessage());
           }
 

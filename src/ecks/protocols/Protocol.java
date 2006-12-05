@@ -24,7 +24,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 public interface Protocol {
-    int getState();
+    States getState();
+    void setState(States newstate);
 
     void setBuffers(BufferedWriter o);
 
@@ -93,7 +94,7 @@ public interface Protocol {
     void outTOPIC(Service me, String where, String what);
 
     public static enum States {
-        S_DISCONNECTED, S_HASBUFFERS, S_BURSTING, S_SERVICES, S_ONLINE
+        S_DISCONNECTED, S_HASBUFFERS, S_BURSTING, S_SERVICES, S_ONLINE, S_DISCONNECTING
     }
 
     String getModeArgs()
