@@ -69,7 +69,8 @@ public interface Protocol {
 // Have services leave a channel
             ;
 
-    void outGLINE(Service me, Client who, String why)
+    void outGLINE(Service me, Client who, String why);
+    void outGLINE(Service me, String mask, long duration, String why)
 // Add an AKILL
             ;
 
@@ -77,7 +78,7 @@ public interface Protocol {
 // Remove an AKILL
             ;
 
-    void srvSetAuthed(Service me, String who)
+    void srvSetAuthed(Service me, String who, Long svsid)
 // Let other servers know that this user is authed
             ;
 
@@ -89,7 +90,8 @@ public interface Protocol {
 // Invite someone somewhere
             ;
 
-    void outMODE(Service me, String who, String where, String what);
+    void outMODE(Service me, String who, String what, String more);
+    // use svs mode or server mode to force
 
     void outTOPIC(Service me, String where, String what);
 

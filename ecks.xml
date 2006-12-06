@@ -139,6 +139,7 @@
             <command value="ecks.services.modules.SrvAuth.Register" />
             <command value="ecks.services.modules.SrvAuth.Unregister" />
             <command value="ecks.services.modules.SrvAuth.Auth" />
+            <command value="ecks.services.modules.SrvAuth.ReAuth" />
             <command value="ecks.services.modules.SrvAuth.Help" />
             <command value="ecks.services.modules.SrvAuth.Confirm" />
             <command value="ecks.services.modules.SrvAuth.WhoAmi" />

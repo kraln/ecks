@@ -140,7 +140,7 @@ public class ChanModes implements Modes {
             }
         }
 
-        return "+" + t + ca.trim();
+        return "+" + t + " " + ca.trim();
     }
 
 }

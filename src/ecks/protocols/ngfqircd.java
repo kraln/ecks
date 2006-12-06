@@ -140,7 +140,13 @@ public class ngfqircd implements Protocol {
 
             } else if (cmd.equals("AWAY")) {                                                                     // AWAY
 
-               // do nothing. suppress 'unsupported command', though
+               // goggles. suppresses 'unsupported command'
+
+            } else if (cmd.equals("PART")) {                                                                     // PART
+
+                // :SOURCE PART #CHANNEL
+                Generic.chanPart(tokens[2],source);
+
 
             } else if (cmd.equals("QUIT")) {                                                                     // QUIT
 
@@ -201,11 +207,7 @@ public class ngfqircd implements Protocol {
                 // :SOURCE TOPIC #CHANNAME SETTER TS :NEWTOPIC
                 Generic.chanTopic(Integer.parseInt(tokens[4]),tokens[2],args);
 
-            } else if (cmd.equals("PART")) {                                                                     // PART
 
-                // :SOURCE PART #CHANNEL
-                Generic.chanPart(tokens[2],source);
-                
             } else if (cmd.equals("ERROR")) {                                                                   // ERROR
 
                 Logging.error("PROTOCOL", "Recieved Error. Disconnecting.");
@@ -257,7 +259,7 @@ public class ngfqircd implements Protocol {
 
     void outHandshake() throws IOException // very much bahamut specific
     {
-        Outgoing("CAPAB :QS TSORA SERVICES CHW KLN GLN KNOCK SSJOIN"); // Quitstorm, Timestamp, Services, @+notices, klines and glines, knocking, and SJOIN for joins
+        Outgoing("CAPAB :QS TSORA SERVICES CHW KLN GLN KNOCK SSJOIN TSMODE"); // Quitstorm, Timestamp, Services, @+notices, klines and glines, knocking, and SJOIN for joins
         Outgoing("PASS " + Configuration.Config.get("password") + " :TS"); // send our connection password
         Outgoing("SERVER " + Configuration.Config.get("hostname") + " 1 :Ecks Services " + util.getVersion()); // send our server info
         Outgoing("SVINFO 6 3 1 :" + util.getTS()); // send our ts version and offset
@@ -395,8 +397,23 @@ public class ngfqircd implements Protocol {
     // Add an AKILL
     {
         try {
-            Outgoing(":" + Configuration.Config.get("hostname") + " AKILL *@" + who.host + " " + who.uid + " 0 " + me.getname() + " " + util.getTS() + " :" + why);
-            outKILL(me, who.uid, "[AKILLED] " + why); // on bahamut you're supposed to send a kill after you add an akill
+            Outgoing(":" + Configuration.Config.get("hostname") + " AKILL " + who.host + " " + who.ident + " 0 " + me.getname() + " " + util.getTS() + " :" + why);
+        } catch (IOException e) {
+            Logging.error("PROTOCOL", "Got IOException while sending a command.");
+            Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
+        }
+    }
+
+    public void outGLINE(Service me, String mask, long duration, String why)
+    // Add an AKILL on an arbitrary mask
+    {
+        try {
+            String id = "*";
+            String host = "";
+            String [] t = mask.split("@");
+            id = t[0];
+            host = t[1];
+            Outgoing(":" + Configuration.Config.get("hostname") + " AKILL " + host + " " + id + " " + duration + " " + me.getname() + " " + util.getTS() + " :" + why);
         } catch (IOException e) {
             Logging.error("PROTOCOL", "Got IOException while sending a command.");
             Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
@@ -407,22 +424,22 @@ public class ngfqircd implements Protocol {
     // Remove an AKILL
     {
         try {
-            Outgoing(":" + Configuration.Config.get("hostname") + " RAKILL *@" + mask + " " + me.getname());
+            String id = "*";
+            String host = "";
+            String [] t = mask.split("@");
+            id = t[0];
+            host = t[1];
+            Outgoing("RAKILL " + host + " " + id + " " + me.getname());
         } catch (IOException e) {
             Logging.error("PROTOCOL", "Got IOException while sending a command.");
             Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
         }
     }
 
-    public void srvSetAuthed(Service me, String who)
+    public void srvSetAuthed(Service me, String who, Long svsid)
     // Let other servers know that this user is authed
     {
-        try {
-            Outgoing("SVSMODE " + who + " :+r");
-        } catch (IOException e) {
-            Logging.error("PROTOCOL", "Got IOException while sending a command.");
-            Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
-        }
+        outMODE(me, who, "+rd", svsid.toString());
     }
     public void outKICK(Service me, String who, String where, String why)
     // Kick someone from a channel
@@ -445,10 +462,10 @@ public class ngfqircd implements Protocol {
         }
     }
     
-    public void outMODE(Service me, String who, String where, String what)
+    public void outMODE(Service me, String who, String what, String more)
     {
        try {
-            Outgoing("SVSMODE " + where + " " + who + " :" + what);
+            Outgoing("SVSMODE " + who + " " + what + " :" + more);
         } catch (IOException e) {
             Logging.error("PROTOCOL", "Got IOException while sending a command.");
             Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());

@@ -62,6 +62,10 @@ public class Client {
         authhandle = null;
     }
 
+    public List<String> getChans()
+    {
+        return new ArrayList<String>(chans); // a copy
+    }
 
     //public Client(){  modes = new UserModes(); chans = new ArrayList<String>(); }
     public String toString()
@@ -69,7 +73,7 @@ public class Client {
         String c = "";
         for(String ch : chans)
         c += " " + ch;
-        return uid + ": " + modes.getModes() + " " + ident + " " + host + " (" + althost + ") on " + uplink + ". In " + chans.size() + " channels:" + c;
+        return uid + ": svsid: " + svsid + ", " + modes.getModes() + " " + ident + " " + host + " (" + althost + ") on " + uplink + ". In " + chans.size() + " channels:" + c;
     }
 }
 

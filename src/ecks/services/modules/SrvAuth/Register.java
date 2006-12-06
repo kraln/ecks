@@ -52,6 +52,7 @@ public class Register extends bCommand {
                                 {
                                     temp.getUsers().put(u, new SrvAuth_user(u, pw, e, CommandDesc.access_levels.A_PENDING));
                                     Generic.Users.get(user).authhandle = u.trim().toLowerCase(); // user is now authed
+                                    Generic.curProtocol.srvSetAuthed(who,user,((long)-1)); // new users don't have svsids
                                     String tCookie = util.makeCookie();
                                     temp.getUsers().get(u).setMeta("cookie", tCookie);
                                     util.SendRegMail(e, tCookie);

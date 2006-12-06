@@ -32,6 +32,7 @@ import org.w3c.dom.*;
 public class SrvAuth extends bService {
     public String name = "SrvAuth";
     public Map<String, SrvAuth_user> Users;
+    public Map<Long, String> dbMap; // lets us lookup usernames by dbid
 
     public void introduce() {
         Configuration.authservice = name.toLowerCase(); // I lay claim to users
@@ -75,6 +76,7 @@ public class SrvAuth extends bService {
 
     public SrvAuth() {
         Users = new HashMap<String, SrvAuth_user>();
+        dbMap = new HashMap<Long, String>();
     }
 
     public Map<String, SrvAuth_user> getUsers() {
@@ -127,6 +129,8 @@ public class SrvAuth extends bService {
             }
 
             Users.put(uTemp.toLowerCase().trim(), new SrvAuth_user(uTemp, pTemp, eTemp, aTemp, mTemp));
+            Users.get(uTemp.toLowerCase().trim()).dbnum = (i+1);
+            dbMap.put((long)(i+1),uTemp.toLowerCase().trim());
         }
         Logging.info("SRVAUTH", "Loaded " + Users.size() + " registered users from database.");
     }
