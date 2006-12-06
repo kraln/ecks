@@ -24,6 +24,7 @@ import ecks.Utility.*;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class Generic {
@@ -57,6 +58,11 @@ public class Generic {
         Client client = Users.get(oldid);
         client.uid = newnick; // keep their uid in step with their nickname...
 
+        if (oldid.equals(newid)) return;
+        // this was a major issue. ircd sends nick changes for case changing.
+        // we are case insensitive. we'd end up removing the user and causing all sorts of crap
+        // so the above should fix it.
+
         Users.put(newid, client);
         Users.remove(oldid);
     }
@@ -65,14 +71,15 @@ public class Generic {
     // a user changed his/her modes
     {
         Users.get(target.toLowerCase()).modes.applyChanges(modes);
-        Hooks.hook(Hooks.Events.E_UMODE,null,target,modes);
+        Hooks.hook(Hooks.Events.E_UMODE, null, target, modes);
 
     }
+
     public static void modeChan(String target, String modes)
     // a client changed a channel's modes
     {
         Channels.get(target.toLowerCase()).modes.applyChanges(modes);
-        Hooks.hook(Hooks.Events.E_MODE,null,target,modes);
+        Hooks.hook(Hooks.Events.E_MODE, null, target, modes);
     }
 
 
@@ -98,37 +105,39 @@ public class Generic {
                         tokens[12]
                 )
         );
+        if (Long.parseLong(tokens[9]) > 0) // if user was authed before
+            if (Configuration.getSvc().containsKey(Configuration.authservice)) // if we have an auth service
+                Configuration.getSvc().get(Configuration.authservice).handle(tokens[1].toLowerCase(),"service","reauth " + tokens[9] + " " + tokens[3]);
     }
 
-    public static void nickSignOff(String who)
+    public synchronized static void nickSignOff(String who)
     // a client has exited
     {
         if (Users.containsKey(who.toLowerCase())) {
-            for (int j = 0; j < Users.get(who.toLowerCase()).chans.size(); j++)  // when they sign off, they take their channels with them
-                chanPart(Users.get(who.toLowerCase()).chans.get(j).toLowerCase(),who.toLowerCase());
+            List<String> blah = Users.get(who.toLowerCase()).getChans(); // avoid concurrency issues
+            for (String chan : blah)
+                chanPart(chan, who);
             Users.remove(who);
         } else {
             Logging.warn("PROTOCOL", "Tried to sign off a user that didn't exist");
         }
     }
 
-    public static void nickGotKicked(String user, String channel)
-    {
+    public static void nickGotKicked(String user, String channel) {
 
         chanPart(channel, user); // track parts properly
-        Hooks.hook(Hooks.Events.E_KICK,channel,user,null);
+        Hooks.hook(Hooks.Events.E_KICK, channel, user, null);
         if (Configuration.getSvc().containsKey(user.toLowerCase())) {
-        // they've kicked one of us. bad idea.
+            // they've kicked one of us. bad idea.
             Logging.info("PROTOCOL", "Service was kicked! Attempting rejoin.");
             curProtocol.srvJoin(Configuration.getSvc().get(user.toLowerCase()), channel, "+nt"); // rejoin
         }
     }
 
-    public static void nickGotKilled(String user)
-    {
+    public static void nickGotKilled(String user) {
         nickSignOff(user); // track quits properly
         if (Configuration.getSvc().containsKey(user.toLowerCase())) {
-        // they've killed one of us. possibly wrong protocol?
+            // they've killed one of us. possibly wrong protocol?
             Logging.error("PROTOCOL", "Service was killed! Attempting 'reconnect'.");
             Configuration.getSvc().get(user.toLowerCase()).introduce(); // reintroduce
         }
@@ -143,7 +152,8 @@ public class Generic {
         for (String user : users) {
             UserModes t = new UserModes();
             Client z;
-            if (user.startsWith("@")) { // we should really pull these character->mode mappings from the PROTOCOL or whatever
+            if (user.startsWith("@"))
+            { // we should really pull these character->mode mappings from the PROTOCOL or whatever
                 z = Users.get(user.substring(1).toLowerCase());
                 t.applyChanges("+o");
             } else if (user.startsWith("+")) {
@@ -165,13 +175,12 @@ public class Generic {
             Logging.verbose("PROTOCOL", "Channel " + channel + " is now being tracked.");
         }
 
-        for (String user : users)
-        {
+        for (String user : users) {
             if (user.startsWith("@")) user = user.substring(1);
             if (user.startsWith("+")) user = user.substring(1);
             user = user.toLowerCase();
             Users.get(user).chans.add(channel);
-            Hooks.hook(Hooks.Events.E_JOINCHAN,channel,user,null);
+            Hooks.hook(Hooks.Events.E_JOINCHAN, channel, user, null);
         }
 
     }
@@ -180,9 +189,9 @@ public class Generic {
         if (Channels.containsKey(channel.toLowerCase())) {
             Channels.get(channel.toLowerCase()).clientmodes.put(Users.get(user.toLowerCase()), new UserModes());
             Users.get(user.toLowerCase()).chans.add(channel);
-            Hooks.hook(Hooks.Events.E_JOINCHAN,channel,user,"");
+            Hooks.hook(Hooks.Events.E_JOINCHAN, channel, user, "");
         } else { // services joining an empty channel
-            chanBurst(ts,channel,"+nt", new String[] {user});
+            chanBurst(ts, channel, "+nt", new String[]{user});
         }
 
     }
@@ -191,7 +200,7 @@ public class Generic {
         if (Channels.containsKey(channel.toLowerCase())) {
             Channels.get(channel.toLowerCase()).topic = what;
             Channels.get(channel.toLowerCase()).tts = ts;
-            Hooks.hook(Hooks.Events.E_TOPIC,channel,what,null);
+            Hooks.hook(Hooks.Events.E_TOPIC, channel, what, null);
         } else {
             Logging.error("PROTOCOL", "Attempted to set a topic on a channel that does not exist");
         }
@@ -216,16 +225,16 @@ public class Generic {
         }
 
         if (Channels.get(channel.toLowerCase()).clientmodes.containsKey(who)) { // we had better...
-            Channels.get(channel.toLowerCase()).clientmodes.remove(who);
             who.chans.remove(channel);
-            Hooks.hook(Hooks.Events.E_PARTCHAN,channel,user,null);
+            Channels.get(channel.toLowerCase()).clientmodes.remove(who);
+            Hooks.hook(Hooks.Events.E_PARTCHAN, channel, user, null);
         } else {
             Logging.warn("PROTOCOL", "Tried to part user " + user + " from channel " + channel + " that they weren't on");
             Logging.info("PROTOCOL", "User is: " + who.toString());
             Logging.info("PROTOCOL", "Chan is: " + Channels.get(channel.toLowerCase()).toString());
         }
 
-        if(Channels.get(channel.toLowerCase()).clientmodes.size() == 0) // channel is empty, remove
+        if (Channels.get(channel.toLowerCase()).clientmodes.size() == 0) // channel is empty, remove
         {
             Channels.remove(channel.toLowerCase());
             Logging.verbose("PROTOCOL", "Channel " + channel + " is no longer being tracked.");
@@ -242,13 +251,13 @@ public class Generic {
     public static void srvJoin(Service whatservice, String where, String modes)
     // just pass this one straight down to the protocol
     {
-        curProtocol.srvJoin(whatservice,where,modes);
+        curProtocol.srvJoin(whatservice, where, modes);
     }
 
     public static void srvPart(Service whatservice, String where, String why)
     // just pass this one straight down to the protocol
     {
-        curProtocol.srvPart(whatservice,where,why);
+        curProtocol.srvPart(whatservice, where, why);
     }
 
     public static void srvDie() {
@@ -258,7 +267,7 @@ public class Generic {
     public static void srvDie(String message) {
         if (message.trim().equals("")) srvDie(); // don't quit with no message
         for (Service Serve : Configuration.getSvc().values()) {
-            curProtocol.outQUIT(Serve,message);
+            curProtocol.outQUIT(Serve, message);
         }
         main.goGracefullyIntoTheNight();
     }

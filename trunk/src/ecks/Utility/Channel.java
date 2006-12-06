@@ -48,7 +48,11 @@ public class Channel {
     {
         String c = "";
         for (Client uname : clientmodes.keySet())
-        c += " " + uname.uid;                                                                                                                  
+        if (uname!=null)
+            c += " " + uname.uid;
+        else
+            clientmodes.remove(uname);
+
         return name + ": " + ts + " " + modes.getModes() + " occupied by " + clientmodes.size() + " users. Topic is: " + topic + ". Users:" + c;
     }
 }

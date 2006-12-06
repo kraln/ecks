@@ -31,6 +31,11 @@ public class SrvAuth_user { // direct correlation to a database entry
     CommandDesc.access_levels services_access;
     Map<String, String> Metadata;
 
+    // not stored in database, created at runtime
+    public Map<String, String> WhereAccess;
+    public long dbnum;
+
+
     public SrvAuth_user() {
     }
 
@@ -91,7 +96,7 @@ public class SrvAuth_user { // direct correlation to a database entry
     }
 
     public String toString() {
-        return username + " " + password.hashCode() + " " + email + " " + services_access.toString();
+        return username + " (" + dbnum + ") " + email + " " + services_access.toString();
     }
 
 }

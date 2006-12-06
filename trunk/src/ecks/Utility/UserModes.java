@@ -18,6 +18,7 @@
 package ecks.Utility;
 
 import ecks.Utility.Modes;
+import ecks.Logging;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -71,7 +72,12 @@ public class UserModes implements Modes {
         for (int i = 0; i < minuses.length(); i++) {
             CharSequence w = minuses.subSequence(i, i + 1);
             if (modes.contains(w.charAt(0))) {
+                try {
                 modes.remove(w.charAt(0)); // remove mode
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Logging.info("uSERMODES", "Minuses: " + minuses + ", charat[0]: " + w.charAt(0) + ", #modes: " + modes.size() );
+                }
             }
         }
     }
