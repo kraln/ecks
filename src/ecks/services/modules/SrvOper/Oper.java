@@ -31,6 +31,6 @@ public class Oper extends bCommand {
     }
 
     public void handle_command(Service who, String user, String replyto, String arguments) {
-        Generic.curProtocol.outMODE(who,user,"", "+o");
+        Generic.curProtocol.outMODE(who,Generic.Users.get(user.toLowerCase()),"+o", "");
     }
 }

@@ -94,6 +94,7 @@ public class ChanModes implements Modes {
                 }
             }
         }
+
         for (int i = 0; i < minuses.length(); i++)
         {
             CharSequence w = minuses.subSequence(i, i+1);
@@ -101,6 +102,9 @@ public class ChanModes implements Modes {
             {
                 if (Generic.curProtocol.getModeArgs().contains(w))
                 {
+                    if (toks.length < (numofargssofar+1))
+                    numofargssofar--; // todo: hack hack hack
+
                     if (modes.get(w.charAt(0)).contains(toks[numofargssofar+1]))
                     {
                         modes.get(w.charAt(0)).remove(toks[numofargssofar+1]); // remove it
@@ -113,7 +117,7 @@ public class ChanModes implements Modes {
                 } else {
                     modes.remove(w.charAt(0)); // mode has no more complex arguments, remove mode
                 }
-            } else; // do nothing because the mode is alredy not set
+            } // do nothing because the mode is alredy not set
         }
     }
 
