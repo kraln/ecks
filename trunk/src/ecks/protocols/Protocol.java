@@ -90,7 +90,7 @@ public interface Protocol {
 // Invite someone somewhere
             ;
 
-    void outMODE(Service me, String who, String what, String more);
+    void outMODE(Service me, Client who, String what, String more);
     // use svs mode or server mode to force
 
     void outTOPIC(Service me, String where, String what);

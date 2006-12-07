@@ -33,7 +33,6 @@ public class SrvAuth_user { // direct correlation to a database entry
 
     // not stored in database, created at runtime
     public Map<String, String> WhereAccess;
-    public long dbnum;
 
 
     public SrvAuth_user() {
@@ -96,7 +95,7 @@ public class SrvAuth_user { // direct correlation to a database entry
     }
 
     public String toString() {
-        return username + " (" + dbnum + ") " + email + " " + services_access.toString();
+        return username + " " + email + " " + services_access.toString();
     }
 
 }

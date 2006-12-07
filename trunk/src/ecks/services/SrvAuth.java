@@ -35,7 +35,6 @@ public class SrvAuth extends bService {
     public Map<Long, String> dbMap; // lets us lookup usernames by dbid
 
     public void introduce() {
-        Configuration.authservice = name.toLowerCase(); // I lay claim to users
         Hooks.regHook(this, Hooks.Events.E_PRIVMSG);
         Generic.srvIntroduce(this);
         if (!(Configuration.Config.get("debugchan").equals("OFF")))
@@ -77,6 +76,7 @@ public class SrvAuth extends bService {
     public SrvAuth() {
         Users = new HashMap<String, SrvAuth_user>();
         dbMap = new HashMap<Long, String>();
+        Configuration.authservice = name.toLowerCase(); // I lay claim to users early, so they can reauth.
     }
 
     public Map<String, SrvAuth_user> getUsers() {
@@ -128,9 +128,9 @@ public class SrvAuth extends bService {
                 mTemp.put(util.decodeUTF((t.item(j)).getNodeName()), util.decodeUTF((t.item(j)).getAttributes().getNamedItem("value").getNodeValue()));
             }
 
-            Users.put(uTemp.toLowerCase().trim(), new SrvAuth_user(uTemp, pTemp, eTemp, aTemp, mTemp));
-            Users.get(uTemp.toLowerCase().trim()).dbnum = (i+1);
-            dbMap.put((long)(i+1),uTemp.toLowerCase().trim());
+            Users.put(uTemp.toLowerCase().trim(), new SrvAuth_user(uTemp, pTemp, eTemp, aTemp, mTemp));         
+            if (Users.get(uTemp.toLowerCase().trim()).getAllMeta().containsKey("hashcode"))
+               dbMap.put(Long.parseLong(Users.get(uTemp.toLowerCase().trim()).getMeta("hashcode")),uTemp.toLowerCase().trim());
         }
         Logging.info("SRVAUTH", "Loaded " + Users.size() + " registered users from database.");
     }

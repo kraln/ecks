@@ -121,7 +121,7 @@ public class ngfqircd implements Protocol {
             } else if (cmd.equals("NICK")) {                                                                     // NICK
 
                 if (hasSource) { // It's a rename
-                    Generic.nickRename(source,tokens[2]);
+                    Generic.nickRename(source,tokens[2], Long.parseLong(args));
                 } else { // It's a new client, in a burst or otherwise
                     nickSignOn(tokens, args);
                 }
@@ -154,7 +154,7 @@ public class ngfqircd implements Protocol {
 
             } else if (cmd.equals("MODE")) {                                                                     // MODE
 
-                String modestring = "";
+                String modestring;
                 if (tokens[2].startsWith("#")) { // is a channel mode
                 modestring = tokens[4];
                 if (tokens.length > 4)
@@ -408,8 +408,8 @@ public class ngfqircd implements Protocol {
     // Add an AKILL on an arbitrary mask
     {
         try {
-            String id = "*";
-            String host = "";
+            String id;
+            String host;
             String [] t = mask.split("@");
             id = t[0];
             host = t[1];
@@ -424,8 +424,8 @@ public class ngfqircd implements Protocol {
     // Remove an AKILL
     {
         try {
-            String id = "*";
-            String host = "";
+            String id;
+            String host;
             String [] t = mask.split("@");
             id = t[0];
             host = t[1];
@@ -439,7 +439,7 @@ public class ngfqircd implements Protocol {
     public void srvSetAuthed(Service me, String who, Long svsid)
     // Let other servers know that this user is authed
     {
-        outMODE(me, who, "+rd", svsid.toString());
+        outMODE(me, Generic.Users.get(who.toLowerCase()), "+rd", svsid.toString());
     }
     public void outKICK(Service me, String who, String where, String why)
     // Kick someone from a channel
@@ -462,10 +462,10 @@ public class ngfqircd implements Protocol {
         }
     }
     
-    public void outMODE(Service me, String who, String what, String more)
+    public void outMODE(Service me, Client who, String what, String more)
     {
        try {
-            Outgoing("SVSMODE " + who + " " + what + " :" + more);
+            Outgoing("SVSMODE " + who.uid + " " + who.signon + what + " " + more);
         } catch (IOException e) {
             Logging.error("PROTOCOL", "Got IOException while sending a command.");
             Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());

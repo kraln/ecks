@@ -24,9 +24,10 @@ import ecks.services.SrvAuth;
 import ecks.services.SrvAuth_user;
 import ecks.protocols.Generic;
 import ecks.Configuration;
+import ecks.Logging;
 
 public class ReAuth extends bCommand {
-    public final CommandDesc Desc = new CommandDesc("reauth", 2, false, CommandDesc.access_levels.A_NONE, "Re-logs you into services after split", "<dbid>, <ts>");
+    public final CommandDesc Desc = new CommandDesc("reauth", 2, true, CommandDesc.access_levels.A_NONE, "Re-logs you into services after split", "<dbid>, <ts>");
 
     public CommandDesc getDesc() {
         return Desc;
@@ -36,22 +37,31 @@ public class ReAuth extends bCommand {
         SrvAuth temp = ((SrvAuth) who);
         String[] args = arguments.split(" ");
 
+        Logging.verbose("SRVREAUTH", "Attempting reauth!");
         if (!replyto.equals("service")) {
             Generic.curProtocol.outPRVMSG(who, user, "\u0002Error:\u0002 This command is for internal use by services only!");
             return;
         }
         if (args.length == 2) {
+            Logging.verbose("SRVREAUTH", "Args Correct!");
             if (Generic.Users.get(user).authhandle == null) { // not logged in (shouldn't be)
-                if (temp.dbMap.containsKey(Long.parseLong(args[0]))) { // if there is a svsid
+                Logging.verbose("SRVREAUTH", "Not logged in!");
+                if (Math.abs(Generic.Users.get(user).hashCode()) == Long.parseLong(args[0])) { // if there is a svsid
+                    Logging.verbose("SRVREAUTH", "Has correct hashcode! " + args[0]);
                     String uname = temp.dbMap.get(Long.parseLong(args[0]));
                     if (temp.Users.containsKey(uname)) { // if uname associated with svsid is valid
+                        Logging.verbose("SRVREAUTH", "Uname associated with svsid! " + uname);
                         SrvAuth_user t = temp.Users.get(uname);
-                        if (t.dbnum == Long.parseLong(args[0])) // if the username thinks it has the same svsid as the svsid thinks it has username
+                        Logging.verbose("SRVREAUTH", "Uname has svsid! " + t.hashCode());
+                        if (t.getMeta("hashcode").equals(args[0])) // if the username thinks it has the same svsid as the svsid thinks it has username
                         {
+                            Logging.verbose("SRVREAUTH", "Should auth!");
                             Generic.Users.get(user).authhandle = uname;
-                            Generic.curProtocol.outNOTICE(who, user, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Welcome back! (auto logged-in as " + uname + ")");
-                            if (Configuration.getSvc().containsKey(Configuration.chanservice))
-                                Configuration.getSvc().get(Configuration.chanservice).handle(user, user, "syncall"); // sync them in all of their channels
+
+//todo: fill a queue
+//                            Generic.curProtocol.outNOTICE(who, user, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Welcome back! (auto logged-in as " + uname + ")");
+//                            if (Configuration.getSvc().containsKey(Configuration.chanservice))
+//                                Configuration.getSvc().get(Configuration.chanservice).handle(user, user, "syncall"); // sync them in all of their channels
                         }
                     }
                 }

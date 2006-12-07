@@ -49,7 +49,7 @@ public class Generic {
         }
     }
 
-    public static void nickRename(String oldnick, String newnick)
+    public static void nickRename(String oldnick, String newnick, long ts)
     // client has renamed
     {
         String oldid = oldnick.toLowerCase();
@@ -57,6 +57,7 @@ public class Generic {
 
         Client client = Users.get(oldid);
         client.uid = newnick; // keep their uid in step with their nickname...
+        client.signon = ts;
 
         if (oldid.equals(newid)) return;
         // this was a major issue. ircd sends nick changes for case changing.
@@ -105,9 +106,16 @@ public class Generic {
                         tokens[12]
                 )
         );
+        Logging.verbose("PROTOCOL", "User " + tokens[1] + " is now being tracked.");
         if (Long.parseLong(tokens[9]) > 0) // if user was authed before
+        {
+            Logging.info("PROTOCOL", "User " + tokens[1] + " was previously authed.");
             if (Configuration.getSvc().containsKey(Configuration.authservice)) // if we have an auth service
+            {
+                Logging.info("PROTOCOL", "Attempting re-entry...");
                 Configuration.getSvc().get(Configuration.authservice).handle(tokens[1].toLowerCase(),"service","reauth " + tokens[9] + " " + tokens[3]);
+            }
+        }
     }
 
     public synchronized static void nickSignOff(String who)
@@ -118,6 +126,7 @@ public class Generic {
             for (String chan : blah)
                 chanPart(chan, who);
             Users.remove(who);
+            Logging.verbose("PROTOCOL", "User " + who + " is no longer being tracked.");
         } else {
             Logging.warn("PROTOCOL", "Tried to sign off a user that didn't exist");
         }
