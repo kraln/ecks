@@ -100,6 +100,7 @@ public class main {
             t.interrupt();
         Logging.warn("SHUTDOWN", "Stopping RPC");
         myConf.RPCServer.shutdown();
+        Logging.summary("SHUTDOWN", "Uptime was: " + (Long.parseLong(util.getTS()) - Generic.curProtocol.getWhenStarted()));
         Logging.warn("SHUTDOWN", "Goodbye."); // should put summary here.
         for (Thread t : util.getThreads())
             t.interrupt();

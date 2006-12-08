@@ -98,7 +98,7 @@ public interface Protocol {
     public static enum States {
         S_DISCONNECTED, S_HASBUFFERS, S_BURSTING, S_SERVICES, S_ONLINE, S_DISCONNECTING
     }
-
+    long getWhenStarted();
     String getModeArgs()
     // Get what channel modes have arguments for this protocol
         ;
