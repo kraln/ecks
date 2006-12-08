@@ -71,11 +71,10 @@ public class SrvChannel_channel { // direct correlation to a database entry
             Metadata.remove(what);
         Metadata.put(what,val);
     }
-    public void rmMeta(String what) throws NoSuchElementException {
+    public void rmMeta(String what) {
         if (Metadata.containsKey(what)) {
             Metadata.remove(what);
-        } else
-            throw new java.util.NoSuchElementException();
+        }
     }
 
     public Map<String,ChanAccess> getUsers()
@@ -88,7 +87,7 @@ public class SrvChannel_channel { // direct correlation to a database entry
     }
     public String toString()
     {
-        return channel + " " + Users.size() + " users, " + Settings.size() + " settings. Owned by: " + owner;
+        return channel + " " + Users.size() + " users, " + Settings.size() + " settings, " + Metadata.size() + " meta. Owned by: " + owner;
     }
 
 }

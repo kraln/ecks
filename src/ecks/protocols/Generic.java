@@ -188,7 +188,7 @@ public class Generic {
             if (user.startsWith("@")) user = user.substring(1);
             if (user.startsWith("+")) user = user.substring(1);
             user = user.toLowerCase();
-            Users.get(user).chans.add(channel);
+            Users.get(user).chans.add(channel.toLowerCase());
             Hooks.hook(Hooks.Events.E_JOINCHAN, channel, user, null);
         }
 
@@ -197,7 +197,7 @@ public class Generic {
     public static void chanJoin(int ts, String channel, String user) {
         if (Channels.containsKey(channel.toLowerCase())) {
             Channels.get(channel.toLowerCase()).clientmodes.put(Users.get(user.toLowerCase()), new UserModes());
-            Users.get(user.toLowerCase()).chans.add(channel);
+            Users.get(user.toLowerCase()).chans.add(channel.toLowerCase());
             Hooks.hook(Hooks.Events.E_JOINCHAN, channel, user, "");
         } else { // services joining an empty channel
             chanBurst(ts, channel, "+nt", new String[]{user});
@@ -234,7 +234,7 @@ public class Generic {
         }
 
         if (Channels.get(channel.toLowerCase()).clientmodes.containsKey(who)) { // we had better...
-            who.chans.remove(channel);
+            who.chans.remove(channel.toLowerCase());
             Channels.get(channel.toLowerCase()).clientmodes.remove(who);
             Hooks.hook(Hooks.Events.E_PARTCHAN, channel, user, null);
         } else {
