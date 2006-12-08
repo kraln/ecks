@@ -30,8 +30,14 @@ public class ngfqircd implements Protocol {
     BufferedWriter out; // where we send our irc commands to
     States myState; // what the current state of connectivity is
     String myUplink; // what our uplink thinks it is
+    long connected; // what time we connected
     int nCount; // for keeping track of notices at the very beginning of the connection
     final String modeargs = "ovblkIE"; // what chanel modes are allowed to have arguments in this protocol
+
+    public long getWhenStarted()
+    {
+        return connected;
+    }
 
     public ngfqircd() {
         myState = States.S_DISCONNECTED; // we start out disconnected
@@ -94,6 +100,7 @@ public class ngfqircd implements Protocol {
                 if (myState == States.S_SERVICES) {
                     myState = States.S_ONLINE;
                     Logging.info("PROTOCOL", "Ecks Services " + util.getVersion() + " operational. " + util.getTS());
+                    connected = Long.parseLong(util.getTS());
                 }
 
                 if (myState == States.S_BURSTING) {

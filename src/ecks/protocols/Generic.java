@@ -125,10 +125,10 @@ public class Generic {
             List<String> blah = Users.get(who.toLowerCase()).getChans(); // avoid concurrency issues
             for (String chan : blah)
                 chanPart(chan, who);
-            Users.remove(who);
+            Users.remove(who.toLowerCase());
             Logging.verbose("PROTOCOL", "User " + who + " is no longer being tracked.");
         } else {
-            Logging.warn("PROTOCOL", "Tried to sign off a user that didn't exist");
+            Logging.warn("PROTOCOL", "Tried to sign off a user that didn't exist!");
         }
     }
 
