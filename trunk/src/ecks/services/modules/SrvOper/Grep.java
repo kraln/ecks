@@ -128,10 +128,15 @@ public class Grep extends bCommand {
                 } else if (cmd.equals("close")) {
                     for (int i = 0; i < matches.size(); i++)
                     {
-                       for (Map.Entry<Client, UserModes> Cl : ((Channel) matches.get(i)).clientmodes.entrySet()) {
-                            Generic.curProtocol.outKILL(who,Cl.getKey().uid,"Channel #" +  ((Channel)matches.get(i)).name + " has been closed by network staff."); // kill? maybe we should just kick...
-                            Logging.warn("SRVOPER", user + " closed channel " +  ((Channel)matches.get(i)).name + " !");
-                       }
+                        ArrayList<Client> alc = new ArrayList<Client>();
+                        for (Map.Entry<Client, UserModes> Cl : ((Channel) matches.get(i)).clientmodes.entrySet())
+                            alc.add(Cl.getKey());
+                        for (Client c : alc)
+                        {
+                            if (!c.modes.contains("o"))
+                            Generic.curProtocol.outKILL(who,c.uid,"Channel #" +  ((Channel)matches.get(i)).name + " has been closed by network staff."); // kill? maybe we should just kick...
+                        }
+                        Logging.warn("SRVOPER", user + " closed channel " +  ((Channel)matches.get(i)).name + " !");
                     }
                 } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid action for channels. Usage: grep channels [name|topic] [print|close] regexp");
             } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid command. Usage: grep [users|channels] [(uid|ident|mask)(name|topic)] [print|(kill|gline)(close)] regexp");

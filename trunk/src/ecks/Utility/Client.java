@@ -62,7 +62,7 @@ public class Client {
         authhandle = null;
     }
 
-    public List<String> getChans()
+    public ArrayList<String> getChans()
     {
         return new ArrayList<String>(chans); // a copy
     }

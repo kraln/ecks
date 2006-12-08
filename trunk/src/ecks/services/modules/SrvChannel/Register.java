@@ -49,8 +49,8 @@ public class Register extends bCommand {
                         temp.getChannels().get(ch).getUsers().put(u, SrvChannel_channel.ChanAccess.C_OWNER);
                         Generic.curProtocol.outPRVMSG(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Registration Succeeded!");
                         Logging.info("SRVCHAN", "Channel " + ch + " registered by " + user + " to " +  u +  ".");
-                        Generic.curProtocol.srvJoin(who, ch, "+stn");
-                        Generic.curProtocol.outSETMODE(who, ch, "+o", who.getname());
+                        Generic.curProtocol.srvJoin(who, ch, "+strn");
+                        Generic.curProtocol.outSETMODE(who, ch, "+ro", who.getname());
                         
                     } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Channel is already registered.");
                 } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Owner to-be is not logged in!");
