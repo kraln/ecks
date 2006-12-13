@@ -37,11 +37,11 @@ public class Auth extends bCommand {
         SrvAuth temp = ((SrvAuth) who);
         if (arguments.split(" ").length == 2) {
             if (Generic.Users.get(user).authhandle == null) {
-                if (temp.getUsers().containsKey(arguments.split(" ")[0].toLowerCase())) { // if the username exists
-                    if (temp.chkpass(arguments.split(" ")[1], arguments.split(" ")[0].toLowerCase())) { // password matches
-                        Generic.Users.get(user).authhandle = arguments.split(" ")[0].toLowerCase();
-                        temp.getUsers().get(arguments.split(" ")[0].toLowerCase()).setMeta("hashcode", String.valueOf(Math.abs(Generic.Users.get(user).hashCode())));
-                        Generic.curProtocol.srvSetAuthed(who,Generic.Users.get(user).uid, ((long)(Math.abs(Generic.Users.get(user).hashCode()))));
+                String uname =arguments.split(" ")[0].toLowerCase();
+                if (temp.getUsers().containsKey(uname)) { // if the username exists
+                    if (temp.chkpass(arguments.split(" ")[1], uname)) { // password matches
+                        Generic.Users.get(user).authhandle = uname;
+                        Generic.curProtocol.srvSetAuthed(who,Generic.Users.get(user).uid, Long.parseLong(temp.getUsers().get(uname).getMeta("svsid")));
                         Generic.curProtocol.outNOTICE(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Welcome back!");
                         if (Configuration.getSvc().containsKey(Configuration.chanservice))
                             Configuration.getSvc().get(Configuration.chanservice).handle(user,user,"syncall"); // up them in all of their channels

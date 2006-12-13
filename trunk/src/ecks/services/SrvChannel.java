@@ -48,7 +48,7 @@ public class SrvChannel extends bService {
         for(String chan : Channels.keySet()) // ... join registered channels
         {
             Generic.curProtocol.srvJoin(this, chan, "+srtn");
-            Generic.curProtocol.outSETMODE(this, chan, "+ro", name);
+            Generic.curProtocol.outSETMODE(this, chan, "+ntro", name);
         }
     }
 

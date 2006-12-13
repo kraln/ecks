@@ -129,8 +129,13 @@ public class SrvAuth extends bService {
             }
 
             Users.put(uTemp.toLowerCase().trim(), new SrvAuth_user(uTemp, pTemp, eTemp, aTemp, mTemp));         
-            if (Users.get(uTemp.toLowerCase().trim()).getAllMeta().containsKey("hashcode"))
-               dbMap.put(Long.parseLong(Users.get(uTemp.toLowerCase().trim()).getMeta("hashcode")),uTemp.toLowerCase().trim());
+            if (!Users.get(uTemp.toLowerCase().trim()).getAllMeta().containsKey("svsid")) {
+                if (!dbMap.containsKey((long)i))
+                    Users.get(uTemp.toLowerCase().trim()).setMeta("svsid", String.valueOf(i));
+                else 
+                    Users.get(uTemp.toLowerCase().trim()).setMeta("svsid", String.valueOf(dbMap.size()));
+            }
+            dbMap.put(Long.parseLong(Users.get(uTemp.toLowerCase().trim()).getMeta("svsid")),uTemp.toLowerCase().trim());
         }
         Logging.info("SRVAUTH", "Loaded " + Users.size() + " registered users from database.");
     }

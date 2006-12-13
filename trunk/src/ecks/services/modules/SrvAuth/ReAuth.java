@@ -46,14 +46,14 @@ public class ReAuth extends bCommand {
             Logging.verbose("SRVREAUTH", "Args Correct!");
             if (Generic.Users.get(user).authhandle == null) { // not logged in (shouldn't be)
                 Logging.verbose("SRVREAUTH", "Not logged in!");
-                if (Math.abs(Generic.Users.get(user).hashCode()) == Long.parseLong(args[0])) { // if there is a svsid
-                    Logging.verbose("SRVREAUTH", "Has correct hashcode! " + args[0]);
+                if (Math.abs(Generic.Users.get(user).svsid) == Long.parseLong(args[0])) { // if there is a svsid
+                    Logging.verbose("SRVREAUTH", "Has correct svsid! " + args[0]);
                     String uname = temp.dbMap.get(Long.parseLong(args[0]));
                     if (temp.Users.containsKey(uname)) { // if uname associated with svsid is valid
                         Logging.verbose("SRVREAUTH", "Uname associated with svsid! " + uname);
                         SrvAuth_user t = temp.Users.get(uname);
-                        Logging.verbose("SRVREAUTH", "Uname has svsid! " + t.hashCode());
-                        if (t.getMeta("hashcode").equals(args[0])) // if the username thinks it has the same svsid as the svsid thinks it has username
+                        Logging.verbose("SRVREAUTH", "Uname has svsid! " + t.getMeta("svsid"));
+                        if (t.getMeta("svsid").equals(args[0])) // if the username thinks it has the same svsid as the svsid thinks it has username
                         {
                             Logging.verbose("SRVREAUTH", "Should auth!");
                             Generic.Users.get(user).authhandle = uname;
@@ -62,6 +62,9 @@ public class ReAuth extends bCommand {
 //                            Generic.curProtocol.outNOTICE(who, user, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Welcome back! (auto logged-in as " + uname + ")");
 //                            if (Configuration.getSvc().containsKey(Configuration.chanservice))
 //                                Configuration.getSvc().get(Configuration.chanservice).handle(user, user, "syncall"); // sync them in all of their channels
+                        } else {
+                            // mismatch for whatever reason. Unset authed
+                            Generic.curProtocol.srvUnSetAuthed(who,Generic.Users.get(user).uid);
                         }
                     }
                 }

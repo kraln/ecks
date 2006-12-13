@@ -448,6 +448,14 @@ public class ngfqircd implements Protocol {
     {
         outMODE(me, Generic.Users.get(who.toLowerCase()), "+rd", svsid.toString());
     }
+
+    public void srvUnSetAuthed(Service me, String who)
+    // Un-auth a user
+    {
+        outMODE(me, Generic.Users.get(who.toLowerCase()), "-rd", "");
+    }
+
+
     public void outKICK(Service me, String who, String where, String why)
     // Kick someone from a channel
     {
