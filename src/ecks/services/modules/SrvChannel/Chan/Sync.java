@@ -54,6 +54,8 @@ public class Sync extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
+                if (((SrvChannel) who).getChannels().get(whatchan).getAllMeta().containsKey("greeting")) // if there is a greeting
+                            Generic.curProtocol.outNOTICE(who, whatchan, "\u0002" + whatchan + "\u0002:" + ((SrvChannel) who).getChannels().get(whatchan).getMeta("greeting"));
                 if (Generic.Users.get(whom).authhandle != null) {
                     String aname = Generic.Users.get(whom).authhandle;
                     if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {

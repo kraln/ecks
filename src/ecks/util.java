@@ -36,7 +36,7 @@ public class util {
     public static List<Thread> threads;
 
     public static String getVersion() {
-        return "0.4.1A";
+        return "0.4.2A";
     }
 
     public static Thread startThread(Thread whattostart) {

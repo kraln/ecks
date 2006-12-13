@@ -82,6 +82,11 @@ public interface Protocol {
 // Let other servers know that this user is authed
             ;
 
+    void srvUnSetAuthed(Service me, String who)
+// Log a user out
+            ;
+
+
     void outKICK(Service me, String who, String where, String why)
 // Kick someone from a channel
             ;
