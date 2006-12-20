@@ -29,6 +29,7 @@ import ecks.Hooks.Hooks;
 public class ngfqircd implements Protocol {
     BufferedWriter out; // where we send our irc commands to
     States myState; // what the current state of connectivity is
+    boolean wasOnline; // helps us determine if we were online (split or first time connect)
     String myUplink; // what our uplink thinks it is
     long connected; // what time we connected
     int nCount; // for keeping track of notices at the very beginning of the connection
@@ -41,6 +42,7 @@ public class ngfqircd implements Protocol {
 
     public ngfqircd() {
         myState = States.S_DISCONNECTED; // we start out disconnected
+        wasOnline = false;
         nCount = 0;
     }
     
@@ -104,9 +106,16 @@ public class ngfqircd implements Protocol {
                 }
 
                 if (myState == States.S_BURSTING) {
-                    Logging.info("PROTOCOL", "Burst completed. Bringing services online...");
-                    myState = States.S_SERVICES;
-                    Generic.BringServicesOnline();
+                    if (!wasOnline) { // first time connecting
+                        Logging.info("PROTOCOL", "Burst completed. Bringing services online...");
+                        myState = States.S_SERVICES;
+                        Generic.BringServicesOnline();
+                        wasOnline = true;
+                    } else { // netsplit recovery
+                        Logging.warn("PROTOCOL", "Network recovered from netsplit...");
+                        Logging.info("PROTOCOL", "Burst completed.");
+                        myState = States.S_SERVICES;
+                    }
                 }
 
             } else if (cmd.equals("NOTICE")) {                                                                 // NOTICE
