@@ -23,6 +23,7 @@ import ecks.services.Service;
 import ecks.services.SrvChannel;
 import ecks.services.SrvChannel_channel;
 import ecks.protocols.Generic;
+import ecks.protocols.Protocol;
 
 public class Sync extends bCommand {
     public final CommandDesc Desc = new CommandDesc("sync", 1, true, CommandDesc.access_levels.A_NONE, "Synchronizes a user's modes with their access.", "[channel]");
@@ -55,7 +56,8 @@ public class Sync extends bCommand {
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
                 if (((SrvChannel) who).getChannels().get(whatchan).getAllMeta().containsKey("greeting")) // if there is a greeting
-                            Generic.curProtocol.outNOTICE(who, whatchan, "\u0002" + whatchan + "\u0002:" + ((SrvChannel) who).getChannels().get(whatchan).getMeta("greeting"));
+                if (Generic.curProtocol.getState().equals(Protocol.States.S_ONLINE))
+                      Generic.curProtocol.outNOTICE(who, whom, "\u0002" + whatchan + "\u0002:" + ((SrvChannel) who).getChannels().get(whatchan).getMeta("greeting"));
                 if (Generic.Users.get(whom).authhandle != null) {
                     String aname = Generic.Users.get(whom).authhandle;
                     if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
