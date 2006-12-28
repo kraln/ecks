@@ -76,6 +76,13 @@ public class Generic {
 
     }
 
+   public static void vHost(String target, String newhost)
+    // a user changed his/her modes
+    {
+        Users.get(target.toLowerCase()).althost = newhost;
+
+    }
+
     public static void modeChan(String target, String modes)
     // a client changed a channel's modes
     {

@@ -48,7 +48,6 @@ public class unreal32 implements Protocol {
     boolean wasOnline; // helps us determine if we were online (split or first time connect)
     String myUplink; // what our uplink thinks it is
     long connected; // what time we connected
-    int nCount; // for keeping track of notices at the very beginning of the connection
     final String modeargs = "abefhIjovqlLkE"; // what chanel modes are allowed to have arguments in this protocol
 
     public long getWhenStarted() {
@@ -58,7 +57,6 @@ public class unreal32 implements Protocol {
     public unreal32() {
         myState = States.S_DISCONNECTED; // we start out disconnected
         wasOnline = false;
-        nCount = 0;
     }
 
     public String getModeArgs() {
@@ -136,23 +134,22 @@ public class unreal32 implements Protocol {
             } else if (cmd.equals("NOTICE")) {                                                                 // NOTICE
 
                 if (myState == States.S_HASBUFFERS) { // We're probably being told about hostnames and so forth
-                    nCount++;
-                    if (nCount > 1) // this is the only way to tell we're connected on bahamut
-                    {
                         outHandshake(); // send our half of the server information handshake
                         Logging.info("PROTOCOL", "Sending Handshake...");
-                    }
                 }
 
-            } else if (cmd.equals("SMO")) {                                                               // GNOTICE
+            } else if (cmd.equals("SMO")) {                                                                   // GNOTICE
 
-                Logging.info("PROTOCOL", "Connection established. Beginning burst...");
-                myState = States.S_BURSTING;
+                if (myState == States.S_HASBUFFERS)
+                {
+                    Logging.info("PROTOCOL", "Connection established. Beginning burst...");
+                    myState = States.S_BURSTING;
+                }
 
             } else if (cmd.equals("NICK")) {                                                                     // NICK
 
                 if (hasSource) { // It's a rename
-                    Generic.nickRename(source, tokens[2], Long.parseLong(args));
+                    Generic.nickRename(source, tokens[2], 0);
                 } else { // It's a new client, in a burst or otherwise
                     nickSignOn(tokens, args);
                 }
@@ -187,9 +184,9 @@ public class unreal32 implements Protocol {
 
                 String modestring;
                 if (tokens[2].startsWith("#")) { // is a channel mode
-                    modestring = tokens[4];
-                    if (tokens.length > 4)
-                        for (int i = 5; i < tokens.length; i++)
+                    modestring = tokens[3];
+                    if (tokens.length > 3)
+                        for (int i = 4; i < tokens.length; i++)
                             modestring += " " + tokens[i];
                     Generic.modeChan(tokens[2], modestring);
                 } else {                         // user mode has changed
@@ -202,7 +199,13 @@ public class unreal32 implements Protocol {
                 //:SOURCE PRIVMSG TARGET :MESSAGE
                 Hooks.hook(Hooks.Events.E_PRIVMSG, source, tokens[2], args);
 
-            } else if (cmd.equals("JOIN")) {                                                                   // SJOIN
+            } else if (cmd.equals("SETHOST")) {                                                               // SETHOST
+                // :SOURCE SETHOST NEWHOST
+
+                Generic.vHost(source, tokens[2]);
+
+
+            } else if (cmd.equals("JOIN")) {                                                                    // SJOIN
 
                 // :SOURCE JOIN :#channel, #channel
                 String[] t = tokens[2].split(",");
@@ -469,13 +472,13 @@ public class unreal32 implements Protocol {
     public void srvSetAuthed(Service me, String who, Long svsid)
     // Let other servers know that this user is authed
     {
-        outMODE(me, Generic.Users.get(who.toLowerCase()), "+rx", "");
+        outMODE(me, Generic.Users.get(who.toLowerCase()), "+r", "");
     }
 
     public void srvUnSetAuthed(Service me, String who)
     // Un-auth a user
     {
-        outMODE(me, Generic.Users.get(who.toLowerCase()), "-rx", "");
+        outMODE(me, Generic.Users.get(who.toLowerCase()), "-r", "");
     }
 
 
@@ -503,7 +506,8 @@ public class unreal32 implements Protocol {
 
     public void outMODE(Service me, Client who, String what, String more) {
         try {
-            Outgoing("SVSMODE " + who.uid + " " + who.signon + " " + what + " " + more);
+            Outgoing("SVSMODE " + who.uid + " " + what + " " + more);
+            who.modes.applyChanges(what + " " + more);
         } catch (IOException e) {
             Logging.error("PROTOCOL", "Got IOException while sending a command.");
             Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());

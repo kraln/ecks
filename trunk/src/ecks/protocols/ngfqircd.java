@@ -490,6 +490,7 @@ public class ngfqircd implements Protocol {
     {
        try {
             Outgoing("SVSMODE " + who.uid + " " + who.signon + " " + what + " " + more);
+            who.modes.applyChanges(what + " " + more);
         } catch (IOException e) {
             Logging.error("PROTOCOL", "Got IOException while sending a command.");
             Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());

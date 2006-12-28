@@ -47,12 +47,12 @@ public class ConnThread implements Runnable {
           } catch (NullPointerException npe) {
               npe.printStackTrace();
               Logging.error("CONNTHREAD", "Null pointer exception!");
-              if (stream == null)
-              {
+//              if (stream == null)
+//              {
                   Generic.curProtocol.setState(Protocol.States.S_DISCONNECTING);
                   Logging.error("CONNTHREAD", "Upstream is null; Server closed connection.");                   
                     break;
-              }
+//              }
           } catch (IOException e) {
               e.printStackTrace();
               break;
