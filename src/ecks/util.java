@@ -30,6 +30,8 @@ import java.util.ArrayList;
 
 import sun.misc.BASE64Encoder;
 import ecks.Threads.EmailThread;
+import ecks.services.SrvAuth;
+import ecks.services.modules.CommandDesc;
 
 public class util {
 
@@ -137,6 +139,11 @@ public class util {
             throw new RuntimeException("UTF-8 not supported", ex);
         }
         return result;
+    }
+    
+    public static boolean checkaccess(String user, int level)
+    {
+        return ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).checkAccess(user.toLowerCase()).ordinal() >= level;
     }
 
     public static String decodeUTF(String what) {

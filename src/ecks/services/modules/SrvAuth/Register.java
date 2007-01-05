@@ -55,6 +55,8 @@ public class Register extends bCommand {
                                     Generic.curProtocol.srvSetAuthed(who,user,((long)-1)); // new users don't have svsids
                                     String tCookie = util.makeCookie();
                                     temp.getUsers().get(u).setMeta("cookie", tCookie);
+                                    temp.getUsers().get(u).setMeta("_ts_registered", util.getTS());
+                                    temp.getUsers().get(u).setMeta("_ts_last", util.getTS());
                                     util.SendRegMail(e, tCookie);
                                     Generic.curProtocol.outPRVMSG(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Registration Succeeded!");
                                 } else { // first registration is an SRA

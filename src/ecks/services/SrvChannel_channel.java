@@ -27,7 +27,6 @@ import java.util.NoSuchElementException;
 public class SrvChannel_channel { // direct correlation to a database entry
     public static enum ChanAccess { C_NONE, C_PEON, C_CHANOP, C_MASTER, C_COOWNER, C_OWNER }
     String channel;
-    String owner;
     Map<String, ChanAccess> Users;
     Map<String, String> Settings;
     Map<String, String> Metadata;
@@ -37,16 +36,14 @@ public class SrvChannel_channel { // direct correlation to a database entry
     {
         channel = chan;
         Users = new HashMap<String,ChanAccess>();
-        owner = o;
         Users.put(o,ChanAccess.C_OWNER);
         Settings = new HashMap<String,String>();
         Metadata = new HashMap<String,String>();
     }
-    public SrvChannel_channel(String chan, String o, Map<String, ChanAccess> u, Map<String, String> s, Map<String, String> m)
+    public SrvChannel_channel(String chan, Map<String, ChanAccess> u, Map<String, String> s, Map<String, String> m)
     {
         channel = chan;
         Users = u;
-        owner = o;
         Settings = s;
         Metadata = m;
     }
@@ -87,7 +84,7 @@ public class SrvChannel_channel { // direct correlation to a database entry
     }
     public String toString()
     {
-        return channel + " " + Users.size() + " users, " + Settings.size() + " settings, " + Metadata.size() + " meta. Owned by: " + owner;
+        return channel + " " + Users.size() + " users, " + Settings.size() + " settings, " + Metadata.size() + " meta.";
     }
 
 }

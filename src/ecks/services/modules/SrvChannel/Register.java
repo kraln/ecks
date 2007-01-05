@@ -47,6 +47,9 @@ public class Register extends bCommand {
                     if (!temp.getChannels().containsKey(ch)) {
                         temp.getChannels().put(ch, new SrvChannel_channel(ch, u));
                         temp.getChannels().get(ch).getUsers().put(u, SrvChannel_channel.ChanAccess.C_OWNER);
+                        temp.getChannels().get(ch).setMeta("_registered-by", Generic.Users.get(user.toLowerCase()).authhandle);
+                        temp.getChannels().get(ch).setMeta("_ts_registered", util.getTS());
+                        temp.getChannels().get(ch).setMeta("_ts_last", util.getTS());
                         Generic.curProtocol.outPRVMSG(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Registration Succeeded!");
                         Logging.info("SRVCHAN", "Channel " + ch + " registered by " + user + " to " +  u +  ".");
                         Generic.curProtocol.srvJoin(who, ch, "+strn");

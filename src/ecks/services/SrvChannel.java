@@ -71,7 +71,6 @@ public class SrvChannel extends bService {
         for (Map.Entry<String, SrvChannel_channel> usar : Channels.entrySet()) {
             tOut = tOut + "\t" + "<channel>\r\n";
             tOut = tOut + "\t\t" +"<name value=\"" + util.encodeUTF(usar.getValue().channel) + "\"/>\r\n";
-            tOut = tOut + "\t\t" +"<owner value=\"" + util.encodeUTF(usar.getValue().owner) + "\"/>\r\n";
             tOut = tOut + "\t\t" +"<users>\r\n";
             for (Map.Entry<String, SrvChannel_channel.ChanAccess> md : usar.getValue().getUsers().entrySet()) {
                 tOut = tOut + "\t\t\t" +"<" + util.encodeUTF(md.getKey()) + " value=\"" + md.getValue() + "\"/>\r\n";
@@ -106,8 +105,6 @@ public class SrvChannel extends bService {
 
             t = ((Element)XMLin.item(i)).getElementsByTagName("name");
             nTemp = util.decodeUTF(t.item(0).getAttributes().getNamedItem("value").getNodeValue());
-            t = ((Element)XMLin.item(i)).getElementsByTagName("owner");
-            oTemp = util.decodeUTF(t.item(0).getAttributes().getNamedItem("value").getNodeValue());
 
             t = ((Element)XMLin.item(i)).getElementsByTagName("settings").item(0).getChildNodes();
             for (int j =0; j< t.getLength();j++) {
@@ -127,7 +124,7 @@ public class SrvChannel extends bService {
                 mTemp.put(util.decodeUTF((t.item(j)).getNodeName()), util.decodeUTF((t.item(j)).getAttributes().getNamedItem("value").getNodeValue()));
             }
 
-            Channels.put(nTemp.toLowerCase().trim(), new SrvChannel_channel(nTemp,oTemp,uTemp, sTemp,mTemp));
+            Channels.put(nTemp.toLowerCase().trim(), new SrvChannel_channel(nTemp,uTemp, sTemp,mTemp));
         }
         Logging.info("SRVCHAN", "Loaded " + Channels.size() + " registered channels from database.");
     }
