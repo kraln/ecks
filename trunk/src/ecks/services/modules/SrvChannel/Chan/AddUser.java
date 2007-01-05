@@ -22,6 +22,7 @@ import ecks.services.modules.CommandDesc;
 import ecks.services.Service;
 import ecks.services.SrvChannel;
 import ecks.services.SrvChannel_channel;
+import ecks.services.SrvAuth;
 import ecks.protocols.Protocol;
 import ecks.protocols.Generic;
 import ecks.Configuration;import ecks.Storage;
@@ -116,6 +117,7 @@ public class AddUser extends bCommand {
                                         SrvChannel_channel.ChanAccess alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(aname);
                                         if (newacc.ordinal() < alevel.ordinal()) {
                                             ((SrvChannel) who).getChannels().get(whatchan).getUsers().put(Generic.Users.get(whom).authhandle, newacc);
+                                            ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().get(Generic.Users.get(whom).authhandle).WhereAccess.put(whatchan,newacc.toString());
                                             Generic.curProtocol.outPRVMSG(who, replyto, "User Added!");
                                         } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You cannot grant a user higher access than yourself!");
                                     } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You have no access to channel!");

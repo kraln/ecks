@@ -56,6 +56,14 @@ public class Sync extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
+                if (((SrvChannel) who).getChannels().get(whatchan).getAllMeta().containsKey("_isbad")) // this is a very naughty channel
+                {
+                    if (Generic.Users.get(whom).authhandle != null)
+                        Generic.curProtocol.outKICK(who, whom, whatchan, "This channel has been closed by the network administration.");
+                    else
+                        Generic.curProtocol.outKILL(who,whom, "You had tried to join a channel that was closed by the network administration.");
+                    Generic.modeChan(whatchan, "+si");
+                }
                 if (((SrvChannel) who).getChannels().get(whatchan).getAllMeta().containsKey("greeting")) // if there is a greeting
                 if (Generic.curProtocol.getState().equals(Protocol.States.S_ONLINE))
                       Generic.curProtocol.outNOTICE(who, whom, "\u0002" + whatchan + "\u0002:" + ((SrvChannel) who).getChannels().get(whatchan).getMeta("greeting"));

@@ -38,7 +38,7 @@ public class Auth extends bCommand {
         SrvAuth temp = ((SrvAuth) who);
         if (arguments.split(" ").length == 2) {
             if (Generic.Users.get(user).authhandle == null) {
-                String uname =arguments.split(" ")[0].toLowerCase();
+                String uname = arguments.split(" ")[0].toLowerCase();
                 if (temp.getUsers().containsKey(uname)) { // if the username exists
                     if (temp.chkpass(arguments.split(" ")[1], uname)) { // password matches
                         Generic.Users.get(user).authhandle = uname;

@@ -94,7 +94,7 @@ public class SrvChannel extends bService {
     public void loadSRVDB(NodeList XMLin)
     {
         for (int i = 0; i < XMLin.getLength(); i++) {  // channel tags
-            String nTemp, oTemp;
+            String nTemp;
             Map <String,String> sTemp = new HashMap<String, String>();
             Map <String,String> mTemp = new HashMap<String, String>();
             Map <String,SrvChannel_channel.ChanAccess> uTemp = new HashMap<String, SrvChannel_channel.ChanAccess>();
@@ -115,7 +115,11 @@ public class SrvChannel extends bService {
             t = ((Element)XMLin.item(i)).getElementsByTagName("users").item(0).getChildNodes();
             for (int j =0; j< t.getLength();j++) {
                 if (t.item(j).getNodeType() != 1 ) continue;
-                uTemp.put(util.decodeUTF((t.item(j)).getNodeName()), SrvChannel_channel.ChanAccess.valueOf((t.item(j)).getAttributes().getNamedItem("value").getNodeValue()));
+                String handle = (util.decodeUTF((t.item(j)).getNodeName()));
+                String access = (t.item(j)).getAttributes().getNamedItem("value").getNodeValue();
+                ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().get(handle.toLowerCase()).WhereAccess.put(nTemp,access);
+                uTemp.put(handle, SrvChannel_channel.ChanAccess.valueOf(access));
+
             }
 
             t = ((Element)XMLin.item(i)).getElementsByTagName("metadata").item(0).getChildNodes();
