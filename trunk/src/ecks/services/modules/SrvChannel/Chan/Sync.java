@@ -24,6 +24,7 @@ import ecks.services.SrvChannel;
 import ecks.services.SrvChannel_channel;
 import ecks.protocols.Generic;
 import ecks.protocols.Protocol;
+import ecks.util;
 
 public class Sync extends bCommand {
     public final CommandDesc Desc = new CommandDesc("sync", 1, true, CommandDesc.access_levels.A_NONE, "Synchronizes a user's modes with their access.", "[channel]");
@@ -68,6 +69,7 @@ public class Sync extends bCommand {
                         if (alevel.ordinal() >= SrvChannel_channel.ChanAccess.C_CHANOP.ordinal())
                             newmode = "+o";
                         Generic.curProtocol.outSETMODE(who,whatchan,newmode, whom);
+                        ((SrvChannel) who).getChannels().get(whatchan).setMeta("_ts_last", util.getTS()); // updade last seen metadata
                         if (((SrvChannel) who).getChannels().get(whatchan).getAllMeta().containsKey("setinfo-" + aname)) // if they have a SetInfo
                             Generic.curProtocol.outPRVMSG(who, whatchan, "\u0002[" + whom + "]\u0002: " + ((SrvChannel) who).getChannels().get(whatchan).getMeta("setinfo-" + aname));
                     } else if(!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has no access to channel!");

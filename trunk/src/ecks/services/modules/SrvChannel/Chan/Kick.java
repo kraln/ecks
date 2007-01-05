@@ -76,6 +76,7 @@ public class Kick extends bCommand {
 
         whom = whom.toLowerCase();
         whatchan = whatchan.toLowerCase();
+        reason = reason.trim();
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {

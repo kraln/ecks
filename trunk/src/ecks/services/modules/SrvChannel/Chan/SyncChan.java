@@ -51,6 +51,8 @@ public class SyncChan extends bCommand {
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
 
+                Generic.curProtocol.outSETMODE(who, whatchan, "+o", who.getname().toLowerCase());
+
                 for (Client whom : Generic.Channels.get(whatchan).clientmodes.keySet()) {
 
                     if (whom.authhandle != null) {

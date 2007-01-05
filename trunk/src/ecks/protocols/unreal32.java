@@ -33,7 +33,7 @@ public class unreal32 implements Protocol {
 
     Please note that I haven't tested this protocol module very thoroughly, and that it's
     based off of the fqircd/bahamut module as of 12/22/2006 - it may be old.
-    
+
     Try not to judge ecks based on how well it deals with unreal.
 
     Services link, join channels, report debug information, and seem to work alright.
