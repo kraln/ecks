@@ -20,6 +20,7 @@ package ecks.services.modules.SrvOper;
 import ecks.services.modules.bCommand;
 import ecks.services.modules.CommandDesc;
 import ecks.services.Service;
+import ecks.services.SrvChannel;
 import ecks.protocols.Generic;
 import ecks.*;
 import ecks.Utility.Channel;
@@ -138,8 +139,14 @@ public class Grep extends bCommand {
                         for (Client c : alc)
                         {
                             if (!c.modes.contains("o"))
-                            Generic.curProtocol.outKILL(who,c.uid,"Channel " +  ((Channel)matches.get(i)).name + " has been closed by network staff."); // kill? maybe we should just kick...
+                            {
+                                if (c.authhandle != null)
+                                    Generic.curProtocol.outKICK(who,c.uid,((Channel)matches.get(i)).name, "Channel has been closed by network administration."); // kick registered users
+                                else
+                                    Generic.curProtocol.outKILL(who,c.uid,"Channel " +  ((Channel)matches.get(i)).name + " has been closed by network staff."); // kill unregistered ones
+                            }
                         }
+                        ((SrvChannel) who).getChannels().get(((Channel)matches.get(i)).name).setMeta("_isbad", "Channel was closed via batch grep.");
                         Logging.warn("SRVOPER", user + " closed channel " +  ((Channel)matches.get(i)).name + " !");
                     }
                 } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid action for channels. Usage: grep channels [name|topic] [print|count|close] regexp");

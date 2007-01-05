@@ -43,7 +43,7 @@ public class Unregister extends bCommand {
         String tU = args[0].toLowerCase();
         if (args.length == 1) {
             if (temp.getChannels().containsKey(tU)) {
-                temp.getChannels().remove(tU); // drop the account
+                temp.getChannels().remove(tU); // drop the channel
                 Generic.srvPart(who, tU, "Channel Unregistered.");
                 Logging.info("SRVCHAN", "Channel " + tU + " unregistered by " + user + ".");
                 Generic.curProtocol.outPRVMSG(who, replyto, "Channel removed.");
