@@ -62,6 +62,8 @@ public class Register extends bCommand {
                                 } else { // first registration is an SRA
                                     temp.getUsers().put(u, new SrvAuth_user(u, pw, e, CommandDesc.access_levels.A_SRA));
                                     Generic.Users.get(user).authhandle = u.trim().toLowerCase(); // user is now authed
+                                    temp.getUsers().get(u).setMeta("_ts_registered", util.getTS());
+                                    temp.getUsers().get(u).setMeta("_ts_last", util.getTS());
                                     Generic.curProtocol.outPRVMSG(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Registration Succeeded! You are now an SRA!");
                                 }
                             } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Email Address");

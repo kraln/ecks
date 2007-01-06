@@ -21,12 +21,12 @@ public class Info extends bCommand {
             Generic.curProtocol.outNOTICE(who, user, "\u0002---------\u0002 ");
 
             if (t.getAllMeta().containsKey("_ts_registered"))
-                Generic.curProtocol.outNOTICE(who, user, "Registered On: " + DateFormat.getDateTimeInstance(DateFormat.LONG,DateFormat.LONG).format(new Date(t.getMeta("_ts_registered"))));
+                Generic.curProtocol.outNOTICE(who, user, "Registered On: " + DateFormat.getDateTimeInstance(DateFormat.LONG,DateFormat.LONG).format(new Date(Integer.parseInt(t.getMeta("_ts_registered"))*1000L)));
             else
                 Generic.curProtocol.outNOTICE(who, user, "Unknown Registration Date.");
 
             if (t.getAllMeta().containsKey("_ts_last"))
-                Generic.curProtocol.outNOTICE(who, user, "Last had a user: " + DateFormat.getDateTimeInstance(DateFormat.LONG,DateFormat.LONG).format(new Date(t.getMeta("_ts_last"))));
+                Generic.curProtocol.outNOTICE(who, user, "Last had a user: " + DateFormat.getDateTimeInstance(DateFormat.LONG,DateFormat.LONG).format(new Date(Integer.parseInt(t.getMeta("_ts_last"))*1000L)));
             else
                 Generic.curProtocol.outNOTICE(who, user, "Has never had a user.");
 

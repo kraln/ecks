@@ -133,6 +133,7 @@ public class unreal32 implements Protocol {
 
             } else if (cmd.equals("NOTICE")) {                                                                 // NOTICE
 
+                if (args.startsWith("*** Found"))
                 if (myState == States.S_HASBUFFERS) { // We're probably being told about hostnames and so forth
                         outHandshake(); // send our half of the server information handshake
                         Logging.info("PROTOCOL", "Sending Handshake...");

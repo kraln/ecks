@@ -44,6 +44,7 @@ public class SrvAuth_user { // direct correlation to a database entry
         email = e;
         services_access = a;
         Metadata = new HashMap<String, String>();
+        WhereAccess = new HashMap<String, String>();
     }
 
     public SrvAuth_user(String u, String p, String e, CommandDesc.access_levels a, Map<String, String> m) {
@@ -52,6 +53,7 @@ public class SrvAuth_user { // direct correlation to a database entry
         email = e;
         services_access = a;
         Metadata = m;
+        WhereAccess = new HashMap<String, String>();
     }
 
     public Map<String, String> getAllMeta() {

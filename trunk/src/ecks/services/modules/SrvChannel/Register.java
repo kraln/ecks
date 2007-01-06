@@ -22,6 +22,7 @@ import ecks.services.modules.CommandDesc;
 import ecks.services.Service;
 import ecks.services.SrvChannel;
 import ecks.services.SrvChannel_channel;
+import ecks.services.SrvAuth;
 import ecks.protocols.Protocol;
 import ecks.protocols.Generic;
 import ecks.Configuration;
@@ -47,6 +48,7 @@ public class Register extends bCommand {
                     if (!temp.getChannels().containsKey(ch)) {
                         temp.getChannels().put(ch, new SrvChannel_channel(ch, u));
                         temp.getChannels().get(ch).getUsers().put(u, SrvChannel_channel.ChanAccess.C_OWNER);
+                        ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().get(u).WhereAccess.put(ch,SrvChannel_channel.ChanAccess.C_OWNER.toString());
                         temp.getChannels().get(ch).setMeta("_registered-by", Generic.Users.get(user.toLowerCase()).authhandle);
                         temp.getChannels().get(ch).setMeta("_ts_registered", util.getTS());
                         temp.getChannels().get(ch).setMeta("_ts_last", util.getTS());
