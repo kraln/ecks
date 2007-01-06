@@ -117,7 +117,10 @@ public class SrvChannel extends bService {
                 if (t.item(j).getNodeType() != 1 ) continue;
                 String handle = (util.decodeUTF((t.item(j)).getNodeName()));
                 String access = (t.item(j)).getAttributes().getNamedItem("value").getNodeValue();
-                ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().get(handle.toLowerCase()).WhereAccess.put(nTemp,access);
+
+                if(((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().containsKey(handle.toLowerCase()))
+                    ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().get(handle.toLowerCase()).WhereAccess.put(nTemp,access);
+
                 uTemp.put(handle, SrvChannel_channel.ChanAccess.valueOf(access));
 
             }
