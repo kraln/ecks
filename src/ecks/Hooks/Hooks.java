@@ -27,7 +27,7 @@ import java.util.ArrayList;
 
 public class Hooks {
     public static enum Events {
-        E_JOINCHAN, E_PARTCHAN, E_PRIVMSG, E_KICK, E_MODE, E_UMODE, E_TOPIC
+        E_JOINCHAN, E_PARTCHAN, E_PRIVMSG, E_KICK, E_MODE, E_UMODE, E_TOPIC, E_SIGNON
     }
 
     public static Map<Service, List<Events>> regHooks;
