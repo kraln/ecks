@@ -131,9 +131,11 @@ public class ngfqircd implements Protocol {
 
             } else if (cmd.equals("GNOTICE")) {                                                               // GNOTICE
 
-                Logging.info("PROTOCOL", "Connection established. Beginning burst...");
-                myState = States.S_BURSTING;
-
+                if( myState != States.S_ONLINE )
+                {
+                    Logging.info("PROTOCOL", "Connection established. Beginning burst...");
+                    myState = States.S_BURSTING;
+                }
             } else if (cmd.equals("NICK")) {                                                                     // NICK
 
                 if (hasSource) { // It's a rename

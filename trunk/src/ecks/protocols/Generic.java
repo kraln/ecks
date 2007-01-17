@@ -113,6 +113,7 @@ public class Generic {
                         tokens[12]
                 )
         );
+        Hooks.hook(Hooks.Events.E_SIGNON, tokens[1], null, tokens[5] + " " + tokens[6] + " " + tokens[11]);
         Logging.verbose("PROTOCOL", "User " + tokens[1] + " is now being tracked.");
         if (Long.parseLong(tokens[9]) > 0) // if user was authed before
         {
@@ -133,6 +134,7 @@ public class Generic {
             for (String chan : blah)
                 chanPart(chan, who);
             Users.remove(who.toLowerCase());
+            
             Logging.verbose("PROTOCOL", "User " + who + " is no longer being tracked.");
         } else {
             Logging.warn("PROTOCOL", "Tried to sign off a user that didn't exist!");
