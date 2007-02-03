@@ -23,6 +23,8 @@ import ecks.RPC.RPCHandler;
 import ecks.Hooks.Hooks;
 
 import java.net.InetAddress;
+import java.io.IOException;
+
 import org.apache.xmlrpc.WebServer;
 
 public class main {
@@ -92,18 +94,27 @@ public class main {
         Logging.verbose("STARTUP", "Good luck!");
     }
 
-    public static void goGracefullyIntoTheNight()
+    public synchronized static void goGracefullyIntoTheNight()
     {
+        if(Generic.curProtocol.getState().equals(Protocol.States.S_DISCONNECTING)) System.exit(0);
         Generic.curProtocol.setState(Protocol.States.S_DISCONNECTING);
         Logging.warn("SHUTDOWN", "Interrupting Threads...");
         for (Thread t : util.getThreads())
             t.interrupt();
         Logging.warn("SHUTDOWN", "Stopping RPC");
         myConf.RPCServer.shutdown();
-        Logging.summary("SHUTDOWN", "Uptime was: " + (Long.parseLong(util.getTS()) - Generic.curProtocol.getWhenStarted()));
+        if (Generic.curProtocol.getWhenStarted() != 0)
+            Logging.summary("SHUTDOWN", "Uptime was: " + (Long.parseLong(util.getTS()) - Generic.curProtocol.getWhenStarted()));
+        else
+            Logging.summary("SHUTDOWN", "Never established a connection!");   
         Logging.warn("SHUTDOWN", "Goodbye."); // should put summary here.
         for (Thread t : util.getThreads())
             t.interrupt();
+        try {
+            Connection.sock.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         // if we're not done by this point, something is terribly amiss
     }
 

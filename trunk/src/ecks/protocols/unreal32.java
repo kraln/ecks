@@ -27,6 +27,8 @@ import ecks.Hooks.Hooks;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Map;
+import java.util.HashMap;
 
 public class unreal32 implements Protocol {
     /*
@@ -57,6 +59,17 @@ public class unreal32 implements Protocol {
     public unreal32() {
         myState = States.S_DISCONNECTED; // we start out disconnected
         wasOnline = false;
+    }
+
+     public Map<Character, Character> getPrefixMap()
+    {
+        Map <Character, Character> z = new HashMap<Character, Character>();
+        z.put('~', 'q');
+        z.put('%', 'h');
+        z.put('&', 'a');
+        z.put('@', 'o');
+        z.put('+', 'v');
+        return z;
     }
 
     public String getModeArgs() {

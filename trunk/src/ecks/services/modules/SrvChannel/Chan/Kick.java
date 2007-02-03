@@ -96,7 +96,7 @@ public class Kick extends bCommand {
                                     if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
                                         SrvChannel_channel.ChanAccess alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(aname);
                                         if (mlevel.ordinal() > alevel.ordinal()) {
-                                            Generic.curProtocol.outKICK(who, whom, whatchan, reason);
+                                            Generic.curProtocol.outKICK(who, whom, whatchan, "(" + who + ") " + reason);
                                         } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has access equal to or more than yours!");
                                     } else Generic.curProtocol.outKICK(who, whom, whatchan, reason);
                                 } else Generic.curProtocol.outKICK(who, whom, whatchan, reason);

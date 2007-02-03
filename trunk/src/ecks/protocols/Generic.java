@@ -153,12 +153,14 @@ public class Generic {
     }
 
     public static void nickGotKilled(String user) {
-        nickSignOff(user); // track quits properly
+        if (!Users.containsKey(user.toLowerCase())) return; // sanity, god I love it (this actually caused some insanity)
         if (Configuration.getSvc().containsKey(user.toLowerCase())) {
             // they've killed one of us. possibly wrong protocol?
             Logging.error("PROTOCOL", "Service was killed! Attempting 'reconnect'.");
             Configuration.getSvc().get(user.toLowerCase()).introduce(); // reintroduce
+            return; // don't bother signing them off
         }
+        nickSignOff(user); // track quits properly
     }
 
     public static void chanBurst(int ts, String channel, String modes, String[] users) {
@@ -166,39 +168,56 @@ public class Generic {
         Map<Client, UserModes> cm = new HashMap<Client, UserModes>();
 
         m.applyChanges(modes);
+        Map <Character, Character> xlate = curProtocol.getPrefixMap();
 
+        if (users.length != 0)
         for (String user : users) {
             UserModes t = new UserModes();
+            String tUser, tMode;
             Client z;
-            if (user.startsWith("@"))
-            { // we should really pull these character->mode mappings from the PROTOCOL or whatever
-                z = Users.get(user.substring(1).toLowerCase());
-                t.applyChanges("+o");
-            } else if (user.startsWith("+")) {
-                z = Users.get(user.substring(1).toLowerCase());
-                t.applyChanges("+v");
-            } else {
-                z = Users.get(user.toLowerCase());
+
+            tUser = user.toLowerCase();
+            tMode = null;
+            for (Map.Entry<Character, Character> e : xlate.entrySet())
+            {
+                if (user.startsWith(e.getKey().toString()))
+                {
+                    tUser = user.substring(1).toLowerCase();
+                    tMode = "+" + xlate.get(user.substring(0,1).toCharArray());
+                }
             }
+
+            z = Users.get(tUser);
+            if (tMode != null)
+                t.applyChanges(tMode);
             cm.put(z, t); // add this client -> mode mapping to channel
 
         }
 
         if (Channels.containsKey(channel.toLowerCase())) {
-            Logging.error("PROTOCOL", "Attempted to add a channel " + channel + " that already exists. " + cm.size() + " user(s) joined.");
-            Logging.info("PROTOCOL", "Chan is: " + Channels.get(channel.toLowerCase()).toString());
-            Channels.get(channel.toLowerCase()).clientmodes.putAll(cm);
+            if (!curProtocol.getState().equals(Protocol.States.S_BURSTING))
+            {
+                Logging.error("PROTOCOL", "Attempted to add a channel " + channel + " that already exists. " + cm.size() + " user(s) joined.");
+                Logging.info("PROTOCOL", "Chan is: " + Channels.get(channel.toLowerCase()).toString());
+                Channels.get(channel.toLowerCase()).clientmodes.putAll(cm);
+            } else {
+                // bursting... ignore this issue
+                Channels.put(channel.toLowerCase(), new Channel(ts, channel, m, cm));
+                Logging.verbose("PROTOCOL", "Channel " + channel + " is now being tracked. (OVERRIDDEN)");
+            }
         } else {
             Channels.put(channel.toLowerCase(), new Channel(ts, channel, m, cm));
             Logging.verbose("PROTOCOL", "Channel " + channel + " is now being tracked.");
         }
 
-        for (String user : users) {
-            if (user.startsWith("@")) user = user.substring(1);
-            if (user.startsWith("+")) user = user.substring(1);
-            user = user.toLowerCase();
-            Users.get(user).chans.add(channel.toLowerCase());
-            Hooks.hook(Hooks.Events.E_JOINCHAN, channel, user, null);
+        try {
+        for (Client c : cm.keySet()) {
+            c.chans.add(channel.toLowerCase());
+            Hooks.hook(Hooks.Events.E_JOINCHAN, channel, c.uid, null);
+        }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
         }
 
     }

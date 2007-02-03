@@ -22,6 +22,7 @@ import ecks.Utility.Client;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Map;
 
 public interface Protocol {
     States getState();
@@ -107,5 +108,8 @@ public interface Protocol {
     String getModeArgs()
     // Get what channel modes have arguments for this protocol
         ;
+    Map<Character, Character> getPrefixMap()
+            // return a mapping of channel prefix to symbol
+            ;
 
 }

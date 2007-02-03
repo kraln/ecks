@@ -35,7 +35,7 @@ public class Connection {
      InetAddress lhost;
      int p;
      Protocol prot;
-     Socket sock;
+     public static Socket sock;
      BufferedWriter out;
      BufferedReader in;
 

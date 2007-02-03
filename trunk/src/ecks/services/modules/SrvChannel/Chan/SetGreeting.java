@@ -66,9 +66,13 @@ public class SetGreeting extends bCommand {
                         if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
                             if (((SrvChannel) who).getChannels().get(whatchan).getUsers().get(aname).ordinal() >= SrvChannel_channel.ChanAccess.C_MASTER.ordinal()) {
                                 if (!what.trim().equals("*"))
+                                {
                                     ((SrvChannel) who).getChannels().get(whatchan).setMeta("greeting", what);
-                                else
+                                    Generic.curProtocol.outPRVMSG(who, replyto, "Greeting Set.");
+                                } else {
                                     ((SrvChannel) who).getChannels().get(whatchan).rmMeta("greeting");
+                                    Generic.curProtocol.outPRVMSG(who, replyto, "Greeting Cleared.");
+                                }
                             } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Must be master or greater to set greeting!");
                         } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has no access to channel!");
                     } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User is not authed!");
