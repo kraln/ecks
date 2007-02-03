@@ -53,6 +53,6 @@ public class Info extends bCommand {
             for (Map.Entry<String, SrvChannel_channel.ChanAccess> e : t.getUsers().entrySet())
                 Generic.curProtocol.outNOTICE(who, user, "    " + util.pad(e.getKey(), 14) + ": " + e.getValue());
 
-        } else Generic.curProtocol.outNOTICE(who, user, "\u0002Error:\u0002 No such registered username...");
+        } else Generic.curProtocol.outNOTICE(who, user, "\u0002Error:\u0002 No such registered channel...");
     }
 }

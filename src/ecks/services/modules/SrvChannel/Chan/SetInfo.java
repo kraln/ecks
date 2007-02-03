@@ -66,9 +66,13 @@ public class SetInfo extends bCommand {
                         String aname = Generic.Users.get(whom).authhandle;
                         if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
                             if (!what.trim().equals("*"))
+                            {
                                 ((SrvChannel) who).getChannels().get(whatchan).setMeta("setinfo-" + aname, what);
-                            else
-                                ((SrvChannel) who).getChannels().get(whatchan).rmMeta("setinfo-" + aname);                                
+                                Generic.curProtocol.outPRVMSG(who, replyto, "Info Set.");
+                            } else {
+                                ((SrvChannel) who).getChannels().get(whatchan).rmMeta("setinfo-" + aname);
+                                Generic.curProtocol.outPRVMSG(who, replyto, "Info Cleared.");
+                            }
                         } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has no access to channel!");
                     } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User is not authed!");
                 } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User does not exist!");

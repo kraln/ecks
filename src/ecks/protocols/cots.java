@@ -1,70 +1,56 @@
-/*
- * The contents of this file are subject to the Mozilla Public License
- * Version 1.1 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/
- *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
- *
- * The Original Code is Ecks, also known as "SrvEcks" or Ecks Services.
- *
- * The Initial Developer of the Original Code is Copyright (C)Jeff Katz
- * <jeff@katzonline.net>. All Rights Reserved.
- *
- */
 package ecks.protocols;
 
-import ecks.*;
+import ecks.Logging;
+import ecks.main;
+import ecks.util;
+import ecks.Configuration;
 import ecks.Utility.Client;
 import ecks.services.Service;
-
-import java.io.IOException;
-import java.io.BufferedWriter;
-import java.util.Map;
-import java.util.HashMap;
-
-import ecks.Hooks.Hooks.Events;
 import ecks.Hooks.Hooks;
 
-public class ngfqircd implements Protocol {
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.regex.Pattern;
+
+public class cots implements Protocol {
     BufferedWriter out; // where we send our irc commands to
     States myState; // what the current state of connectivity is
     boolean wasOnline; // helps us determine if we were online (split or first time connect)
     String myUplink; // what our uplink thinks it is
     long connected; // what time we connected
     int nCount; // for keeping track of notices at the very beginning of the connection
-    final String modeargs = "ovblkIE"; // what chanel modes are allowed to have arguments in this protocol
+    String modeargs = ""; // what chanel modes are allowed to have arguments in this protocol (dynamic in cots)
+    Map<String, String> xlate;
+    Map<Character, Character> mPrefix;
 
-    public long getWhenStarted()
-    {
+    public long getWhenStarted() {
         return connected;
     }
 
-    public Map<Character, Character> getPrefixMap()
-    {
-        Map <Character, Character> z = new HashMap<Character, Character>();
-        z.put('@','o');
-        z.put('+','v');
-        return z;
-    }
-
-    public ngfqircd() {
+    public cots() {
         myState = States.S_DISCONNECTED; // we start out disconnected
+        xlate = new HashMap<String, String>();
+        mPrefix = new HashMap<Character, Character>();
         wasOnline = false;
         nCount = 0;
     }
-    
-    public String getModeArgs() { return modeargs; }
+
+    public String getModeArgs() {
+        return modeargs;
+    }
+
+    public Map<Character, Character> getPrefixMap() {
+        return mPrefix;
+    }
 
     public States getState() {
         return myState;
     }
 
-    public void setState(States newstate)
-    {
+    public void setState(States newstate) {
         myState = newstate;
     }
 
@@ -76,7 +62,7 @@ public class ngfqircd implements Protocol {
 
     public void Incoming(String line) {
 
-        Logging.raw(line,true); // raw lines get logged here
+        Logging.raw(line, true); // raw lines get logged here
 
         if (line == null) { // this should never, ever happen.
             Logging.error("PROTOCOL", "Got NULL incoming line!");
@@ -84,163 +70,186 @@ public class ngfqircd implements Protocol {
             return; // will never get here...
         }
 
-
         // deal with all our tokenization and so forth *here*
         boolean hasSource = line.startsWith(":");
         String halves[] = line.split(" :", 2);
         boolean hasExtArg = (halves.length > 1);
         String tokens[] = halves[0].split(" ");
-        String command = tokens[(hasSource?1:0)];
-        String source = (hasSource?tokens[0].substring(1):null);
+        String command = tokens[(hasSource ? 1 : 0)];
+        String source = (hasSource ? tokens[0].substring(1) : null);
 
-        Delegate(command, hasSource, source, tokens, hasExtArg, (hasExtArg?halves[1]:null));
+        if (hasSource)
+            source = o2n(source);
+
+
+        Delegate(command, hasSource, source, tokens, hasExtArg, (hasExtArg ? halves[1] : null));
 
     }
 
     public void Outgoing(String what) throws IOException {
-        out.write(what + "\r\n");
-        Logging.raw(what,false); 
+        out.write(what);
+        out.newLine();
+        Logging.raw(what, false);
         out.flush();
+        try {
+            Thread.sleep(20);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
-    void Delegate(String cmd, Boolean hasSource, String source, String[] tokens, Boolean hasargs, String args )
-    {
+    void Delegate(String cmd, Boolean hasSource, String source, String[] tokens, Boolean hasargs, String args) {
         try {
             if (cmd.equals("PING")) {                                                                            // PING
 
                 outPong();
-                if (myState == States.S_SERVICES) {
+
+            } else if (cmd.equals("NOTICE")) {                                                                 // NOTICE
+
+                if (myState == States.S_HASBUFFERS) {
+                    outHandshake(); // send our half of the server information handshake
+                    Logging.info("PROTOCOL", "Sending Handshake...");
+                }
+
+            } else if (cmd.equals("CHANMODE")) {                                                             // CHANMODE
+                if (!tokens[2].equals("D")) // if we're talking about modes that take arguments
+                    if (!modeargs.contains(tokens[1]))
+                        modeargs = modeargs + tokens[1];
+            } else if (cmd.equals("BURST")) {                                                                   // BURST
+
+                if (tokens[1].equals("R")) // asking for burst
+                {
+                    myState = States.S_SERVICES;
+                    Generic.BringServicesOnline();
+                    wasOnline = true;
+                    Outgoing("BURST E");
+                    myState = States.S_BURSTING;
+                    Outgoing("BURST R");
+                }
+
+                if (tokens[1].equals("E")) // done with burst
+                {
                     myState = States.S_ONLINE;
                     Logging.info("PROTOCOL", "Ecks Services " + util.getVersion() + " operational. " + util.getTS());
                     connected = Long.parseLong(util.getTS());
                 }
+            } else if (cmd.equals("NOTE")) {                                                                     // NOTE
+                Logging.info("PROTOCOL", "NOTE: " + args);
+            } else if (cmd.equals("PREFIX")) {                                                                 // PREFIX
 
-                if (myState == States.S_BURSTING) {
-                    if (!wasOnline) { // first time connecting
-                        Logging.info("PROTOCOL", "Burst completed. Bringing services online...");
-                        myState = States.S_SERVICES;
-                        Generic.BringServicesOnline();
-                        wasOnline = true;
-                    } else { // netsplit recovery
-                        Logging.warn("PROTOCOL", "Network recovered from netsplit...");
-                        Logging.info("PROTOCOL", "Burst completed.");
-                        myState = States.S_SERVICES;
-                    }
-                }
+                String[] blah = args.substring(1).split("\\)");
+                for (int i = 0; i < blah[0].length(); i++)
+                    mPrefix.put(blah[1].charAt(i), blah[0].charAt(i));
 
-            } else if (cmd.equals("NOTICE")) {                                                                 // NOTICE
+            } else if (cmd.equals("USER")) {                                                                     // USER
 
-                if (myState == States.S_HASBUFFERS) { // We're probably being told about hostnames and so forth
-                    nCount++;
-                    if (nCount > 3) // this is the only way to tell we're connected on bahamut
-                    {
-                        outHandshake(); // send our half of the server information handshake
-                        Logging.info("PROTOCOL", "Sending Handshake...");
-                    }
-                }
+                if (hasargs)
+                    nickSignOn(tokens, args);
+                else
+                    nickSignOn(tokens, tokens[16]); // voodoo for lazy :
 
-            } else if (cmd.equals("GNOTICE")) {                                                               // GNOTICE
-
-                if( myState != States.S_ONLINE )
-                {
-                    Logging.info("PROTOCOL", "Connection established. Beginning burst...");
-                    myState = States.S_BURSTING;
-                }
             } else if (cmd.equals("NICK")) {                                                                     // NICK
 
-                if (hasSource) { // It's a rename
-                    Generic.nickRename(source,tokens[2], Long.parseLong(args));
-                } else { // It's a new client, in a burst or otherwise
-                    nickSignOn(tokens, args);
-                }
+                Generic.nickRename(source, tokens[2], Long.parseLong(util.getTS()));
 
             } else if (cmd.equals("KICK")) {                                                                     // KICK
 
-                Generic.nickGotKicked( tokens[3], tokens[2]);
+                Generic.nickGotKicked(o2n(tokens[3]), o2n(tokens[2]));
 
             } else if (cmd.equals("SERVER")) {                                                                 // SERVER
 
                 myUplink = tokens[1];
+                xlate.put(tokens[2],tokens[1]);
 
             } else if (cmd.equals("KILL")) {                                                                     // KILL
 
-                Generic.nickGotKilled(tokens[2]);
+                if (tokens[2].equals(Configuration.Config.get("hostname"))) // we're getting killed?
+                {
+                    Logging.error("PROTOCOL", "We've done something wrong. Bailing.");
+                    main.goGracefullyIntoTheNight();
+                }
+                Generic.nickGotKilled(o2n(tokens[2]));
 
             } else if (cmd.equals("AWAY")) {                                                                     // AWAY
 
-               // goggles. suppresses 'unsupported command'
+                // goggles. maybe we should track these at some point.
 
             } else if (cmd.equals("PART")) {                                                                     // PART
 
                 // :SOURCE PART #CHANNEL
-                Generic.chanPart(tokens[2],source);
-
+                Generic.chanPart(tokens[2], source);
 
             } else if (cmd.equals("QUIT")) {                                                                     // QUIT
 
+                if (myUplink.equals(o2n(source))) {
+                    main.goGracefullyIntoTheNight();
+                    return;
+                }
                 Generic.nickSignOff(source);
 
             } else if (cmd.equals("MODE")) {                                                                     // MODE
-
-                String modestring;
+                // :SOURCE MODE TARGET :CHANGE
+                if (!hasargs)
+                    args = tokens[3];
                 if (tokens[2].startsWith("#")) { // is a channel mode
-                modestring = tokens[4];
-                if (tokens.length > 4)
-                    for (int i = 5; i< tokens.length; i++)
-                        modestring += " " + tokens[i];
-                    Generic.modeChan(tokens[2], modestring);
+                    Generic.modeChan(o2n(tokens[2]), args);
                 } else {                         // user mode has changed
-                    modestring = args;
-                    Generic.modeUser(tokens[2], modestring);    
+                    Generic.modeUser(o2n(tokens[2]), args);
                 }
+            } else if (cmd.equals("SMODE")) {                                                                   // SMODE
+                // SMODE ts channel mode
+                Generic.modeChan(tokens[3], args);
 
             } else if (cmd.equals("PRIVMSG")) {                                                               // PRIVMSG
 
                 //:SOURCE PRIVMSG TARGET :MESSAGE
-                Hooks.hook(Events.E_PRIVMSG,source,tokens[2],args);
+                Hooks.hook(Hooks.Events.E_PRIVMSG, source, o2n(tokens[2]), args);
 
-            } else if (cmd.equals("SJOIN")) {                                                                   // SJOIN
+            } else if (cmd.equals("JOIN")) {                                                                     // JOIN
+                if (tokens[2].equals("0")) // partall
+                {
+                    Generic.Users.get(source).chans.clear();
+                } else {
 
-                // :SOURCE SJOIN TS #CHANNEL MODES [MODEARGS] :USERS
-                if(!Generic.Users.containsKey(source.toLowerCase())) { // server is introducing channel
-                    if (tokens.length>4) {
-                        String ExtModes = "";
-                        for (int i = 5; i < tokens.length; i++)
-                        {
-                            ExtModes = " " + tokens[i];
-                        }
-                        Generic.chanBurst(
-                                Integer.parseInt(tokens[2]),
-                                tokens[3],
-                                tokens[4] + ExtModes,
-                                args.split(" ")
-                        );
-                    } else {
-                        Generic.chanBurst(
-                                Integer.parseInt(tokens[2]),
-                                tokens[3],
-                                tokens[4],
-                                args.split(" ")
-                        );
-                    }
-
-                } else { // just a user joining
+                    // :SOURCE JOIN #CHANNEL MODE
                     Generic.chanJoin(
-                            Integer.parseInt(tokens[2]),
-                            tokens[3],
+                            0,
+                            tokens[2],
                             source
                     );
                 }
+            } else if (cmd.equals("SJOIN")) {                                                                   // SJOIN
+
+                // :SOURCE SJOIN TS #CHANNEL :PREFIXUSERS
+                String[] temp = args.split(" ");
+                for (int i = 0; i < temp.length; i++) {
+                    String z = "";
+                    for (Map.Entry<Character, Character> e : mPrefix.entrySet())  // remove prefix, xlate, put it back...
+                        if (temp[i].startsWith(e.getKey().toString())) {
+                            z = temp[i].substring(0, 1);
+                            temp[i] = temp[i].substring(1);
+                        }
+                    temp[i] = o2n(temp[i]);
+                    temp[i] = z + temp[i];
+                }
+                Generic.chanBurst(
+                        Integer.parseInt(tokens[2]),
+                        tokens[3],
+                        "",
+                        temp
+                );
+
             } else if (cmd.equals("TOPIC")) {                                                                   // TOPIC
-                // :SOURCE TOPIC #CHANNAME SETTER TS :NEWTOPIC
-                Generic.chanTopic(Integer.parseInt(tokens[4]),tokens[2],args);
+                // :SOURCE TOPIC #CHANNAME :NEWTOPIC
+                Generic.chanTopic(0, tokens[2], args);
 
 
             } else if (cmd.equals("ERROR")) {                                                                   // ERROR
 
                 Logging.error("PROTOCOL", "Recieved Error. Disconnecting.");
-                Logging.warn("PROTOCOL", "Error was: " + (hasargs?args:""));
+                Logging.warn("PROTOCOL", "Error was: " + (hasargs ? args : ""));
                 main.goGracefullyIntoTheNight();
 
             } else {                                                                                          // UNKNOWN
@@ -255,94 +264,106 @@ public class ngfqircd implements Protocol {
     }
 
 
-
-    void nickSignOn(String[] tokens, String args)
-    {
-        // bahamut specific...
-        // nick NICKNAME HOPS SIGNON MODES IDENT HOST SERVER SERVICESID NUMERICIP :REALNAME
-        // 0    1        2    3      4     5     6    7      8          9
+    void nickSignOn(String[] tokens, String args) {
+        // cots specific...
+        // :SOURCE user oid ts name user host realhost ip rport lport mode machine info nickts idle :realname
+        // 0       1    2   3  4    5    6    7        8  9     10    11   12      13   14     15   args
 
         // generic...
         // uid hops signon modes ident host althost uplink svsid numericip realname nickid
-        String[] newargs = { null,
-                    tokens[1],
-                    tokens[2],
-                    tokens[3],
+        // 2   x    3      11    5     7    6       0      x     8         args       x
+
+        xlate.put(tokens[2], tokens[4]);
+        try {
+            String[] newargs = {null,
                     tokens[4],
+                    "0",
+                    tokens[3],
+                    tokens[11],
                     tokens[5],
-                    tokens[6],
-                    tokens[6],
                     tokens[7],
-                    tokens[8],
-                    tokens[9],
+                    tokens[6],
+                    tokens[0],
+                    "0",
+                    String.valueOf(util.ip2long(InetAddress.getByName(tokens[8]))),
                     args,
                     null};
-        Generic.nickSignOn(newargs);        
+
+            Generic.nickSignOn(newargs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    void outPong() throws IOException
-    {
+    void outPong() throws IOException {
         Outgoing("PONG :" + util.getTS());
         Logging.info("PROTOCOL", "Server pinged...");
     }
 
-    void outHandshake() throws IOException // very much bahamut specific
+    void outHandshake() throws IOException // very much cots specific
     {
-        Outgoing("CAPAB :QS TSORA SERVICES CHW KLN GLN KNOCK SSJOIN TSMODE"); // Quitstorm, Timestamp, Services, @+notices, klines and glines, knocking, and SJOIN for joins
-        Outgoing("PASS " + Configuration.Config.get("password") + " :TS"); // send our connection password
-        Outgoing("SERVER " + Configuration.Config.get("hostname") + " 1 :Ecks Services " + util.getVersion()); // send our server info
-        Outgoing("SVINFO 6 3 1 :" + util.getTS()); // send our ts version and offset
+        Outgoing("NOTICE & :\u0001VERSION  " + util.getVersion() + " \u0001"); // version reply
+        Outgoing("AUTH S-A-D * I " + Configuration.Config.get("password")); // auth/password
+        Outgoing("SERVER " + Configuration.Config.get("hostname") + " " + Configuration.Config.get("numeric") + " " + util.getTS() + " :Ecks Services " + util.getVersion()); // send our server info
     }
 
     public void srvIntroduce(Service whom)
     // Introduce a service to the network
     {
-        //NICK <nick> <hops> <TS> <umode> <user> <host> <server> <services#> <nickip>:<ircname>
+        //:SOURCE user oid ts name user host realhost ip rport lport mode machine info nickts idle :realname
         try {
-            String o = "NICK "
-                    + whom.getname()
-                    + " 1 "
-                    + util.getTS()
-                    + " +ior "
+            xlate.put("0" + util.paddingString(whom.getname(), 7, '0', true), whom.getname());
+            String o = ":" + Configuration.Config.get("hostname")
+                    + " USER 0"
+                    + util.paddingString(whom.getname(), 7, '0', true) + " "
+                    + util.getTS() + " "
                     + whom.getname()
                     + " services "
+                    + Configuration.Config.get("hostname") + " "
                     + Configuration.Config.get("hostname")
-                    + " 0 1066435662 :Network Services";
-            Outgoing( o );
+                    + " 0 "
+                    + " * * "
+                    + " +ior "
+                    + " * * "
+                    + util.getTS() + " "
+                    + util.getTS() + " "
+                    + ":Network Services";
+            Outgoing(o);
             String[] tokens = o.split(" ");
-                    String[] newargs = { null,
-                    tokens[1],
-                    tokens[2],
-                    tokens[3],
+            String[] newargs = {null,
                     tokens[4],
+                    "0",
+                    tokens[3],
+                    tokens[11],
                     tokens[5],
-                    tokens[6],
-                    tokens[6],
                     tokens[7],
+                    tokens[6],
+                    tokens[0],
+                    "0",
                     tokens[8],
-                    tokens[9],
                     "Network Services",
                     null};
-            Generic.nickSignOn( newargs );
+            Generic.nickSignOn(newargs);
         } catch (IOException e) {
             Logging.error("PROTOCOL", "Got IOException while introducing service: " + whom.getname());
             Logging.error("PROTOCOL", "IOE Claims: " + e.getMessage());
         }
     }
 
-    public void srvJoin (Service who, String where, String modes)
+    public void srvJoin(Service who, String where, String modes)
     // Have service join a channel
     {
         try {
-            Outgoing("SJOIN " + util.getTS() + " " + where + " " + modes + " :@" + who.getname());
-            Generic.chanJoin(Integer.parseInt(util.getTS()),where,who.getname());
+            Outgoing(":" + who.getname() + " JOIN " + where);
+            Outgoing(":" + who.getname() + " MODE :" + modes);
+            Generic.chanJoin(Integer.parseInt(util.getTS()), where, who.getname());
         } catch (IOException e) {
             Logging.error("PROTOCOL", "Got IOException while sending a command.");
             Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
         }
     }
 
-    public void srvPart (Service who, String where, String why)
+    public void srvPart(Service who, String where, String why)
     // Have service leave a channel
     {
         try {
@@ -415,7 +436,7 @@ public class ngfqircd implements Protocol {
     {
         try {
             Outgoing(":" + me.getname() + " PART " + chan + " :" + reason);
-            Generic.chanPart(chan,me.getname());
+            Generic.chanPart(chan, me.getname());
         } catch (IOException e) {
             Logging.error("PROTOCOL", "Got IOException while sending a command.");
             Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
@@ -439,7 +460,7 @@ public class ngfqircd implements Protocol {
         try {
             String id;
             String host;
-            String [] t = mask.split("@");
+            String[] t = mask.split("@");
             id = t[0];
             host = t[1];
             Outgoing(":" + Configuration.Config.get("hostname") + " AKILL " + host + " " + id + " " + duration + " " + me.getname() + " " + util.getTS() + " :" + why);
@@ -455,7 +476,7 @@ public class ngfqircd implements Protocol {
         try {
             String id;
             String host;
-            String [] t = mask.split("@");
+            String[] t = mask.split("@");
             id = t[0];
             host = t[1];
             Outgoing("RAKILL " + host + " " + id + " " + me.getname());
@@ -488,6 +509,7 @@ public class ngfqircd implements Protocol {
             Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
         }
     }
+
     public void outINVITE(Service me, String who, String where)
     // Invite someone somewhere
     {
@@ -498,10 +520,9 @@ public class ngfqircd implements Protocol {
             Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
         }
     }
-    
-    public void outMODE(Service me, Client who, String what, String more)
-    {
-       try {
+
+    public void outMODE(Service me, Client who, String what, String more) {
+        try {
             Outgoing("SVSMODE " + who.uid + " " + who.signon + " " + what + " " + more);
             who.modes.applyChanges(what + " " + more);
         } catch (IOException e) {
@@ -510,9 +531,14 @@ public class ngfqircd implements Protocol {
         }
     }
 
-    public void outTOPIC(Service me, String where, String what)
-    {
+    public void outTOPIC(Service me, String where, String what) {
 
+    }
+
+    String o2n(String what) {
+        if (what.startsWith("0")) // is an oid
+            return xlate.get(what);
+        return what;
     }
 
 }

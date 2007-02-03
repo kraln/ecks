@@ -21,6 +21,7 @@ import ecks.protocols.Protocol;
 import ecks.protocols.Generic;
 import ecks.Logging;
 import ecks.util;
+import ecks.main;
 
 import java.io.*;
 import java.net.*;
@@ -59,11 +60,15 @@ public class ConnThread implements Runnable {
           } catch (Exception e) {
               e.printStackTrace();
               Logging.error("CONNTHREAD", "Thread got exception!");
-              if (stream == null)
-              {
-                    Generic.curProtocol.setState(Protocol.States.S_DISCONNECTING);
-                    Logging.error("CONNTHREAD", "Upstream is null; Server closed connection.");
-                    break;
+              try {
+                  if (!stream.ready())
+                  {
+                        Generic.curProtocol.setState(Protocol.States.S_DISCONNECTING);
+                        Logging.error("CONNTHREAD", "Upstream is null; Server closed connection.");
+                        break;
+                  }
+              } catch (IOException e1) {
+                  break;
               }
               Logging.info("CONNTHREAD", e.getMessage());
           }
@@ -73,6 +78,7 @@ public class ConnThread implements Runnable {
       }
 
       Logging.warn("CONNTHREAD", "Thread has broken free of loop.");
+      main.goGracefullyIntoTheNight();
       util.getThreads().remove(Thread.currentThread()); // if we're out of this loop, then this thread is over.
 
     }
