@@ -55,4 +55,8 @@ public class Channel {
 
         return name + ": " + ts + " " + modes.getModes() + " occupied by " + clientmodes.size() + " users. Topic is: " + topic + ". Users:" + c;
     }
+    public boolean isRegistered()
+    {
+        return modes.contains("r");
+    }
 }

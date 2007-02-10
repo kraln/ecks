@@ -82,10 +82,10 @@ public class main {
         myConnection.Connect(); // cross our fingers and connect
         Logging.info("STARTUP", "Connection attempted...");
 
-        if (Configuration.Config.get("localport").equals("any"))
+        if (Configuration.Config.get("rpcport").equals("any"))
             myConf.RPCServer = new WebServer(8081);
         else
-            myConf.RPCServer = new WebServer(Integer.parseInt(Configuration.Config.get("localport"))+1,inetT);
+            myConf.RPCServer = new WebServer(Integer.parseInt(Configuration.Config.get("rpcport")),inetT);
 
         myConf.RPCServer.addHandler("ecks", new RPCHandler());
         myConf.RPCServer.start();
