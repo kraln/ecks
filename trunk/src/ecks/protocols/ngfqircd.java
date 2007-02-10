@@ -512,7 +512,12 @@ public class ngfqircd implements Protocol {
 
     public void outTOPIC(Service me, String where, String what)
     {
-
+        try {
+            Outgoing(":" + me.getname() + " TOPIC " + where + " NETWORK " + util.getTS() + " :" + what);
+        } catch (IOException e) {
+            Logging.error("PROTOCOL", "Got IOException while sending a command.");
+            Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
+        }
     }
 
 }

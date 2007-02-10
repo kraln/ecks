@@ -133,7 +133,7 @@ public class SrvAuth extends bService {
                 if (!dbMap.containsKey((long)i))
                     Users.get(uTemp.toLowerCase().trim()).setMeta("svsid", String.valueOf(i));
                 else 
-                    Users.get(uTemp.toLowerCase().trim()).setMeta("svsid", String.valueOf(dbMap.size()));
+                    Users.get(uTemp.toLowerCase().trim()).setMeta("svsid", String.valueOf(dbMap.size()-1));
             }
             dbMap.put(Long.parseLong(Users.get(uTemp.toLowerCase().trim()).getMeta("svsid")),uTemp.toLowerCase().trim());
         }

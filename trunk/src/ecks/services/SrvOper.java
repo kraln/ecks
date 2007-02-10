@@ -22,7 +22,7 @@ import ecks.Configuration;
 import ecks.Hooks.Hooks;
 import ecks.protocols.Generic;
 
-public class SrvOper extends bService {
+public class  SrvOper extends bService {
     public String name = "SrvOper";
 
     public void introduce() {
