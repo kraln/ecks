@@ -36,9 +36,16 @@ public class SrvChannel extends bService {
     public void introduce() {
         Configuration.chanservice = name.toLowerCase();  // I lay claim to channels
         Generic.srvIntroduce(this);
+
+        // register hooks that we care about
         Hooks.regHook(this, Hooks.Events.E_PRIVMSG);
         Hooks.regHook(this, Hooks.Events.E_JOINCHAN);
         Hooks.regHook(this, Hooks.Events.E_KICK);
+
+        // start a thread to clear expired threads
+        util.startThread(new Thread(new SrvChannel_ExpiryThread())).start();
+        Logging.info("SRVCHAN", "Expiry thread started...");
+
         if(!(Configuration.Config.get("debugchan").equals("OFF")))
         {
             Generic.curProtocol.srvJoin(this, Configuration.Config.get("debugchan"), "+stn");

@@ -193,7 +193,7 @@ public class cots implements Protocol {
                 // :SOURCE MODE TARGET :CHANGE
                 if (!hasargs)
                     args = tokens[3];
-                if (tokens[2].startsWith("#")) { // is a channel mode
+                if (o2n(tokens[2]).startsWith("#")) { // is a channel mode
                     Generic.modeChan(o2n(tokens[2]), args);
                 } else {                         // user mode has changed
                     Generic.modeUser(o2n(tokens[2]), args);
