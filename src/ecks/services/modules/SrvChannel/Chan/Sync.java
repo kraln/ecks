@@ -77,7 +77,8 @@ public class Sync extends bCommand {
                         if (alevel.ordinal() >= SrvChannel_channel.ChanAccess.C_CHANOP.ordinal())
                             newmode = "+o";
                         Generic.curProtocol.outSETMODE(who,whatchan,newmode, whom);
-                        ((SrvChannel) who).getChannels().get(whatchan).setMeta("_ts_last", util.getTS()); // updade last seen metadata
+                        if (!who.getname().equalsIgnoreCase(whom)) // don't update the last seen metadata if it's srvchan that is joining
+                            ((SrvChannel) who).getChannels().get(whatchan).setMeta("_ts_last", util.getTS()); // updade last seen metadata
                         if (((SrvChannel) who).getChannels().get(whatchan).getAllMeta().containsKey("setinfo-" + aname)) // if they have a SetInfo
                             Generic.curProtocol.outPRVMSG(who, whatchan, "\u0002[" + whom + "]\u0002: " + ((SrvChannel) who).getChannels().get(whatchan).getMeta("setinfo-" + aname));
                     } else if(!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has no access to channel!");

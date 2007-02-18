@@ -27,12 +27,14 @@ import java.util.List;
 import ecks.util;
 import ecks.Logging;
 import ecks.Configuration;
+import ecks.Utility.Client;
 import ecks.Hooks.Hooks;
 import ecks.protocols.Generic;
 
 public class SrvHelp extends bService {
     public String name = "SrvHelp";
     public Map<String, SrvHelp_channel> Channels;
+    public Map<Client, SrvHelp_channel> qMap;
 
     public void introduce() {
         Generic.srvIntroduce(this);
@@ -63,6 +65,7 @@ public class SrvHelp extends bService {
     public SrvHelp()
     {
         Channels = new HashMap<String, SrvHelp_channel>();
+        qMap = new HashMap<Client, SrvHelp_channel>();
     }
 
    public String getSRVDB() {
@@ -108,9 +111,17 @@ public class SrvHelp extends bService {
         return Channels.size();
     }
     public void hookDispatch(Hooks.Events what, String source, String target, String args) {
-        super.hookDispatch(this, what, source, target, args);
         switch (what) {
+            case E_PRIVMSG:
+                if (qMap.containsKey(Generic.Users.get(source.toLowerCase())))
+                {
+                    // user is being helped. instead of parsing their text as commands,
+                    // add it to a buffer or redirect it to the person assigned to them
+                    break;
+                }
             default:
+                super.hookDispatch(this, what, source, target, args); // this comes after we handle things, so if we're a privmsg
+                                                                      // we can intercept without causing an error
         }
     }
 
