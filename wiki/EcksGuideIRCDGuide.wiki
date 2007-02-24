@@ -1,0 +1,44 @@
+#summary Ecks Guide: IRCd Guide
+#labels Phase-Deploy
+
+=Section 3: Choosing an IRCd =
+
+IRCds that are supported by Ecks:
+
+|| IRCd name || Ecks Version || Ecks Module Name || Type of Support ||
+|| Unreal || 0.4 || ecks.protocols.unreal32 || Full / Experimental ^1^||
+|| Bahamut ^2^ || 0.3 || ecks.protocols.ngfqircd || Full ||
+|| Scarlet || 0.4 || ecks.protocols.cots || Full || 
+
+^1:^ Unreal support has not been tested very much, and assumes that the ircd hasn't been mucked around with much. The version of the protocol that is implemented is U2303.
+
+^2:^ Bahamut is defaultly set up to remove umode +r from users when they change nicknames. We have this patched out of our version for obvious reasons. Everything should still work okay, except that users won't keep their +r through nickchanges. GamesNET uses specifically FQIRCD with the patch to fix +r. 
+
+Your IRCd not listed here? Drop us a line, and we'll more than likely add support in the next version.
+
+[EcksGuideGettingStarted <- Previous] | [EcksGuideInstall Next ->]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
