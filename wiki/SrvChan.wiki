@@ -6,7 +6,7 @@ Channel Services Agent. Provides channel registration and user access list manag
 
 = Modules =
 
-|| MODULE || ACCESS LEVEL || DESCRIPTION ||
+|| *MODULE* || *ACCESS LEVEL* || *DESCRIPTION*||
 || !SrvChannel\Chan\Access.java    || PENDING || Shows the channel access level of a user ||
 || !SrvChannel\Chan\!ShowUsers.java     ||  PENDING  || Shows all the users who have access to the channel   ||
 || !SrvChannel\Chan\!ChUser.java    ||  AUTHED  || Changes a user's channel access level    ||
@@ -27,6 +27,5 @@ Channel Services Agent. Provides channel registration and user access list manag
 || !SrvChannel\Unregister.java    ||  HELPER  ||  Unregister a channel   ||
 || !SrvChannel\Register.java    || HELPER   || Register a channel    ||
 || !SrvChannel\!DumpChans.java    ||   SRA ||  Lists all registered channels  ||
-
 
 
