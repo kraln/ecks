@@ -9,6 +9,16 @@ The following external libraries are linked:
 			Apache XMLRPC Group
 			ASL 2.0 Licensed
 
-The following people have contributed:
+The following classes were used (internally):
+	RBL Checker:	http://www.bitfolge.de
+			Developed by Kai Blankenhorn
+			No license, assumed PD
+
+The following people have contributed directly:
 
 <none>
+
+Special thanks to:
+
+	Spike Damon,	for keeping me on task at
+			five in the morning :)
