@@ -1,4 +1,4 @@
-#summary Ecks Guide: What exactly is "Ecks"?
+#summary Ecks Guide: What exactly is Ecks?
 #labels Phase-Deploy
 
 =Section 1: What is Ecks?=
@@ -10,4 +10,3 @@ Ecks acts as a daemon that links in to the IRC network as a server, and signs th
 Ecks is highly configurable, but currently can provide channel, username, oper, help, and enforcement services.
 
 <- Previous | [EcksGuideGettingStarted Next ->]
-
