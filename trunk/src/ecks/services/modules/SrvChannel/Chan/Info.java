@@ -55,11 +55,11 @@ public class Info extends bCommand {
             if (t.getAllMeta().containsKey("_isbad"))
                 Generic.curProtocol.outNOTICE(who, user, "Is a naughty, naughty channel!");
 
-            if (t.getSettings().size() == 0)
-                Generic.curProtocol.outNOTICE(who, user, "Has no settings.");
+            if (t.getAllMeta().size() == 0)
+                Generic.curProtocol.outNOTICE(who, user, "Has no Metadata.");
             else
-                Generic.curProtocol.outNOTICE(who, user, "Channel Settings:");
-            for (Map.Entry<String, String> e : t.getSettings().entrySet())
+                Generic.curProtocol.outNOTICE(who, user, "Channel Metadata:");
+            for (Map.Entry<String, String> e : t.getAllMeta().entrySet())
                 Generic.curProtocol.outNOTICE(who, user, "    " + util.pad(e.getKey(), 14) + ": " + e.getValue());
             
 

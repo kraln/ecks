@@ -80,7 +80,7 @@ public class Storage {
         Logging.info("DATABASE", "Writing " + (out.getBytes().length) + "bytes of services data to disk...");
         try {
             BufferedWriter o = new BufferedWriter(new FileWriter("srvdb.xml"));
-            o.write("<db>\r\n" + out + "\r\n</db>");
+            o.write("<db version=\"" + util.getVersion() + "\" stamp=\"" + util.getTS() + "\">\r\n" + out + "\r\n</db>");
             o.close();
             Logging.verbose("DATABASE", "Write completed.");
         } catch (IOException e) {

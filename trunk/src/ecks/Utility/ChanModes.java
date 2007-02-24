@@ -105,6 +105,7 @@ public class ChanModes implements Modes {
                     if (toks.length < (numofargssofar+1))
                     numofargssofar--; // todo: hack hack hack
 
+                    try {
                     if (modes.get(w.charAt(0)).contains(toks[numofargssofar+1]))
                     {
                         modes.get(w.charAt(0)).remove(toks[numofargssofar+1]); // remove it
@@ -112,6 +113,10 @@ public class ChanModes implements Modes {
                             modes.remove(w.charAt(0)); // mode has no more complex arguments, remove mode
                     } else {
                         // do nothing because this complex argument wasn't there
+                    }
+                    } catch (Exception e)
+                    {
+                        e.printStackTrace();
                     }
                     numofargssofar++;
                 } else {
