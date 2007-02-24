@@ -8,14 +8,15 @@ Welcome to the Ecks wiki. All documentation for Ecks will be here.
 
 = Users Guide =
 
-  * What is Ecks?
-  * Getting Started
-  * Deciding on an IRCD
-  * Installing and Setting up Ecks
-  * Linking for the first time
-  * Maintenance
-  * Reporting Bugs
-  * Troubleshooting
+  * [EcksGuideWhatIs What is Ecks?]
+  * [EcksGuideGettingStarted Getting Started]
+  * [EcksGuideIRCDGuide Deciding on an IRCD]
+  * [EcksGuideInstall Installing and Setting up Ecks]
+  * [EcksGuideFirstLinking Linking for the first time]
+  * [EcksGuideMaintain Maintenance]
+  * [EcksGuideBugs Reporting Bugs]
+  * [EcksGuideTroubleshooting Troubleshooting]
+
 
 
 
