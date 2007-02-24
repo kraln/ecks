@@ -21,6 +21,7 @@ import ecks.services.modules.CommandDesc;
 import ecks.util;
 import ecks.Logging;
 import ecks.Configuration;
+import ecks.Threads.SrvAuth_ExpiryThread;
 import ecks.Hooks.Hooks;
 import ecks.protocols.Generic;
 
@@ -37,6 +38,11 @@ public class SrvAuth extends bService {
     public void introduce() {
         Hooks.regHook(this, Hooks.Events.E_PRIVMSG);
         Generic.srvIntroduce(this);
+
+        // start a thread to clear expired users
+        util.startThread(new Thread(new SrvAuth_ExpiryThread())).start();
+        Logging.info("SRVAUTH", "Expiry thread started...");
+
         if (!(Configuration.Config.get("debugchan").equals("OFF")))
             Generic.srvJoin(this, Configuration.Config.get("debugchan"), "+stn");
     }

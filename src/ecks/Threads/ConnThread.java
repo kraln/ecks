@@ -45,10 +45,10 @@ public class ConnThread implements Runnable {
               e.printStackTrace();
               Logging.warn("CONNTHREAD", "Thread is being interrupted.");
               break;
-//          } catch (SocketException e) {
-//              Generic.curProtocol.setState(Protocol.States.S_DISCONNECTED);
-//              Logging.error("CONNTHREAD", "Connection terminated unexpectedly, quitting");
-//              break;
+          } catch (SocketException e) {
+              Generic.curProtocol.setState(Protocol.States.S_DISCONNECTED);
+              Logging.error("CONNTHREAD", "Connection terminated unexpectedly, quitting");
+              break;
             } catch (NullPointerException npe) {
               npe.printStackTrace();
               Logging.error("CONNTHREAD", "Null pointer exception!");

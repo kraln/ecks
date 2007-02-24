@@ -426,7 +426,7 @@ public class ngfqircd implements Protocol {
     // Add an AKILL
     {
         try {
-            Outgoing(":" + Configuration.Config.get("hostname") + " AKILL " + who.host + " " + who.ident + " 0 " + me.getname() + " " + util.getTS() + " :" + why);
+            Outgoing(":" + Configuration.Config.get("hostname") + " AKILL " + who.host + " " + who.ident + " 3600 " + me.getname() + " " + util.getTS() + " :" + why);
         } catch (IOException e) {
             Logging.error("PROTOCOL", "Got IOException while sending a command.");
             Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
