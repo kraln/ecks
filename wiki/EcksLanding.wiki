@@ -1,0 +1,21 @@
+#summary Landing page for the Ecks wiki
+#labels Featured,Phase-Deploy
+
+= Introduction =
+
+Welcome to the Ecks wiki. All documentation for Ecks will be here.
+
+
+= Users Guide =
+
+  * What is Ecks?
+  * Getting Started
+  * Deciding on an IRCD
+  * Installing and Setting up Ecks
+  * Linking for the first time
+  * Maintenance
+  * Reporting Bugs
+  * Troubleshooting
+
+
+
