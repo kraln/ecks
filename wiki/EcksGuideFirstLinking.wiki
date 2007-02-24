@@ -1,0 +1,5 @@
+#summary Ecks Guide: First Linkage
+
+=Section 5: Linking for the first time =
+
+[EcksGuideInstall <- Previous] | [EcksGuideMaintain Next ->]
