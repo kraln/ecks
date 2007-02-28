@@ -27,6 +27,8 @@ import ecks.services.SrvAuth;
 import ecks.services.modules.CommandDesc;
 import ecks.services.modules.bCommand;
 
+import java.util.NoSuchElementException;
+
 public class Auth extends bCommand {
     public final CommandDesc Desc = new CommandDesc("auth", 2, false, CommandDesc.access_levels.A_NONE, "Logs you into services.", "<username> <password>");
 
@@ -43,7 +45,12 @@ public class Auth extends bCommand {
                     if (temp.chkpass(arguments.split(" ")[1], uname)) { // password matches
                         Generic.Users.get(user).authhandle = uname;
                         ((SrvAuth) who).getUsers().get(uname).setMeta("_ts_last", util.getTS()); // update last seen metadata
-                        Generic.curProtocol.srvSetAuthed(who,Generic.Users.get(user).uid, Long.parseLong(temp.getUsers().get(uname).getMeta("svsid")));
+                        try {
+                            Generic.curProtocol.srvSetAuthed(who,Generic.Users.get(user).uid, Long.parseLong(temp.getUsers().get(uname).getMeta("svsid")));
+                        } catch (NoSuchElementException nsee) {
+                            temp.getUsers().get(uname).setMeta("svsid", "-1");
+                            Generic.curProtocol.srvSetAuthed(who,Generic.Users.get(user).uid, (long)-1);
+                        }
                         Generic.curProtocol.outNOTICE(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Welcome back!");
                         if (Configuration.getSvc().containsKey(Configuration.chanservice))
                             Configuration.getSvc().get(Configuration.chanservice).handle(user,user,"syncall"); // up them in all of their channels
