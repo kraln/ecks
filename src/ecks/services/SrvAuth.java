@@ -69,6 +69,13 @@ public class SrvAuth extends bService {
     public void handle(String user, String replyto, String command) {
         // don't let people auth or register, or change password without fqdn
         String cmd = command.split(" ")[0];
+
+        if(Configuration.Config.get("secure").equals("NO"))
+        {
+            super.handle(user.toLowerCase(), replyto.toLowerCase(), command);
+            return;
+        }
+
         if (cmd.startsWith("FQDN"))
             super.handle(user.toLowerCase(), replyto.toLowerCase(), command);
         else {

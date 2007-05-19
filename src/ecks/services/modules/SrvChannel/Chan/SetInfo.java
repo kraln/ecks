@@ -26,7 +26,7 @@ import ecks.util;
 import ecks.protocols.Generic;
 
 public class SetInfo extends bCommand {
-    public final CommandDesc Desc = new CommandDesc("setinfo", 99, true, CommandDesc.access_levels.A_PENDING, "Sets a short message that you will be greeted with when entering a channel", "[channel] [message]");
+    public final CommandDesc Desc = new CommandDesc("setinfo", 99, true, CommandDesc.access_levels.A_AUTHED, "Sets a short message that you will be greeted with when entering a channel", "[channel] [message]");
 
     public CommandDesc getDesc() {
         return Desc;
