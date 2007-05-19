@@ -113,6 +113,10 @@ class ConfParse {
         el = (Element) zl.item(0);
         Configuration.Config.put("joinchannels", el.getAttribute("value"));
 
+        zl = docEle.getElementsByTagName("secure");
+        el = (Element) zl.item(0);
+        Configuration.Config.put("secure", el.getAttribute("value"));
+
         NodeList nl = docEle.getElementsByTagName("uplink");
         Configuration.Config.put("protocol", ((Element) nl.item(0)).getAttribute("protocol"));
 
