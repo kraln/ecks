@@ -26,7 +26,7 @@ import java.util.NoSuchElementException;
 
 public class SrvChannel_channel { // direct correlation to a database entry
     public static enum ChanAccess { C_NONE, C_PEON, C_CHANOP, C_MASTER, C_COOWNER, C_OWNER }
-    String channel;
+    public String channel;
     Map<String, ChanAccess> Users;
     Map<String, String> Settings;
     Map<String, String> Metadata;

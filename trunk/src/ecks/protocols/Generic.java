@@ -210,16 +210,10 @@ public class Generic {
             Logging.verbose("PROTOCOL", "Channel " + channel + " is now being tracked.");
         }
 
-        try {
         for (Client c : cm.keySet()) {
             c.chans.add(channel.toLowerCase());
             Hooks.hook(Hooks.Events.E_JOINCHAN, channel, c.uid, null);
         }
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
     }
 
     public static void chanJoin(int ts, String channel, String user) {

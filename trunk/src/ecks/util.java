@@ -27,6 +27,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import sun.misc.BASE64Encoder;
 import ecks.Threads.EmailThread;
@@ -38,7 +39,7 @@ public class util {
     public static List<Thread> threads;
 
     public static String getVersion() {
-        return "0.5B";
+        return "0.6B";
     }
 
     public static Thread startThread(Thread whattostart) {
@@ -177,6 +178,47 @@ public class util {
         CustomException(String message) {
             super(message);
         }
+    }
+
+    public static String long2string(Long i)
+    {
+        double in = i.doubleValue();
+        double SIP1=in / Math.pow(256,3);
+        double SIP2=((in%Math.pow(256,3))/Math.pow(256,2));
+        double SIP3=(((in%Math.pow(256,3))%Math.pow(256,2))/Math.pow(256,1));
+        double SIP4=((((in%Math.pow(256,3))%Math.pow(256,2))%Math.pow(256,1))/Math.pow(256,0));
+
+        return (int)SIP1 + "." + (int)SIP2 + "." + (int)SIP3 + "." + (int)SIP4;
+    }
+
+
+    public static long ip2long(String s) {
+
+        long num = 0;
+     /*   StringTokenizer st = new StringTokenizer(s, ".");
+
+        num = ((long) 16777216 * Long.valueOf(st.nextToken())) +
+              ((long) 65536 * Long.valueOf(st.nextToken())) +
+              ((long) 256 * Long.valueOf(st.nextToken())) +
+              Long.valueOf(st.nextToken());
+       */
+        return (convert1(s));
+    }
+
+    public static long convert1(String s) {
+        long IP = 0x00;
+        char[] data = s.toCharArray();
+        for (int i = 0; i < data.length; i++) {
+            char c = data[i];
+            int b = 0x00;
+            while (c != '.') {
+                b = b * 10 + c - '0';
+                if (++i >= data.length) break;
+                c = data[i];
+            }
+            IP = (IP << 8) + b;
+        }
+        return IP;
     }
 
 }

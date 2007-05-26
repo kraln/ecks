@@ -21,6 +21,7 @@ import ecks.Logging;
 import ecks.Storage;
 import ecks.util;
 import ecks.Configuration;
+import ecks.protocols.Generic;
 import ecks.services.SrvChannel_channel;
 import ecks.services.SrvChannel;
 
@@ -30,7 +31,7 @@ public class SrvChannel_ExpiryThread implements Runnable {
 
     public void run() {
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-        for (;;) {
+        for (; ;) {
             try {
                 Thread.sleep(1000 * 60 * 5); // five minutes
             } catch (InterruptedException e) {
@@ -57,8 +58,13 @@ public class SrvChannel_ExpiryThread implements Runnable {
             }
 
             // remove channels
+            // remove channels
+            for (SrvChannel_channel chan : deletelist) {
+                ((SrvChannel) Configuration.getSvc().get(Configuration.chanservice)).getChannels().remove(chan.channel);
+                Generic.srvPart(Configuration.getSvc().get(Configuration.chanservice), chan.channel, "Channel Expired.");
+            }
 
-            Logging.info("EXPIRY", deletelist.size() + " of " + (((SrvChannel) Configuration.getSvc().get(Configuration.chanservice)).getChannels().size())  + " channels would have expired due to inactivity...");
+            Logging.info("EXPIRY", deletelist.size() + " of " + (((SrvChannel) Configuration.getSvc().get(Configuration.chanservice)).getChannels().size()) + " channels expired due to inactivity...");
         }
         util.getThreads().remove(Thread.currentThread()); // if we're out of this loop, then this thread is over.
     }
