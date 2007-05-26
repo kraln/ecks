@@ -43,7 +43,7 @@ public class SrvAuth_ExpiryThread implements Runnable {
 
 
             for (SrvAuth_user user : ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().values())
-            // iterate through channels
+            // iterate through users
             {
                 if (user.getAllMeta().containsKey("_ts_last")) {
                     if (Long.parseLong(util.getTS()) - Long.parseLong(user.getMeta("_ts_last")) > (60 * 60 * 24 * 7 * 5))  // 5 weeks
@@ -56,9 +56,9 @@ public class SrvAuth_ExpiryThread implements Runnable {
                 }
             }
 
-            // remove channels
-
-            Logging.info("EXPIRY", deletelist.size() + " of " + (((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().size())  + " users would have expired due to inactivity...");
+            // remove users
+   //            for (SrvAuth_user user : deletelist)
+         //         ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().remove(user);
         }
         util.getThreads().remove(Thread.currentThread()); // if we're out of this loop, then this thread is over.
     }

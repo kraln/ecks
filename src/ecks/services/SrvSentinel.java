@@ -68,15 +68,28 @@ public class SrvSentinel extends bService {
                 // channel is registered. don't do anything
             } else {
                 // channel is unregistered. ensure that users do not have ops, only registered users can speak, etc
+                if(Generic.Channels.containsKey(source.toLowerCase()))
+                {
+                    try {
                 for (Map.Entry<Client, UserModes> e : Generic.Channels.get(source.toLowerCase()).clientmodes.entrySet())
                 {
-                    Generic.curProtocol.outSETMODE(this,source,"-oah",e.getKey().uid);
+
+                    Generic.curProtocol.outSETMODE(this,source,"-oaqh",e.getKey().uid);
                     if (e.getKey().modes.contains("r"))
                         Generic.curProtocol.outSETMODE(this,source,"+v",e.getKey().uid);
                 }
                 Generic.curProtocol.outTOPIC(this,source,"This is an unregistered channel. Only registered users may chat. Please see the network help channel for more information.");
                 Generic.curProtocol.outSETMODE(this, source, "+Mstl", "10");
                 Generic.curProtocol.outPRVMSG(this,source,"This is an unregistered channel. Only registered users may chat. Please see the network help channel for more information.");
+                    } catch (NullPointerException NPE)
+                    {
+                        NPE.printStackTrace();
+                    }
+                    } else {
+
+                // ERROR!!111
+                }
+
             }
             break;
             case E_SIGNON:

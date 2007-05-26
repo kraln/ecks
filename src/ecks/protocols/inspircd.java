@@ -1,3 +1,21 @@
+/*
+ * The contents of this file are subject to the Mozilla Public License
+ * Version 1.1 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS"
+ * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ * License for the specific language governing rights and limitations
+ * under the License.
+ *
+ * The Original Code is Ecks, also known as "SrvEcks" or Ecks Services.
+ *
+ * The Initial Developer of the Original Code is Copyright (C)Jeff Katz
+ * <jeff@katzonline.net>. All Rights Reserved.
+ *
+ */
+
 package ecks.protocols;
 
 import ecks.Logging;
@@ -14,13 +32,12 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class inspircd implements Protocol {
-    BufferedWriter out; // where we send our irc commands to
-    States myState; // what the current state of connectivity is
-    boolean wasOnline; // helps us determine if we were online (split or first time connect)
-    String myUplink; // what our uplink thinks it is
-    long connected; // what time we connected
-    int nCount; // for keeping track of notices at the very beginning of the connection
-    final String modeargs = "ovblkIE"; // what chanel modes are allowed to have arguments in this protocol
+    BufferedWriter out;
+    States myState;
+    boolean wasOnline;
+    String myUplink;
+    long connected;
+    final String modeargs = "ovqahblkIE";
 
     public long getWhenStarted() {
         return connected;
@@ -30,13 +47,15 @@ public class inspircd implements Protocol {
         Map<Character, Character> z = new HashMap<Character, Character>();
         z.put('@', 'o');
         z.put('+', 'v');
+        z.put('~', 'q');
+        z.put('&', 'a');
+        z.put('%', 'h');
         return z;
     }
 
     public inspircd() {
         myState = States.S_DISCONNECTED; // we start out disconnected
         wasOnline = false;
-        nCount = 0;
     }
 
     public String getModeArgs() {
@@ -52,8 +71,8 @@ public class inspircd implements Protocol {
     }
 
     public void setBuffers(BufferedWriter o) {
-        out = o; // set our outbuffer to the one we're given
-        myState = States.S_HASBUFFERS; // now we have somewhere to send our commands
+        out = o;
+        myState = States.S_HASBUFFERS;
         Logging.info("PROTOCOL", "Waiting for server...");
     }
 
@@ -64,7 +83,7 @@ public class inspircd implements Protocol {
         if (line == null) { // this should never, ever happen.
             Logging.error("PROTOCOL", "Got NULL incoming line!");
             main.goGracefullyIntoTheNight();
-            return; // will never get here...
+            return;
         }
 
         // deal with all our tokenization and so forth *here*
@@ -93,71 +112,52 @@ public class inspircd implements Protocol {
                 outPong();
             } else if (cmd.equals("ENDBURST")) {                                                             // ENDBURST
                 Logging.info("PROTOCOL", "Burst completed.");
-                myState = States.S_SERVICES;
-
                 myState = States.S_ONLINE;
                 Logging.info("PROTOCOL", "Ecks Services " + util.getVersion() + " operational. " + util.getTS());
                 connected = Long.parseLong(util.getTS());
 
-
             } else if (cmd.equals("CAPAB")) {                                                                   // CAPAB
-
-                if (myState == States.S_HASBUFFERS) {
-
-                    if (tokens[1].equals("END")) {
-                        Logging.info("PROTOCOL", "Sending Handshake...");
-                        outHandshake(); // send our half of the server information handshake
-                        myState = States.S_BURSTING;
-                        Generic.BringServicesOnline();
-
-                    }
-
-                }
-
-            } else if (cmd.equals("NOTICE")) {                                                                 // NOTICE
-
-
-            } else if (cmd.equals("GNOTICE")) {                                                               // GNOTICE
-
-                if (myState != States.S_ONLINE) {
-                    Logging.info("PROTOCOL", "Connection established. Beginning burst...");
+                // nothing interesting gets sent in capab, yet
+                if (tokens[1].equals("END")) {
+                    Logging.info("PROTOCOL", "Sending Handshake...");
+                    outHandshake();
+                    myState = States.S_SERVICES;
+                    Generic.BringServicesOnline();
                     myState = States.S_BURSTING;
+                }
+            } else if (cmd.equals("NOTICE")) {                                                                 // NOTICE
+            } else if (cmd.equals("GNOTICE")) {                                                               // GNOTICE
+            } else if (cmd.equals("METADATA")) {                                                             // METADATA
+                // :nethack.kraln.com METADATA Kuja accountname :Kuja
+                if (tokens[3].equals("accountname")) {
+                    Logging.info("PROTOCOL", "User " + tokens[2] + " was previously authed.");
+                    if (Configuration.getSvc().containsKey(Configuration.authservice)) // if we have an auth service
+                    {
+                        Logging.info("PROTOCOL", "Attempting re-entry...");
+                        Configuration.getSvc().get(Configuration.authservice).handle(tokens[2].toLowerCase(), "service", "reauth " + args + " " + util.getTS());
+                    }
                 }
             } else if (cmd.equals("NICK")) {                                                                     // NICK
 
                 if (tokens.length > 7) {
-                   nickSignOn(tokens, args);
+                    nickSignOn(tokens, args);
                 } else { // just a rename
-                     Generic.nickRename(source, tokens[2], 0);
+                    Generic.nickRename(source, tokens[2], 0);
                 }
-
             } else if (cmd.equals("KICK")) {                                                                     // KICK
-
                 Generic.nickGotKicked(tokens[3], tokens[2]);
-
             } else if (cmd.equals("SERVER")) {                                                                 // SERVER
-
                 myUplink = tokens[1];
-
             } else if (cmd.equals("KILL")) {                                                                     // KILL
-
                 Generic.nickGotKilled(tokens[2]);
-
             } else if (cmd.equals("AWAY")) {                                                                     // AWAY
-
-                // goggles. suppresses 'unsupported command'
-
             } else if (cmd.equals("PART")) {                                                                     // PART
-
-                // :SOURCE PART #CHANNEL
                 Generic.chanPart(tokens[2], source);
-
-
             } else if (cmd.equals("QUIT")) {                                                                     // QUIT
-
                 Generic.nickSignOff(source);
-
-            } else if (cmd.equals("MODE")) {                                                                     // MODE
+            } else if (cmd.equals("OPERTYPE")) {                                                             // OPERTYPE
+                Generic.modeUser(source, "+o"); // lame...
+            } else if (cmd.equals("FMODE")) {                                                                   // FMODE
 
                 String modestring;
                 if (tokens[2].startsWith("#")) { // is a channel mode
@@ -167,38 +167,56 @@ public class inspircd implements Protocol {
                             modestring += " " + tokens[i];
                     Generic.modeChan(tokens[2], modestring);
                 } else {                         // user mode has changed
-                    modestring = args;
-                    Generic.modeUser(tokens[2], modestring);
+                    Generic.modeUser(tokens[2], tokens[5]);
                 }
 
             } else if (cmd.equals("PRIVMSG")) {                                                               // PRIVMSG
-
                 //:SOURCE PRIVMSG TARGET :MESSAGE
                 Hooks.hook(Hooks.Events.E_PRIVMSG, source, tokens[2], args);
-
-            } else if (cmd.equals("SJOIN")) {                                                                   // SJOIN
-
+            } else if (cmd.equals("JOIN")) {                                                                     // JOIN
+                Generic.chanJoin(
+                        Integer.parseInt(tokens[3]),
+                        tokens[2],
+                        source
+                );
+            } else if (cmd.equals("FJOIN")) {                                                                   // FJOIN
                 // :SOURCE FJOIN #CHANNEL TS [MODE,USER]
                 if (!Generic.Users.containsKey(source.toLowerCase())) { // server is introducing channel
-                    if (tokens.length > 4) {
-                        String ExtModes = "";
-                        for (int i = 5; i < tokens.length; i++) {
-                            ExtModes = " " + tokens[i];
+                    String m = "";
+                    String n[];
+                    if (hasargs) {
+                        n = args.split(" ");
+                        String z[] = n;
+
+                        int i = -1;
+                        for (String y : z) {
+                            String c[] = y.split(",");
+                            m = m + c[0];
+                            n[++i] = c[1];
                         }
-                        Generic.chanBurst(
-                                Integer.parseInt(tokens[2]),
-                                tokens[3],
-                                tokens[4] + ExtModes,
-                                args.split(" ")
-                        );
                     } else {
-                        Generic.chanBurst(
-                                Integer.parseInt(tokens[2]),
-                                tokens[3],
-                                tokens[4],
-                                args.split(" ")
-                        );
+                        n = tokens;
+                        String z[] = n;
+
+                        String c[] = z[4].split(",");
+                        m = m + c[0];
+                        n = new String[]{c[1]};
                     }
+
+                    try {
+                        Generic.chanBurst(
+                                Integer.parseInt(tokens[3]),
+                                tokens[2],
+                                m,
+                                n
+                        );
+
+                    } catch (NullPointerException NPE) {
+                        System.out.println(tokens[3] + " " + tokens[2]);
+                        NPE.printStackTrace();
+
+                    }
+                    // todo: fix null pointer here.
 
                 } else { // just a user joining
                     Generic.chanJoin(
@@ -207,21 +225,11 @@ public class inspircd implements Protocol {
                             source
                     );
                 }
+
             } else if (cmd.equals("TOPIC")) {                                                                   // TOPIC
-                // :SOURCE TOPIC #CHANNAME SETTER TS :NEWTOPIC
-                Generic.chanTopic(Integer.parseInt(tokens[4]), tokens[2], args);
-
-
-            } else if (cmd.equals("ERROR")) {                                                                   // ERROR
-
-                Logging.error("PROTOCOL", "Recieved Error. Disconnecting.");
-                Logging.warn("PROTOCOL", "Error was: " + (hasargs ? args : ""));
-                main.goGracefullyIntoTheNight();
-
+                Generic.chanTopic(0, tokens[2], args);
             } else {                                                                                          // UNKNOWN
-
                 Logging.warn("PROTOCOL", "Unsupported command: " + cmd);
-
             }
         } catch (IOException ioe) {
             Logging.error("PROTOCOL", "Got IOException while delegating command: " + cmd);
@@ -231,9 +239,9 @@ public class inspircd implements Protocol {
 
 
     void nickSignOn(String[] tokens, String args) {
-        // bahamut specific...
-        // nick <timestamp> <nick> <hostname> <displayed-hostname> <ident> +<modes> <ip> :<gecos>
-        // 1    2           3       4         5                    6       7        8
+        // inspircd specific...
+        // :SOURCE NICK <timestamp> <nick> <hostname> <displayed-hostname> <ident> +<modes> <ip> :<gecos>
+        // 0       1    2           3       4         5                    6       7        8
 
         // generic...
         // uid hops signon modes ident host althost uplink svsid numericip realname nickid
@@ -245,9 +253,9 @@ public class inspircd implements Protocol {
                 tokens[6],
                 tokens[4],
                 tokens[5],
-                "", // should be source
+                tokens[0],
                 "0",
-                "0", // should be ip (8)
+                String.valueOf(util.ip2long(tokens[8])),
                 args,
                 null};
         Generic.nickSignOn(newargs);
@@ -262,13 +270,13 @@ public class inspircd implements Protocol {
     {
         Outgoing("SERVER " + Configuration.Config.get("hostname") + " " + Configuration.Config.get("password") + " 0 :Ecks Services " + util.getVersion()); // send our server info
         Outgoing("BURST " + util.getTS()); // send our ts version and offset
+        Outgoing(":" + Configuration.Config.get("hostname") + " VERSION :Ecks Services " + util.getVersion());
     }
 
     public void srvIntroduce(Service whom)
     // Introduce a service to the network
     {
         //server NICK <timestamp> <nick> <hostname> <displayed-hostname> <ident> +<modes> <ip> :<gecos>
-        //NICK <nick> <hops> <TS> <umode> <user> <host> <server> <services#> <nickip>:<ircname>
         try {
             String o = "NICK "
                     + util.getTS() + " "
@@ -276,7 +284,7 @@ public class inspircd implements Protocol {
                     + Configuration.Config.get("hostname") + " "
                     + Configuration.Config.get("hostname") + " "
                     + whom.getname()
-                    + " +ior "
+                    + " +ir "
                     + "0.0.0.0 :Network Services";
             Outgoing(":" + Configuration.Config.get("hostname") + " " + o);
             String[] tokens = o.split(" ");
@@ -295,6 +303,7 @@ public class inspircd implements Protocol {
                     "0",
                     null};
             Generic.nickSignOn(newargs);
+            Outgoing(":" + whom.getname() + " OPERTYPE :network service");
 
         } catch (IOException e) {
             Logging.error("PROTOCOL", "Got IOException while introducing service: " + whom.getname());
@@ -359,20 +368,17 @@ public class inspircd implements Protocol {
         }
     }
 
-    public void outSETMODE(Service me, String channel, String mode, String who)
-    // Set a mode on a channel. If we're not ulined, we'll have to force it...
-    {
-        try {
-            Outgoing(":" + me.getname() + " MODE " + channel + " " + mode + " " + who);
-        } catch (IOException e) {
-            Logging.error("PROTOCOL", "Got IOException while sending a command.");
-            Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
-        }
+    public void outSETMODE(Service me, String channel, String mode, String who) {
+            try {
+                Outgoing(":" + me.getname() + " MODE " + channel + " " + mode + " " + who);
+            } catch (IOException e) {
+                Logging.error("PROTOCOL", "Got IOException while sending a command.");
+                Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
+            }
+
     }
 
-    public void outKILL(Service me, String who, String why)
-    // Kill someone.
-    {
+    public void outKILL(Service me, String who, String why) {
         try {
             Outgoing(":" + me.getname() + " KILL " + who + " :" + Configuration.Config.get("hostname") + "!services!" + me.getname() + "! (" + why + ")");
             Generic.nickSignOff(who.toLowerCase());
@@ -382,9 +388,7 @@ public class inspircd implements Protocol {
         }
     }
 
-    public void outPART(Service me, String chan, String reason)
-    // Have services leave a channel
-    {
+    public void outPART(Service me, String chan, String reason) {
         try {
             Outgoing(":" + me.getname() + " PART " + chan + " :" + reason);
             Generic.chanPart(chan, me.getname());
@@ -394,9 +398,7 @@ public class inspircd implements Protocol {
         }
     }
 
-    public void outGLINE(Service me, Client who, String why)
-    // Add an AKILL
-    {
+    public void outGLINE(Service me, Client who, String why) {
         try {
             Outgoing(":" + Configuration.Config.get("hostname") + " AKILL " + who.host + " " + who.ident + " 3600 " + me.getname() + " " + util.getTS() + " :" + why);
         } catch (IOException e) {
@@ -405,9 +407,7 @@ public class inspircd implements Protocol {
         }
     }
 
-    public void outGLINE(Service me, String mask, long duration, String why)
-    // Add an AKILL on an arbitrary mask
-    {
+    public void outGLINE(Service me, String mask, long duration, String why) {
         try {
             String id;
             String host;
@@ -421,9 +421,7 @@ public class inspircd implements Protocol {
         }
     }
 
-    public void outUNGLINE(Service me, String mask)
-    // Remove an AKILL
-    {
+    public void outUNGLINE(Service me, String mask) {
         try {
             String id;
             String host;
@@ -437,22 +435,28 @@ public class inspircd implements Protocol {
         }
     }
 
-    public void srvSetAuthed(Service me, String who, Long svsid)
-    // Let other servers know that this user is authed
-    {
-        outMODE(me, Generic.Users.get(who.toLowerCase()), "+rd", svsid.toString());
+    public void srvSetAuthed(Service me, String who, Long svsid) {
+        outMODE(me, Generic.Users.get(who.toLowerCase()), "+r", "");
+        try {
+            Outgoing(":" + Configuration.Config.get("hostname") + " METADATA " + who.toLowerCase() + " accountname :" + Generic.Users.get(who.toLowerCase()).svsid);
+        } catch (IOException e) {
+            Logging.error("PROTOCOL", "Got IOException while sending a command.");
+            Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
+        }
     }
 
-    public void srvUnSetAuthed(Service me, String who)
-    // Un-auth a user
-    {
-        outMODE(me, Generic.Users.get(who.toLowerCase()), "-rd", "");
+    public void srvUnSetAuthed(Service me, String who) {
+        outMODE(me, Generic.Users.get(who.toLowerCase()), "-r", "");
+        try {
+            Outgoing(":" + Configuration.Config.get("hostname") + " METADATA " + who.toLowerCase() + " accountname :\0");
+        } catch (IOException e) {
+            Logging.error("PROTOCOL", "Got IOException while sending a command.");
+            Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
+        }
     }
 
 
-    public void outKICK(Service me, String who, String where, String why)
-    // Kick someone from a channel
-    {
+    public void outKICK(Service me, String who, String where, String why) {
         try {
             Outgoing(":" + me.getname() + " KICK " + where + " " + who + " :" + why);
         } catch (IOException e) {
@@ -461,9 +465,7 @@ public class inspircd implements Protocol {
         }
     }
 
-    public void outINVITE(Service me, String who, String where)
-    // Invite someone somewhere
-    {
+    public void outINVITE(Service me, String who, String where) {
         try {
             Outgoing(":" + me.getname() + " INVITE " + who + " " + where);
         } catch (IOException e) {
@@ -474,7 +476,8 @@ public class inspircd implements Protocol {
 
     public void outMODE(Service me, Client who, String what, String more) {
         try {
-            Outgoing("SVSMODE " + who.uid + " " + who.signon + " " + what + " " + more);
+            // :<source server or nickname> MODE <target> <modes and parameters>
+            Outgoing(":" + me.getname() + " MODE " + who.uid + " " + what + " " + more);
             who.modes.applyChanges(what + " " + more);
         } catch (IOException e) {
             Logging.error("PROTOCOL", "Got IOException while sending a command.");
@@ -484,7 +487,7 @@ public class inspircd implements Protocol {
 
     public void outTOPIC(Service me, String where, String what) {
         try {
-            Outgoing(":" + me.getname() + " TOPIC " + where + " NETWORK " + util.getTS() + " :" + what);
+            Outgoing(":" + me.getname() + " TOPIC " + where + " :" + what);
         } catch (IOException e) {
             Logging.error("PROTOCOL", "Got IOException while sending a command.");
             Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());

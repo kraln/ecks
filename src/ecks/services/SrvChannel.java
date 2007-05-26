@@ -145,7 +145,16 @@ public class SrvChannel extends bService {
     }
 
     public void hookDispatch(Hooks.Events what, String source, String target, String args) {
-        super.hookDispatch(this, what, source, target, args);
+        if (what.equals(Hooks.Events.E_PRIVMSG)) {
+            // if starts with command char
+            // todo: hack hack hack
+            if (args.length() > 0)
+                if (args.substring(0, 1).equals("!"))
+                    super.hookDispatch(this, what, source, target, this.getname() + ": " + args.substring(1));
+                else
+                    super.hookDispatch(this, what, source, target, args);
+        } else
+            super.hookDispatch(this, what, source, target, args);
         switch (what) {
             case E_JOINCHAN:
                 this.handle(target, source, "sync silent");
