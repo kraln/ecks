@@ -13,12 +13,11 @@ IRCds that are supported by Ecks:
 
 ^1:^ Unreal support has not been tested very much, and assumes that the ircd hasn't been mucked around with much. The version of the protocol that is implemented is U2303.
 
-^2:^ Bahamut is defaultly set up to remove umode +r from users when they change nicknames. We have this patched out of our version for obvious reasons. Everything should still work okay, except that users won't keep their +r through nickchanges. GamesNET uses specifically FQIRCD with the patch to fix +r. 
+^2:^ Bahamut is defaultly set up to remove umode +r from users when they change nicknames. We have this patched out of our version for obvious reasons. Everything should still work okay, except that users won't keep their +r through nickchanges. You may wish to patch this behavior.
 
 Your IRCd not listed here? Drop us a line, and we'll more than likely add support in the next version.
 
 [EcksGuideGettingStarted <- Previous] | [EcksGuideInstall Next ->]
-
 
 
 
