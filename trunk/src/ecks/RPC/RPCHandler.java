@@ -20,6 +20,9 @@ package ecks.RPC;
 
 import ecks.Configuration;
 import ecks.Logging;
+import ecks.services.Service;
+import ecks.services.SrvAuth;
+import ecks.services.SrvAuth_user;
 import ecks.protocols.Generic;
 
 /**
@@ -84,6 +87,50 @@ public class RPCHandler {
         if (Generic.Channels.containsKey(whatchan.toLowerCase()))
             return Generic.Channels.get(whatchan.toLowerCase()).clientmodes.size();
         return -1;
+    }
+
+    /**
+     * Method checkUserAuth checks a username and password against the database
+     *
+     * @param username username is case insensitive
+     * @param password of type String
+     * @return boolean true if user is authenticated
+     */
+    public int checkUserAuth(String username, String password)
+    {
+        Logging.info("RPC", "Got checkUserAuth Request!");
+        Logging.verbose("RPC", "Request was for user: " + username);
+        if (!Configuration.getSvc().containsKey(Configuration.authservice))
+            return 0;
+
+        SrvAuth auth = (SrvAuth)Configuration.getSvc().get(Configuration.authservice);
+
+        if (auth.getUsers().containsKey(username.toLowerCase()) && auth.chkpass(password, username.toLowerCase()))
+            return 1;
+
+        return 0;
+    }
+
+    /**
+     * Method getUserAccess returns ordinal of user access, or zero if no srvauth or user
+     *
+     * @param username of type String
+     * @return int
+     */
+    public int getUserAccess(String username)
+    {
+        Logging.info("RPC", "Got getUserAccess Request!");
+        Logging.verbose("RPC", "Request was for user: " + username);
+        if (!Configuration.getSvc().containsKey(Configuration.authservice))
+            return 0;
+        
+        SrvAuth auth = (SrvAuth)Configuration.getSvc().get(Configuration.authservice);
+
+        if (!auth.getUsers().containsKey(username.toLowerCase()))
+            return 0;
+
+        SrvAuth_user u = auth.getUsers().get(username.toLowerCase());
+        return u.getAccess().ordinal();
     }
 
 }

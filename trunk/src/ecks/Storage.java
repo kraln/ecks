@@ -69,20 +69,29 @@ public class Storage {
 
     }
 
-    public static synchronized void flushDB() {
+    public static void flushDB() {
+        Logging.verbose("DATABASE", "Started DB save thread...");
+        util.startThread(new Thread(new flushThread())).start();
+        Logging.verbose("DATABASE", "Thread started...");
+    }
+
+    static class flushThread implements Runnable {
+        public void run() {
         String out = "";
+        Logging.verbose("DATABASE", "Started gathering services info...");
         for (Map.Entry<String, Service> Serve : Configuration.Services.entrySet()) {
             out = out + Serve.getValue().getSRVDB(); // get well-formed xml from each
         }
         out = out.trim();
-        Logging.info("DATABASE", "Writing " + (out.getBytes().length) + "bytes of services data to disk...");
-        try {
-            BufferedWriter o = new BufferedWriter(new FileWriter("srvdb.xml"));
-            o.write("<db version=\"" + util.getVersion() + "\" stamp=\"" + util.getTS() + "\">\r\n" + out + "\r\n</db>");
-            o.close();
-            Logging.verbose("DATABASE", "Write completed.");
-        } catch (IOException e) {
-            e.printStackTrace();
+            Logging.info("DATABASE", "Writing " + (out.getBytes().length) + "bytes of services data to disk...");
+            try {
+                BufferedWriter o = new BufferedWriter(new FileWriter("srvdb.xml"));
+                o.write("<db version=\"" + util.getVersion() + "\" stamp=\"" + util.getTS() + "\">\r\n" + out + "\r\n</db>");
+                o.close();
+                Logging.verbose("DATABASE", "Write completed.");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
