@@ -1,0 +1,18 @@
+-You are recieving this email because someone used 
+-it to register a username on the FOOBAR network. 
+-                                                   
+-If it wasn't you, feel free to disregard this email.
+
+Thank you for registering your account.
+
+Your confirmation code is %%CODE%%.
+
+To confirm your email address and complete the registration
+process, you must enter this code into SrvAuth. The commands
+are as follows:
+
+/msg SrvAuth@services.ecks auth [yourusername] [yourpassword]
+/msg SrvAuth@services.ecks confirm %%CODE%%
+
+Welcome to the network!
+-The FOOBAR Staff
