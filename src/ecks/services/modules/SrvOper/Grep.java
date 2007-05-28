@@ -55,7 +55,7 @@ public class Grep extends bCommand {
             else reason = "Matched Grep.";
             try {
                 if (what.equals("users")) {
-                    List matches = new ArrayList<Client>();
+                    List<Client> matches = new ArrayList<Client>();
                     for (Map.Entry<String, Client> Client : Generic.Users.entrySet()) {
                         if (what2.equals("uid")) {
                             if (Client.getValue().uid.matches(towhat.replace("*", "\\S+")))
@@ -108,15 +108,14 @@ public class Grep extends bCommand {
                     } else
                         Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid action for user. Usage: grep users [uid|mask|ident] [print|count|kill|gline] regexp");
                 } else if (what.equals("channels")) {
-                    List matches = new ArrayList<Channel>();
+                    List<Channel> matches = new ArrayList<Channel>();
                     for (Map.Entry<String, Channel> Client : Generic.Channels.entrySet()) {
                         if (what2.equals("name")) {
                             if (Client.getValue().name.matches(towhat.replace("*", "\\S+")))
                                 matches.add(Client.getValue());
                         } else if (what2.equals("topic")) {
-                            //todo
-                            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Unimplimented");
-                            return;
+                            if (Client.getValue().topic.matches(towhat.replace("*", "\\S+")))
+                                matches.add(Client.getValue());
                         } else {
                             Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid field for channel. Usage: grep channels [name|topic] [print|count|close] regexp");
                             return;

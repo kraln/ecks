@@ -341,8 +341,10 @@ public class inspircd implements Protocol {
         try {
             Outgoing(":" + me.getname() + " PRIVMSG " + coru + " :" + msg);
         } catch (IOException e) {
+            this.setState(States.S_DISCONNECTING);
             Logging.error("PROTOCOL", "Got IOException while sending a command.");
             Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
+            main.goGracefullyIntoTheNight();
         }
     }
 

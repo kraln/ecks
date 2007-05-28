@@ -69,9 +69,12 @@ public class SrvHelp extends bService {
     }
 
     public String getSRVDB() {
+        Logging.verbose("SRVHELP", "Started gathering SrvHelp Database...");
         String tOut = "";
         tOut = tOut + "<service class=\"" + this.getClass().getName() + "\" name=\"" + name + "\">\r\n";
-        for (Map.Entry<String, SrvHelp_channel> usar : Channels.entrySet()) {
+        HashMap<String, SrvHelp_channel> X = new HashMap<String, SrvHelp_channel>(Channels);
+
+        for (Map.Entry<String, SrvHelp_channel> usar : X.entrySet()) {
             tOut = tOut + "\t" + "<channel>\r\n";
             tOut = tOut + "\t\t" + "<name value=\"" + util.encodeUTF(usar.getValue().channel) + "\"/>\r\n";
             tOut = tOut + "\t\t" + "<metadata>\r\n";
@@ -82,6 +85,7 @@ public class SrvHelp extends bService {
             tOut = tOut + "\t" + "</channel>\r\n";
         }
         tOut = tOut + "</service>\r\n";
+        Logging.verbose("SRVHELP", "Done...");
         return tOut;
     }
 

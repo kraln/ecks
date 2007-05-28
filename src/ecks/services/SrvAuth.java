@@ -96,9 +96,11 @@ public class SrvAuth extends bService {
     }
 
     public String getSRVDB() {
+        Logging.verbose("SRVAUTH", "Started gathering SrvAuth Database...");
         String tOut = "";
         tOut = tOut + "<service class=\"" + this.getClass().getName() + "\" name=\"" + name + "\">\r\n";
-        for (Map.Entry<String, SrvAuth_user> usar : Users.entrySet()) {
+        HashMap<String, SrvAuth_user> X = new HashMap<String, SrvAuth_user>(Users);
+        for (Map.Entry<String, SrvAuth_user> usar : X.entrySet()) {
             tOut = tOut + "\t" + "<user>\r\n";
             tOut = tOut + "\t\t" + "<username value=\"" + util.encodeUTF(usar.getValue().username) + "\"/>\r\n";
             tOut = tOut + "\t\t" + "<password value=\"" + util.encodeUTF(usar.getValue().password) + "\"/>\r\n";
@@ -112,6 +114,7 @@ public class SrvAuth extends bService {
             tOut = tOut + "\t" + "</user>\r\n";
         }
         tOut = tOut + "</service>\r\n";
+        Logging.verbose("SRVAUTH", "Done...");
         return tOut;
     }
 
