@@ -17,15 +17,14 @@
  */
 package ecks.services.modules.SrvChannel.Chan;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
-import ecks.services.Service;
-import ecks.services.SrvChannel_channel;
-import ecks.services.SrvChannel;
-import ecks.services.SrvAuth;
-import ecks.protocols.Protocol;
+import ecks.Configuration;
 import ecks.protocols.Generic;
-import ecks.Configuration;import ecks.Storage;
+import ecks.services.Service;
+import ecks.services.SrvAuth;
+import ecks.services.SrvChannel;
+import ecks.services.SrvChannel_channel;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
 public class DelUser extends bCommand {
     public final CommandDesc Desc = new CommandDesc("deluser", 2, true, CommandDesc.access_levels.A_AUTHED, "Removes a user from a channel", "<user> [channel]");
@@ -83,9 +82,12 @@ public class DelUser extends bCommand {
                                         ((SrvChannel) who).getChannels().get(whatchan).getUsers().remove(Generic.Users.get(whom).authhandle);
                                         ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().get(Generic.Users.get(whom).authhandle).WhereAccess.remove(whatchan); // should not create a duplicate entry. If it does, issues...
                                         Generic.curProtocol.outPRVMSG(who, replyto, "User Removed!");
-                                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You cannot remove a user of higher access than yourself!");
-                                } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User already has no access to channel!");
-                            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You have no access to channel!");
+                                    } else
+                                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You cannot remove a user of higher access than yourself!");
+                                } else
+                                    Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User already has no access to channel!");
+                            } else
+                                Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You have no access to channel!");
                         } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You are not authed!");
                     } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User is not authed!");
                 } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User does not exist!");

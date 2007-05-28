@@ -17,17 +17,27 @@
  */
 package ecks.Hooks;
 
-import ecks.services.Service;
 import ecks.Logging;
+import ecks.services.Service;
 
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
 
+/**
+ * Hook system for services to recieve events from irc
+ */
 public class Hooks {
+    /**
+     * Enum Events
+     * <p/>
+     * The kind of hooks that a service can register for
+     *
+     * @author Jeff
+     */
     public static enum Events {
-        E_JOINCHAN, E_PARTCHAN, E_PRIVMSG, E_KICK, E_MODE, E_UMODE, E_TOPIC, E_SIGNON
+        E_JOINCHAN, E_PARTCHAN, E_PRIVMSG, E_KICK, E_MODE, E_UMODE, E_TOPIC, E_SIGNON;
     }
 
     public static Map<Service, List<Events>> regHooks;
@@ -36,6 +46,12 @@ public class Hooks {
         regHooks = new HashMap<Service, List<Events>>();
     }
 
+    /**
+     * Method regHook - register a hook with the hook system
+     *
+     * @param who  of type Service (what service object are you)
+     * @param what of type Events (what events you want to handle)
+     */
     public static void regHook(Service who, Events what) {
         if (regHooks.containsKey(who)) {
             List<Events> e = regHooks.get(who);
@@ -48,6 +64,12 @@ public class Hooks {
         }
     }
 
+    /**
+     * Method unregHook - unregister an existing hook
+     *
+     * @param who  of type Service (what service object you are)
+     * @param what of type Events (what you don't want anymore)
+     */
     public static void unregHook(Service who, Events what) {
         if (regHooks.containsKey(who)) {
             List<Events> e = regHooks.get(who);
@@ -59,10 +81,18 @@ public class Hooks {
         } else Logging.warn("HOOKS", "Tried to remove a hook for a service that doesn't exist!");
     }
 
-    public static void hook (Events what, String source, String target, String args){
-        for(Map.Entry<Service, List<Events>> e : regHooks.entrySet()) {
+    /**
+     * Method hook - called elsewhere in the codebase, and redirected to services that are listening
+     *
+     * @param what   of type Events - What kind of event it is
+     * @param source of type String - IRC Source
+     * @param target of type String - IRC Destination
+     * @param args   of type String - Everything Else
+     */
+    public static void hook(Events what, String source, String target, String args) {
+        for (Map.Entry<Service, List<Events>> e : regHooks.entrySet()) {
             if (e.getValue().contains(what)) { // if there's a hook here
-                e.getKey().hookDispatch(what,source,target,args); // dispatch hook      
+                e.getKey().hookDispatch(what, source, target, args); // dispatch hook
             }
         }
     }

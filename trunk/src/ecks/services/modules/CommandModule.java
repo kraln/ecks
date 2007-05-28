@@ -17,15 +17,38 @@
  */
 package ecks.services.modules;
 
-import ecks.protocols.Protocol;
-import ecks.Configuration;
 import ecks.services.Service;
 
+/**
+ * Interface CommandModule is the interface of which all commands must follow
+ *
+ * @author Jeff
+ */
 public interface CommandModule {
     public final CommandDesc Desc = null;
 
+    /**
+     * Method getName returns the name of this CommandModule object.
+     *
+     * @return the name (type String) of this CommandModule object.
+     */
     public String getName();
+
+    /**
+     * Method getDesc returns the desc of this CommandModule object.
+     *
+     * @return the desc (type CommandDesc) of this CommandModule object.
+     */
     public CommandDesc getDesc();
+
+    /**
+     * Method handle_command passes the user's command to the module for processing
+     *
+     * @param who       of type Service
+     * @param user      of type String
+     * @param replyto   of type String
+     * @param arguments of type String
+     */
     public void handle_command(Service who, String user, String replyto, String arguments);
 
 }

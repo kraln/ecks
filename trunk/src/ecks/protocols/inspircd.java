@@ -18,18 +18,18 @@
 
 package ecks.protocols;
 
-import ecks.Logging;
-import ecks.main;
-import ecks.util;
 import ecks.Configuration;
-import ecks.Utility.Client;
-import ecks.services.Service;
 import ecks.Hooks.Hooks;
+import ecks.Logging;
+import ecks.Utility.Client;
+import ecks.main;
+import ecks.services.Service;
+import ecks.util;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class inspircd implements Protocol {
     BufferedWriter out;
@@ -369,12 +369,12 @@ public class inspircd implements Protocol {
     }
 
     public void outSETMODE(Service me, String channel, String mode, String who) {
-            try {
-                Outgoing(":" + me.getname() + " MODE " + channel + " " + mode + " " + who);
-            } catch (IOException e) {
-                Logging.error("PROTOCOL", "Got IOException while sending a command.");
-                Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
-            }
+        try {
+            Outgoing(":" + me.getname() + " MODE " + channel + " " + mode + " " + who);
+        } catch (IOException e) {
+            Logging.error("PROTOCOL", "Got IOException while sending a command.");
+            Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
+        }
 
     }
 

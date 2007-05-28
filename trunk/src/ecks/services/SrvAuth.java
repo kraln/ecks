@@ -17,18 +17,18 @@
  */
 package ecks.services;
 
+import ecks.Configuration;
+import ecks.Hooks.Hooks;
+import ecks.Logging;
+import ecks.Threads.SrvAuth_ExpiryThread;
+import ecks.protocols.Generic;
 import ecks.services.modules.CommandDesc;
 import ecks.util;
-import ecks.Logging;
-import ecks.Configuration;
-import ecks.Threads.SrvAuth_ExpiryThread;
-import ecks.Hooks.Hooks;
-import ecks.protocols.Generic;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
-import java.util.Map;
 import java.util.HashMap;
-
-import org.w3c.dom.*;
+import java.util.Map;
 
 public class SrvAuth extends bService {
     public String name = "SrvAuth";
@@ -70,8 +70,7 @@ public class SrvAuth extends bService {
         // don't let people auth or register, or change password without fqdn
         String cmd = command.split(" ")[0];
 
-        if(Configuration.Config.get("secure").equals("NO"))
-        {
+        if (Configuration.Config.get("secure").equals("NO")) {
             super.handle(user.toLowerCase(), replyto.toLowerCase(), command);
             return;
         }
@@ -141,14 +140,14 @@ public class SrvAuth extends bService {
                 mTemp.put(util.decodeUTF((t.item(j)).getNodeName()), util.decodeUTF((t.item(j)).getAttributes().getNamedItem("value").getNodeValue()));
             }
 
-            Users.put(uTemp.toLowerCase().trim(), new SrvAuth_user(uTemp, pTemp, eTemp, aTemp, mTemp));         
+            Users.put(uTemp.toLowerCase().trim(), new SrvAuth_user(uTemp, pTemp, eTemp, aTemp, mTemp));
             if (!Users.get(uTemp.toLowerCase().trim()).getAllMeta().containsKey("svsid")) {
-                if (!dbMap.containsKey((long)i))
+                if (!dbMap.containsKey((long) i))
                     Users.get(uTemp.toLowerCase().trim()).setMeta("svsid", String.valueOf(i));
-                else 
-                    Users.get(uTemp.toLowerCase().trim()).setMeta("svsid", String.valueOf(dbMap.size()-1));
+                else
+                    Users.get(uTemp.toLowerCase().trim()).setMeta("svsid", String.valueOf(dbMap.size() - 1));
             }
-            dbMap.put(Long.parseLong(Users.get(uTemp.toLowerCase().trim()).getMeta("svsid")),uTemp.toLowerCase().trim());
+            dbMap.put(Long.parseLong(Users.get(uTemp.toLowerCase().trim()).getMeta("svsid")), uTemp.toLowerCase().trim());
         }
         Logging.info("SRVAUTH", "Loaded " + Users.size() + " registered users from database.");
     }
@@ -156,6 +155,7 @@ public class SrvAuth extends bService {
     public int getcount() {
         return Users.size();
     }
+
     public void hookDispatch(Hooks.Events what, String source, String target, String args) {
         super.hookDispatch(this, what, source, target, args);
         switch (what) {

@@ -17,15 +17,16 @@
  */
 
 package ecks;
-import ecks.protocols.*;
-import ecks.Threads.DbThread;
-import ecks.RPC.RPCHandler;
+
 import ecks.Hooks.Hooks;
-
-import java.net.InetAddress;
-import java.io.IOException;
-
+import ecks.RPC.RPCHandler;
+import ecks.Threads.DbThread;
+import ecks.protocols.Generic;
+import ecks.protocols.Protocol;
 import org.apache.xmlrpc.WebServer;
+
+import java.io.IOException;
+import java.net.InetAddress;
 
 public class main {
 
@@ -36,7 +37,7 @@ public class main {
         // declare our protocol
         Protocol myProto = null;
         try {
-           myProto = (Protocol) Class.forName(Configuration.Config.get("protocol")).newInstance();
+            myProto = (Protocol) Class.forName(Configuration.Config.get("protocol")).newInstance();
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -50,7 +51,7 @@ public class main {
         Logging.setup();
         Logging.summary("STARTUP", "Welcome to Ecks Services. Internal Version: " + util.getVersion());
         Logging.verbose("STARTUP", "Logging loaded...");
-        
+
         //initialize hooks
         Hooks.initialize();
         Logging.verbose("STARTUP", "Hooks initialized...");
@@ -77,7 +78,7 @@ public class main {
         else
             inetT = InetAddress.getByName(Configuration.Config.get("localhost"));
 
-        Connection myConnection = new Connection(Configuration.Config.get("remote"), Integer.parseInt(Configuration.Config.get("port")),Configuration.Config.get("localport"), inetT, myProto);
+        Connection myConnection = new Connection(Configuration.Config.get("remote"), Integer.parseInt(Configuration.Config.get("port")), Configuration.Config.get("localport"), inetT, myProto);
 
         myConnection.Connect(); // cross our fingers and connect
         Logging.info("STARTUP", "Connection attempted...");
@@ -85,7 +86,7 @@ public class main {
         if (Configuration.Config.get("rpcport").equals("any"))
             myConf.RPCServer = new WebServer(8081);
         else
-            myConf.RPCServer = new WebServer(Integer.parseInt(Configuration.Config.get("rpcport")),inetT);
+            myConf.RPCServer = new WebServer(Integer.parseInt(Configuration.Config.get("rpcport")), inetT);
 
         myConf.RPCServer.addHandler("ecks", new RPCHandler());
         myConf.RPCServer.start();
@@ -94,9 +95,8 @@ public class main {
         Logging.verbose("STARTUP", "Good luck!");
     }
 
-    public synchronized static void goGracefullyIntoTheNight()
-    {
-        if(Generic.curProtocol.getState().equals(Protocol.States.S_DISCONNECTING)) System.exit(0);
+    public synchronized static void goGracefullyIntoTheNight() {
+        if (Generic.curProtocol.getState().equals(Protocol.States.S_DISCONNECTING)) System.exit(0);
         Generic.curProtocol.setState(Protocol.States.S_DISCONNECTING);
         Logging.warn("SHUTDOWN", "Interrupting Threads...");
         for (Thread t : util.getThreads())
@@ -106,7 +106,7 @@ public class main {
         if (Generic.curProtocol.getWhenStarted() != 0)
             Logging.summary("SHUTDOWN", "Uptime was: " + (Long.parseLong(util.getTS()) - Generic.curProtocol.getWhenStarted()));
         else
-            Logging.summary("SHUTDOWN", "Never established a connection!");   
+            Logging.summary("SHUTDOWN", "Never established a connection!");
         Logging.warn("SHUTDOWN", "Goodbye."); // should put summary here.
         for (Thread t : util.getThreads())
             t.interrupt();

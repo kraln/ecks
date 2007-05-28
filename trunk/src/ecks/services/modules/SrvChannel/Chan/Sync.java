@@ -17,13 +17,13 @@
  */
 package ecks.services.modules.SrvChannel.Chan;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
+import ecks.protocols.Generic;
+import ecks.protocols.Protocol;
 import ecks.services.Service;
 import ecks.services.SrvChannel;
 import ecks.services.SrvChannel_channel;
-import ecks.protocols.Generic;
-import ecks.protocols.Protocol;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 import ecks.util;
 
 public class Sync extends bCommand {
@@ -61,12 +61,12 @@ public class Sync extends bCommand {
                     if (Generic.Users.get(whom).authhandle != null)
                         Generic.curProtocol.outKICK(who, whom, whatchan, "This channel has been closed by the network administration.");
                     else
-                        Generic.curProtocol.outKILL(who,whom, "You had tried to join a channel that was closed by the network administration.");
+                        Generic.curProtocol.outKILL(who, whom, "You had tried to join a channel that was closed by the network administration.");
                     Generic.modeChan(whatchan, "+si");
                 }
                 if (((SrvChannel) who).getChannels().get(whatchan).getAllMeta().containsKey("greeting")) // if there is a greeting
-                if (Generic.curProtocol.getState().equals(Protocol.States.S_ONLINE))
-                      Generic.curProtocol.outNOTICE(who, whom, "\u0002" + whatchan + "\u0002: " + ((SrvChannel) who).getChannels().get(whatchan).getMeta("greeting"));
+                    if (Generic.curProtocol.getState().equals(Protocol.States.S_ONLINE))
+                        Generic.curProtocol.outNOTICE(who, whom, "\u0002" + whatchan + "\u0002: " + ((SrvChannel) who).getChannels().get(whatchan).getMeta("greeting"));
                 if (Generic.Users.get(whom).authhandle != null) {
                     String aname = Generic.Users.get(whom).authhandle;
                     if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
@@ -76,14 +76,17 @@ public class Sync extends bCommand {
                             newmode = "+v";
                         if (alevel.ordinal() >= SrvChannel_channel.ChanAccess.C_CHANOP.ordinal())
                             newmode = "+o";
-                        Generic.curProtocol.outSETMODE(who,whatchan,newmode, whom);
+                        Generic.curProtocol.outSETMODE(who, whatchan, newmode, whom);
                         if (!who.getname().equalsIgnoreCase(whom)) // don't update the last seen metadata if it's srvchan that is joining
                             ((SrvChannel) who).getChannels().get(whatchan).setMeta("_ts_last", util.getTS()); // updade last seen metadata
                         if (((SrvChannel) who).getChannels().get(whatchan).getAllMeta().containsKey("setinfo-" + aname)) // if they have a SetInfo
                             Generic.curProtocol.outPRVMSG(who, whatchan, "\u0002[" + whom + "]\u0002: " + ((SrvChannel) who).getChannels().get(whatchan).getMeta("setinfo-" + aname));
-                    } else if(!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has no access to channel!");
-                } else if(!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User is not authed!");
-            } else if(!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
-        } else if(!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a channel!");
+                    } else if (!silent)
+                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has no access to channel!");
+                } else
+                if (!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User is not authed!");
+            } else
+            if (!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
+        } else if (!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a channel!");
     }
 }

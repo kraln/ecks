@@ -16,11 +16,9 @@
  *
  */
 package ecks.Utility;
-import ecks.Utility.Modes;
-import ecks.Utility.Client;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Channel {
     public String name;
@@ -30,33 +28,36 @@ public class Channel {
     public ChanModes modes;
     public Map<Client, UserModes> clientmodes;
 
-    public Channel(){}
-    public Channel(int t, String n, ChanModes m)
-    {
-        ts = t; name = n; modes = m;
-        clientmodes=new HashMap<Client,UserModes>();
+    public Channel() {
     }
-    public Channel(int t, String n, ChanModes m, Map<Client, UserModes> cm)
-    {
+
+    public Channel(int t, String n, ChanModes m) {
+        ts = t;
+        name = n;
+        modes = m;
+        clientmodes = new HashMap<Client, UserModes>();
+    }
+
+    public Channel(int t, String n, ChanModes m, Map<Client, UserModes> cm) {
         ts = t;
         name = n;
         modes = m;
         clientmodes = cm;
         topic = "";
     }
-    public String toString()
-    {
+
+    public String toString() {
         String c = "";
         for (Client uname : clientmodes.keySet())
-        if (uname!=null)
-            c += " " + uname.uid;
-        else
-            clientmodes.remove(uname);
+            if (uname != null)
+                c += " " + uname.uid;
+            else
+                clientmodes.remove(uname);
 
         return name + ": " + ts + " " + modes.getModes() + " occupied by " + clientmodes.size() + " users. Topic is: " + topic + ". Users:" + c;
     }
-    public boolean isRegistered()
-    {
+
+    public boolean isRegistered() {
         return modes.contains("r");
     }
 }

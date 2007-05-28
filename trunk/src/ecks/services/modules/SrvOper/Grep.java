@@ -17,20 +17,19 @@
  */
 package ecks.services.modules.SrvOper;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
-import ecks.services.Service;
-import ecks.services.SrvChannel;
-import ecks.protocols.Generic;
-import ecks.*;
+import ecks.Logging;
 import ecks.Utility.Channel;
 import ecks.Utility.Client;
-import ecks.Utility.Modes;
 import ecks.Utility.UserModes;
+import ecks.protocols.Generic;
+import ecks.services.Service;
+import ecks.services.SrvChannel;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.PatternSyntaxException;
 
 public class Grep extends bCommand {
@@ -55,106 +54,104 @@ public class Grep extends bCommand {
             if (args.length > 5) for (int i = 5; i < args.length; i++) reason = reason + args[i] + " ";
             else reason = "Matched Grep.";
             try {
-            if (what.equals("users")) {
-                List matches = new ArrayList<Client>();
-                for (Map.Entry<String, Client> Client : Generic.Users.entrySet()) {
-                    if (what2.equals("uid")) {
-                        if (Client.getValue().uid.matches(towhat.replace("*", "\\S+")))
-                            matches.add(Client.getValue());
-                    } else if (what2.equals("mask")) {
-                        if (Client.getValue().host.matches(towhat.replace("*", "\\S+")))
-                            matches.add(Client.getValue());
-                    } else if (what2.equals("ident")) {
-                        if (Client.getValue().ident.matches(towhat.replace("*", "\\S+")))
-                            matches.add(Client.getValue());
-                    } else {
-                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid field for user. Usage: grep users [uid|mask|ident] [print|kill|gline] regexp");
-                        return;
-                    }
-                }
-                if (cmd.equals("count")) {
-                    Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Grep Results:\u0002 " + matches.size() + " matches.");
-                } else if (cmd.equals("print")) {
-                    Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Grep Results:\u0002 " + matches.size() + " matches.");
-                    for (int i = 0; i < matches.size(); i++)
-                        Generic.curProtocol.outPRVMSG(who, replyto, "   " + matches.get(i).toString());
-                } else if (cmd.equals("kill")) {
-                    if (matches.size() > (Generic.Users.size() / 10))  // we're not going to kill more than 10% without confirm
-                    {
-                        if (confirm) {
-                            for (int i = 0; i < matches.size(); i++)
-                            {
-                                Generic.curProtocol.outKILL(who, ((Client) matches.get(i)).uid, reason);
-                            }
-                            Logging.warn("SRVOPER", user + " killed more than 10% of the network.!");
-                        } else
-                            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Affects more than 10% of network (" + matches.size() + "/" + Generic.Users.size() + ", " + (((float)matches.size()/(float)Generic.Users.size()) * 100) + "%). Confirm by adding CONFIRM to end of command.");
-                    } else {
-                        for (int i = 0; i < matches.size(); i++)
-                            Generic.curProtocol.outKILL(who, ((Client) matches.get(i)).uid, reason);
-                    }
-                } else if (cmd.equals("gline")) {
-                    if (matches.size() > (Generic.Users.size() / 10))  // we're not going to akill more than 10% without confirm
-                    {
-                        if (confirm) {
-                            for (int i = 0; i < matches.size(); i++) {
-                                Generic.curProtocol.outGLINE(who, ((Client) matches.get(i)), reason);
-                            }
-                            Logging.warn("SRVOPER", user + " managed to gline more than 10% of the network!");
-                        } else
-                            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Affects more than 10% of network (" + matches.size() + "/" + Generic.Users.size() + ", " + ((matches.size()/Generic.Users.size()) * 100) + "%). Confirm by adding CONFIRM to end of command.");
-                    } else {
-                        for (int i = 0; i < matches.size(); i++)
-                            Generic.curProtocol.outGLINE(who, ((Client) matches.get(i)), reason);
-                    }
-                } else
-                    Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid action for user. Usage: grep users [uid|mask|ident] [print|count|kill|gline] regexp");
-            } else if (what.equals("channels")) {
-                List matches = new ArrayList<Channel>();
-                for (Map.Entry<String, Channel> Client : Generic.Channels.entrySet()) {
-                    if (what2.equals("name")) {
-                        if (Client.getValue().name.matches(towhat.replace("*", "\\S+")))
-                            matches.add(Client.getValue());
-                    } else if (what2.equals("topic")) {
-                        //todo
-                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Unimplimented");
-                        return;
-                    } else {
-                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid field for channel. Usage: grep channels [name|topic] [print|count|close] regexp");
-                        return;
-                    }
-                }
-                if (cmd.equals("count")) {
-                    Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Grep Results:\u0002 " + matches.size() + " matches.");
-                } else if (cmd.equals("print")) {
-                    Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Grep Results:\u0002 " + matches.size() + " matches.");
-                    for (int i = 0; i < matches.size(); i++)
-                        Generic.curProtocol.outPRVMSG(who, replyto, "   " + matches.get(i).toString());
-                } else if (cmd.equals("close")) {
-                    for (int i = 0; i < matches.size(); i++)
-                    {
-                        ArrayList<Client> alc = new ArrayList<Client>();
-                        for (Map.Entry<Client, UserModes> Cl : ((Channel) matches.get(i)).clientmodes.entrySet())
-                            alc.add(Cl.getKey());
-                        for (Client c : alc)
-                        {
-                            if (!c.modes.contains("o"))
-                            {
-                                if (c.authhandle != null)
-                                    Generic.curProtocol.outKICK(who,c.uid,((Channel)matches.get(i)).name, "Channel has been closed by network administration."); // kick registered users
-                                else
-                                    Generic.curProtocol.outKILL(who,c.uid,"Channel " +  ((Channel)matches.get(i)).name + " has been closed by network staff."); // kill unregistered ones
-                            }
+                if (what.equals("users")) {
+                    List matches = new ArrayList<Client>();
+                    for (Map.Entry<String, Client> Client : Generic.Users.entrySet()) {
+                        if (what2.equals("uid")) {
+                            if (Client.getValue().uid.matches(towhat.replace("*", "\\S+")))
+                                matches.add(Client.getValue());
+                        } else if (what2.equals("mask")) {
+                            if (Client.getValue().host.matches(towhat.replace("*", "\\S+")))
+                                matches.add(Client.getValue());
+                        } else if (what2.equals("ident")) {
+                            if (Client.getValue().ident.matches(towhat.replace("*", "\\S+")))
+                                matches.add(Client.getValue());
+                        } else {
+                            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid field for user. Usage: grep users [uid|mask|ident] [print|kill|gline] regexp");
+                            return;
                         }
-                        ((SrvChannel) who).getChannels().get(((Channel)matches.get(i)).name).setMeta("_isbad", "Channel was closed via batch grep.");
-                        Logging.warn("SRVOPER", user + " closed channel " +  ((Channel)matches.get(i)).name + " !");
                     }
-                } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid action for channels. Usage: grep channels [name|topic] [print|count|close] regexp");
-            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid command. Usage: grep [users|channels] [(uid|ident|mask)(name|topic)] [print|count|(kill|gline)(close)] regexp");
-            } catch (PatternSyntaxException pse)
-            {
-               Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Bad Regex.");
+                    if (cmd.equals("count")) {
+                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Grep Results:\u0002 " + matches.size() + " matches.");
+                    } else if (cmd.equals("print")) {
+                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Grep Results:\u0002 " + matches.size() + " matches.");
+                        for (int i = 0; i < matches.size(); i++)
+                            Generic.curProtocol.outPRVMSG(who, replyto, "   " + matches.get(i).toString());
+                    } else if (cmd.equals("kill")) {
+                        if (matches.size() > (Generic.Users.size() / 10))  // we're not going to kill more than 10% without confirm
+                        {
+                            if (confirm) {
+                                for (int i = 0; i < matches.size(); i++) {
+                                    Generic.curProtocol.outKILL(who, ((Client) matches.get(i)).uid, reason);
+                                }
+                                Logging.warn("SRVOPER", user + " killed more than 10% of the network.!");
+                            } else
+                                Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Affects more than 10% of network (" + matches.size() + "/" + Generic.Users.size() + ", " + (((float) matches.size() / (float) Generic.Users.size()) * 100) + "%). Confirm by adding CONFIRM to end of command.");
+                        } else {
+                            for (int i = 0; i < matches.size(); i++)
+                                Generic.curProtocol.outKILL(who, ((Client) matches.get(i)).uid, reason);
+                        }
+                    } else if (cmd.equals("gline")) {
+                        if (matches.size() > (Generic.Users.size() / 10))  // we're not going to akill more than 10% without confirm
+                        {
+                            if (confirm) {
+                                for (int i = 0; i < matches.size(); i++) {
+                                    Generic.curProtocol.outGLINE(who, ((Client) matches.get(i)), reason);
+                                }
+                                Logging.warn("SRVOPER", user + " managed to gline more than 10% of the network!");
+                            } else
+                                Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Affects more than 10% of network (" + matches.size() + "/" + Generic.Users.size() + ", " + ((matches.size() / Generic.Users.size()) * 100) + "%). Confirm by adding CONFIRM to end of command.");
+                        } else {
+                            for (int i = 0; i < matches.size(); i++)
+                                Generic.curProtocol.outGLINE(who, ((Client) matches.get(i)), reason);
+                        }
+                    } else
+                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid action for user. Usage: grep users [uid|mask|ident] [print|count|kill|gline] regexp");
+                } else if (what.equals("channels")) {
+                    List matches = new ArrayList<Channel>();
+                    for (Map.Entry<String, Channel> Client : Generic.Channels.entrySet()) {
+                        if (what2.equals("name")) {
+                            if (Client.getValue().name.matches(towhat.replace("*", "\\S+")))
+                                matches.add(Client.getValue());
+                        } else if (what2.equals("topic")) {
+                            //todo
+                            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Unimplimented");
+                            return;
+                        } else {
+                            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid field for channel. Usage: grep channels [name|topic] [print|count|close] regexp");
+                            return;
+                        }
+                    }
+                    if (cmd.equals("count")) {
+                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Grep Results:\u0002 " + matches.size() + " matches.");
+                    } else if (cmd.equals("print")) {
+                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Grep Results:\u0002 " + matches.size() + " matches.");
+                        for (int i = 0; i < matches.size(); i++)
+                            Generic.curProtocol.outPRVMSG(who, replyto, "   " + matches.get(i).toString());
+                    } else if (cmd.equals("close")) {
+                        for (int i = 0; i < matches.size(); i++) {
+                            ArrayList<Client> alc = new ArrayList<Client>();
+                            for (Map.Entry<Client, UserModes> Cl : ((Channel) matches.get(i)).clientmodes.entrySet())
+                                alc.add(Cl.getKey());
+                            for (Client c : alc) {
+                                if (!c.modes.contains("o")) {
+                                    if (c.authhandle != null)
+                                        Generic.curProtocol.outKICK(who, c.uid, ((Channel) matches.get(i)).name, "Channel has been closed by network administration."); // kick registered users
+                                    else
+                                        Generic.curProtocol.outKILL(who, c.uid, "Channel " + ((Channel) matches.get(i)).name + " has been closed by network staff."); // kill unregistered ones
+                                }
+                            }
+                            ((SrvChannel) who).getChannels().get(((Channel) matches.get(i)).name).setMeta("_isbad", "Channel was closed via batch grep.");
+                            Logging.warn("SRVOPER", user + " closed channel " + ((Channel) matches.get(i)).name + " !");
+                        }
+                    } else
+                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid action for channels. Usage: grep channels [name|topic] [print|count|close] regexp");
+                } else
+                    Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid command. Usage: grep [users|channels] [(uid|ident|mask)(name|topic)] [print|count|(kill|gline)(close)] regexp");
+            } catch (PatternSyntaxException pse) {
+                Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Bad Regex.");
             }
-        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid arguments. Usage: grep [users|channels] [(uid|ident|mask)(name|topic)] [print|count|(kill|gline)(close)] regexp");
+        } else
+            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid arguments. Usage: grep [users|channels] [(uid|ident|mask)(name|topic)] [print|count|(kill|gline)(close)] regexp");
     }
 }

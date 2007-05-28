@@ -17,9 +17,15 @@
  */
 package ecks.Utility;
 
+/**
+ * Interface Modes represents the idea of a collection of modes
+ *
+ * @author Jeff Katz
+ */
 public abstract interface Modes {
-    // this class represents modes
     void applyChanges(String newmodes);
+
     boolean contains(String what);
+
     String getModes();
 }

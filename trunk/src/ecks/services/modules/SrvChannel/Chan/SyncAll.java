@@ -17,12 +17,10 @@
  */
 package ecks.services.modules.SrvChannel.Chan;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
-import ecks.services.Service;
-import ecks.services.SrvChannel;
-import ecks.services.SrvChannel_channel;
 import ecks.protocols.Generic;
+import ecks.services.Service;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
 public class SyncAll extends bCommand {
     public final CommandDesc Desc = new CommandDesc("syncall", 0, true, CommandDesc.access_levels.A_NONE, "Synchronizes a user's modes with their access in every channel they are in.", "");
@@ -37,7 +35,7 @@ public class SyncAll extends bCommand {
         boolean silent = false;
         whom = user.toLowerCase();
         for (String chan : Generic.Users.get(whom).chans) {
-             who.handle(user,chan,"sync silent");
+            who.handle(user, chan, "sync silent");
         }
     }
 }

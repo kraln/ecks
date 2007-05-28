@@ -17,11 +17,11 @@
  */
 package ecks.services.modules.SrvAuth;
 
+import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
 import ecks.services.modules.CommandDesc;
 import ecks.services.modules.bCommand;
-import ecks.protocols.Generic;
 
 public class WhoAmi extends bCommand {
     public final CommandDesc Desc = new CommandDesc("whoami", 0, true, CommandDesc.access_levels.A_NONE, "Gives you information about yourself, including services info");

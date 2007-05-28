@@ -17,10 +17,8 @@
  */
 package ecks.Utility;
 
-import ecks.Utility.Modes;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Client {
     // this class contains every possible bit of information we could ever have about a client
@@ -43,12 +41,12 @@ public class Client {
 
     public String authhandle; // for use with auth services
 
-    public Client(String a, int b, long c, String d, String e, String f, String g, String h, long i, long j, String k, String l)
-    {
+    public Client(String a, int b, long c, String d, String e, String f, String g, String h, long i, long j, String k, String l) {
         uid = a;
         hops = b;
         signon = c;
-        modes = new UserModes(); modes.applyChanges(d);
+        modes = new UserModes();
+        modes.applyChanges(d);
         ident = e;
         host = f;
         althost = g;
@@ -62,17 +60,15 @@ public class Client {
         authhandle = null;
     }
 
-    public ArrayList<String> getChans()
-    {
+    public ArrayList<String> getChans() {
         return new ArrayList<String>(chans); // a copy
     }
 
     //public Client(){  modes = new UserModes(); chans = new ArrayList<String>(); }
-    public String toString()
-    {
+    public String toString() {
         String c = "";
-        for(String ch : chans)
-        c += " " + ch;
+        for (String ch : chans)
+            c += " " + ch;
         return uid + ": svsid: " + svsid + ", " + modes.getModes() + " " + ident + " " + host + " (" + althost + ") on " + uplink + ". In " + chans.size() + " channels:" + c;
     }
 }

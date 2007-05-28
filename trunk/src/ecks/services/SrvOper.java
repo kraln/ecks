@@ -17,33 +17,37 @@
  */
 package ecks.services;
 
-import org.w3c.dom.NodeList;
 import ecks.Configuration;
 import ecks.Hooks.Hooks;
 import ecks.protocols.Generic;
+import org.w3c.dom.NodeList;
 
-public class  SrvOper extends bService {
+public class SrvOper extends bService {
     public String name = "SrvOper";
 
     public void introduce() {
         Configuration.logservice = name.toLowerCase(); // I lay claim to logging
         Generic.srvIntroduce(this);
         Hooks.regHook(this, Hooks.Events.E_PRIVMSG);
-        if(!(Configuration.Config.get("debugchan").equals("OFF")))
-        {
+        if (!(Configuration.Config.get("debugchan").equals("OFF"))) {
             Generic.curProtocol.srvJoin(this, Configuration.Config.get("debugchan"), "+stn");
             Generic.curProtocol.outSETMODE(this, Configuration.Config.get("debugchan"), "+o", name);
         }
     }
 
-    public String getname() { return name; }
-    public void setname(String nname) { name = nname; }
+    public String getname() {
+        return name;
+    }
+
+    public void setname(String nname) {
+        name = nname;
+    }
+
     public String getSRVDB() {
         return "";
     }
-    
-    public void loadSRVDB(NodeList XMLin)
-    {
+
+    public void loadSRVDB(NodeList XMLin) {
         // I don't have a database yet
     }
 
@@ -58,10 +62,11 @@ public class  SrvOper extends bService {
                 super.handle(user.toLowerCase(), replyto.toLowerCase(), command);
         }
     }
-    public int getcount()
-    {
+
+    public int getcount() {
         return -1; // return ideally the number of opers online...
     }
+
     public void hookDispatch(Hooks.Events what, String source, String target, String args) {
         super.hookDispatch(this, what, source, target, args);
         switch (what) {

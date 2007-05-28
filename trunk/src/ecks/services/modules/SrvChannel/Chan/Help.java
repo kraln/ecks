@@ -17,37 +17,36 @@
  */
 package ecks.services.modules.SrvChannel.Chan;
 
-import ecks.services.modules.bCommand;
+import ecks.Configuration;
+import ecks.protocols.Generic;
+import ecks.services.Service;
+import ecks.services.SrvAuth;
 import ecks.services.modules.CommandDesc;
 import ecks.services.modules.CommandModule;
-import ecks.services.Service;
-import ecks.services.SrvChannel;
-import ecks.services.SrvAuth;
-import ecks.protocols.Protocol;
-import ecks.protocols.Generic;
-import ecks.Configuration;
+import ecks.services.modules.bCommand;
 import ecks.util;
 
 import java.util.Map;
 
 public class Help extends bCommand {
     public final CommandDesc Desc = new CommandDesc("help", 0, true, CommandDesc.access_levels.A_NONE, "Shows you help for this service.");
-    public CommandDesc getDesc() { return Desc; }
+
+    public CommandDesc getDesc() {
+        return Desc;
+    }
+
     public void handle_command(Service who, String user, String replyto, String arguments) {
 
         Generic.curProtocol.outPRVMSG(who, user, "\u0002COMMAND     \u0002<required argument> [optional argument]");
         Generic.curProtocol.outPRVMSG(who, user, "\u0002            Command Description\u0002");
         Generic.curProtocol.outPRVMSG(who, user, "\u0002------------------------------------------------\u0002");
 
-        for(Map.Entry<String,CommandModule> z : who.getCommands().entrySet())
-        {
+        for (Map.Entry<String, CommandModule> z : who.getCommands().entrySet()) {
             CommandModule cm = z.getValue();
-            if (cm.getDesc().Required_Access.ordinal() <= ((SrvAuth)Configuration.getSvc().get(Configuration.authservice)).checkAccess(user.toLowerCase()).ordinal())
-            {
-                if(!cm.getName().startsWith("\u0001"))
-                {
-                    Generic.curProtocol.outPRVMSG(who, user, "\u0002" + util.pad(z.getKey(), 12) + "\u0002" + cm.getDesc().arguments );
-                    Generic.curProtocol.outPRVMSG(who, user, "\u0002            " + cm.getDesc().help + "\u0002" );
+            if (cm.getDesc().Required_Access.ordinal() <= ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).checkAccess(user.toLowerCase()).ordinal()) {
+                if (!cm.getName().startsWith("\u0001")) {
+                    Generic.curProtocol.outPRVMSG(who, user, "\u0002" + util.pad(z.getKey(), 12) + "\u0002" + cm.getDesc().arguments);
+                    Generic.curProtocol.outPRVMSG(who, user, "\u0002            " + cm.getDesc().help + "\u0002");
                 }
             }
         }

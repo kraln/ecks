@@ -17,13 +17,14 @@
  */
 package ecks.services.modules;
 
-import ecks.protocols.Protocol;
-import ecks.Configuration;
 import ecks.services.Service;
 
-public abstract class bCommand implements CommandModule{
+public abstract class bCommand implements CommandModule {
 
-    public String getName() { return getDesc().command; }
+    public String getName() {
+        return getDesc().command;
+    }
+
     public abstract CommandDesc getDesc();
 
     public abstract void handle_command(Service who, String user, String replyto, String arguments);

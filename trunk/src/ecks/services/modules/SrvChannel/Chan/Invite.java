@@ -1,15 +1,13 @@
 package ecks.services.modules.SrvChannel.Chan;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
+import ecks.Configuration;
+import ecks.Logging;
+import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvChannel;
 import ecks.services.SrvChannel_channel;
-import ecks.protocols.Protocol;
-import ecks.protocols.Generic;
-import ecks.Configuration;
-import ecks.Logging;
-import ecks.Storage;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
 public class Invite extends bCommand {
     public final CommandDesc Desc = new CommandDesc("invite", 2, true, CommandDesc.access_levels.A_AUTHED, "Invites a user to a channel", "[channel] <user>");
@@ -56,8 +54,7 @@ public class Invite extends bCommand {
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
                 if (Generic.Users.containsKey(whom)) {
-                    if (Configuration.getSvc().containsKey(whom))
-                    {
+                    if (Configuration.getSvc().containsKey(whom)) {
                         Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Users should not play with fire. (You cannot kick network services)");
                         return;
                     }
@@ -67,8 +64,10 @@ public class Invite extends bCommand {
                             SrvChannel_channel.ChanAccess mlevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(mname);
                             if (mlevel.ordinal() >= SrvChannel_channel.ChanAccess.C_CHANOP.ordinal()) {
                                 Generic.curProtocol.outINVITE(who, whom, whatchan);
-                            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You do not have sufficient access to perform that command");
-                        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You have no access to this channel");
+                            } else
+                                Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You do not have sufficient access to perform that command");
+                        } else
+                            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You have no access to this channel");
                     } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You are not authed!");
                 } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User does not exist!");
             } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");

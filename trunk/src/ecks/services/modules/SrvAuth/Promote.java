@@ -17,10 +17,7 @@
  */
 package ecks.services.modules.SrvAuth;
 
-import ecks.Configuration;
 import ecks.Logging;
-import ecks.Storage;
-import ecks.protocols.Protocol;
 import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
@@ -41,7 +38,7 @@ public class Promote extends bCommand {
         String tU = args[0].toLowerCase();
         CommandDesc.access_levels tA;
         try {
-        tA =  CommandDesc.access_levels.valueOf(args[1]);
+            tA = CommandDesc.access_levels.valueOf(args[1]);
         } catch (IllegalArgumentException e) {
             Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Access Level");
             return;
@@ -51,16 +48,20 @@ public class Promote extends bCommand {
                 if (temp.getUsers().containsKey(tU)) {
                     if ((temp.getUsers().get(Generic.Users.get(user).authhandle)).getAccess().ordinal() > (temp.getUsers().get(tU).getAccess().ordinal() + 1)) { // we can only promote who are below us by two
                         if ((temp.getUsers().get(Generic.Users.get(user).authhandle)).getAccess().ordinal() > (tA.ordinal())) {
-                        temp.getUsers().get(tU).update(tA); // update the account
-                        Generic.curProtocol.outPRVMSG(who, replyto, "User account promoted to " + tA + ".");
-                        } else if ((temp.getUsers().get(Generic.Users.get(user).authhandle)).getAccess().equals(CommandDesc.access_levels.A_SRA)) { // if we're an SRA, we can do whatever we damn well please.
                             temp.getUsers().get(tU).update(tA); // update the account
                             Generic.curProtocol.outPRVMSG(who, replyto, "User account promoted to " + tA + ".");
-                            Logging.info("SRVAUTH", "Account " + tU + " promoted by " + user + " to " + tA +  ".");
-                        }else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Cannot promote users to your access level.");
-                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has access that is unpromotable from you!");
+                        } else
+                        if ((temp.getUsers().get(Generic.Users.get(user).authhandle)).getAccess().equals(CommandDesc.access_levels.A_SRA)) { // if we're an SRA, we can do whatever we damn well please.
+                            temp.getUsers().get(tU).update(tA); // update the account
+                            Generic.curProtocol.outPRVMSG(who, replyto, "User account promoted to " + tA + ".");
+                            Logging.info("SRVAUTH", "Account " + tU + " promoted by " + user + " to " + tA + ".");
+                        } else
+                            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Cannot promote users to your access level.");
+                    } else
+                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has access that is unpromotable from you!");
                 } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 No such username is registered");
             } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid username.");
-        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: promote [username] [access]");
+        } else
+            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: promote [username] [access]");
     }
 }

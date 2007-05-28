@@ -17,8 +17,6 @@
  */
 package ecks.services.modules.SrvAuth;
 
-import ecks.Configuration;
-import ecks.protocols.Protocol;
 import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
@@ -27,7 +25,11 @@ import ecks.services.modules.bCommand;
 
 public class Whois extends bCommand {
     public final CommandDesc Desc = new CommandDesc("whois", 1, true, CommandDesc.access_levels.A_HELPER, "Gives you information about a user");
-    public CommandDesc getDesc() { return Desc; }
+
+    public CommandDesc getDesc() {
+        return Desc;
+    }
+
     public void handle_command(Service who, String user, String replyto, String arguments) {
         if (Generic.Users.containsKey(arguments.toLowerCase())) {
             if (Generic.Users.get(arguments.toLowerCase()).authhandle != null) {

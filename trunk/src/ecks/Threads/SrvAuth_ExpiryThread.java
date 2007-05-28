@@ -17,12 +17,11 @@
  */
 package ecks.Threads;
 
-import ecks.Logging;
 import ecks.Configuration;
-import ecks.util;
-import ecks.services.SrvAuth_user;
+import ecks.Logging;
 import ecks.services.SrvAuth;
-import ecks.services.SrvChannel;
+import ecks.services.SrvAuth_user;
+import ecks.util;
 
 import java.util.ArrayList;
 
@@ -30,7 +29,7 @@ public class SrvAuth_ExpiryThread implements Runnable {
 
     public void run() {
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-        for (;;) {
+        for (; ;) {
             try {
                 Thread.sleep(1000 * 60 * 5); // five minutes
             } catch (InterruptedException e) {
@@ -57,8 +56,8 @@ public class SrvAuth_ExpiryThread implements Runnable {
             }
 
             // remove users
-   //            for (SrvAuth_user user : deletelist)
-         //         ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().remove(user);
+            //            for (SrvAuth_user user : deletelist)
+            //         ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().remove(user);
         }
         util.getThreads().remove(Thread.currentThread()); // if we're out of this loop, then this thread is over.
     }

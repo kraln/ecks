@@ -17,15 +17,12 @@
  */
 package ecks.services.modules.SrvHelp;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
-import ecks.services.Service;
-import ecks.services.SrvChannel;
-import ecks.services.SrvHelp;
-import ecks.protocols.Protocol;
-import ecks.protocols.Generic;
-import ecks.Configuration;
 import ecks.Logging;
+import ecks.protocols.Generic;
+import ecks.services.Service;
+import ecks.services.SrvHelp;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
 public class Unregister extends bCommand {
     public final CommandDesc Desc = new CommandDesc("unregister", 1, true, CommandDesc.access_levels.A_OPER, "Unregisters a channel", "<channel>");
@@ -43,8 +40,9 @@ public class Unregister extends bCommand {
                 temp.getChannels().remove(tU); // drop the account
                 Generic.srvPart(who, tU, "Channel Unregistered.");
                 Generic.curProtocol.outPRVMSG(who, replyto, "Channel removed.");
-                Logging.info("SRVHELP", "Channel " + tU + " unregistered by " + user + ".");                
+                Logging.info("SRVHELP", "Channel " + tU + " unregistered by " + user + ".");
             } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 No such channel is registered");
-        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: unregister <channel>");
+        } else
+            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: unregister <channel>");
     }
 }

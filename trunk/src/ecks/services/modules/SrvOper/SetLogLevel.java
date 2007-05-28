@@ -17,15 +17,11 @@
  */
 package ecks.services.modules.SrvOper;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
-import ecks.services.Service;
-import ecks.protocols.Protocol;
-import ecks.protocols.Generic;
-import ecks.Configuration;
 import ecks.Logging;
-
-import java.io.IOException;
+import ecks.protocols.Generic;
+import ecks.services.Service;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
 public class SetLogLevel extends bCommand {
     public final CommandDesc Desc = new CommandDesc("setloglevel", 1, true, CommandDesc.access_levels.A_SRA, "Changes the current logging level", "<new level>");

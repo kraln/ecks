@@ -17,8 +17,6 @@
  */
 package ecks.services.modules.SrvAuth;
 
-import ecks.Configuration;
-import ecks.protocols.Protocol;
 import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
@@ -30,10 +28,13 @@ import java.util.Map;
 
 public class DumpUsers extends bCommand {
     public final CommandDesc Desc = new CommandDesc("dumpusers", 0, true, CommandDesc.access_levels.A_SRA, "Dumps registered users.");
-    public CommandDesc getDesc() { return Desc; }
+
+    public CommandDesc getDesc() {
+        return Desc;
+    }
+
     public void handle_command(Service who, String user, String replyto, String arguments) {
-        for(Map.Entry<String,SrvAuth_user> t : ((SrvAuth) who).getUsers().entrySet())
-        {
+        for (Map.Entry<String, SrvAuth_user> t : ((SrvAuth) who).getUsers().entrySet()) {
             Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Entry\u0002 " + t.toString());
         }
     }

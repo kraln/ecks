@@ -1,19 +1,18 @@
 package ecks.protocols;
 
-import ecks.Logging;
-import ecks.main;
-import ecks.util;
 import ecks.Configuration;
-import ecks.Utility.Client;
-import ecks.services.Service;
 import ecks.Hooks.Hooks;
+import ecks.Logging;
+import ecks.Utility.Client;
+import ecks.main;
+import ecks.services.Service;
+import ecks.util;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.regex.Pattern;
+import java.util.Map;
 
 public class cots implements Protocol {
     BufferedWriter out; // where we send our irc commands to
@@ -161,7 +160,7 @@ public class cots implements Protocol {
             } else if (cmd.equals("SERVER")) {                                                                 // SERVER
 
                 myUplink = tokens[1];
-                xlate.put(tokens[2],tokens[1]);
+                xlate.put(tokens[2], tokens[1]);
 
             } else if (cmd.equals("KILL")) {                                                                     // KILL
 

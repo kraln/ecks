@@ -17,10 +17,7 @@
  */
 package ecks.services.modules.SrvAuth;
 
-import ecks.Configuration;
 import ecks.Logging;
-import ecks.Storage;
-import ecks.protocols.Protocol;
 import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvAuth;

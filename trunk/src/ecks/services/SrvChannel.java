@@ -17,18 +17,17 @@
  */
 package ecks.services;
 
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Element;
-
-import java.util.Map;
-import java.util.HashMap;
-
-import ecks.util;
-import ecks.Logging;
 import ecks.Configuration;
-import ecks.Threads.SrvChannel_ExpiryThread;
 import ecks.Hooks.Hooks;
+import ecks.Logging;
+import ecks.Threads.SrvChannel_ExpiryThread;
 import ecks.protocols.Generic;
+import ecks.util;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SrvChannel extends bService {
     public String name = "SrvChan";

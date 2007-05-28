@@ -17,21 +17,20 @@
  */
 package ecks;
 
-import java.util.Map;
-import java.io.IOException;
-import java.util.*;
+import ecks.services.Service;
+import ecks.services.modules.CommandModule;
+import org.apache.xmlrpc.WebServer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.xmlrpc.WebServer;
-
-import org.w3c.dom.*;
-import org.xml.sax.SAXException;
-import ecks.protocols.Protocol;
-
-import ecks.services.Service;
-import ecks.services.modules.CommandModule;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Configuration {
     public static Map<String, String> Config;
@@ -53,13 +52,11 @@ public class Configuration {
         logservice = null;
     }
 
-    public static Storage getDB()
-    {
+    public static Storage getDB() {
         return Database;
     }
 
-    public static Map<String,Service> getSvc()
-    {
+    public static Map<String, Service> getSvc() {
         return Services;
     }
 
@@ -129,7 +126,7 @@ class ConfParse {
                 mval = (cnod.item(i)).getAttributes().getNamedItem("value").getNodeValue();
 
             } catch (NullPointerException N) {
-                 //
+                //
             }
             if (!mname.equals("#text") && !mname.equals("#comment")) {
                 Configuration.Config.put(mname, mval);

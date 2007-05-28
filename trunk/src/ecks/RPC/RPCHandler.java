@@ -18,33 +18,67 @@
 
 package ecks.RPC;
 
-import ecks.protocols.Generic;
-import ecks.Logging;
 import ecks.Configuration;
+import ecks.Logging;
+import ecks.protocols.Generic;
 
+/**
+ * Class RPCHandler allows for functions that can be called remotely
+ *
+ * @author Jeff
+ */
 public class RPCHandler {
+    /**
+     * Method getUserCount returns the network wide usercount
+     *
+     * @return the userCount (type int).
+     */
     public int getUserCount() {
         Logging.info("RPC", "Got UserCount Request!");
         return Generic.Users.size();
     }
+
+    /**
+     * Method getChanCount returns the network wide channel count.
+     *
+     * @return the chanCount (type int).
+     */
     public int getChanCount() {
         Logging.info("RPC", "Got ChanCount Request!");
         return Generic.Channels.size();
     }
+
+    /**
+     * Method getRegUserCount returns the global registered users count (if auth service is used).
+     *
+     * @return the regUserCount (type int).
+     */
     public int getRegUserCount() {
         Logging.info("RPC", "Got RegUserCount Request!");
         if (Configuration.getSvc().containsKey(Configuration.authservice))
             return Configuration.getSvc().get(Configuration.authservice).getcount();
         return -1; // no auth service
     }
+
+    /**
+     * Method getRegChanCount returns the global registered channels count (if chan service is used).
+     *
+     * @return the regChanCount (type int).
+     */
     public int getRegChanCount() {
         Logging.info("RPC", "Got RegChanCount Request!");
         if (Configuration.getSvc().containsKey(Configuration.chanservice))
             return Configuration.getSvc().get(Configuration.chanservice).getcount();
         return -1; // no chan service
     }
-    public int getChanUserCount(String whatchan)
-    {
+
+    /**
+     * Method getChanUserCount returns the number of users currently active in a channel
+     *
+     * @param whatchan of type String (channel
+     * @return int (users in the channel)
+     */
+    public int getChanUserCount(String whatchan) {
         Logging.info("RPC", "Got ChanUserCount Request!");
         Logging.verbose("RPC", "Request was for channel: " + whatchan);
         if (Generic.Channels.containsKey(whatchan.toLowerCase()))

@@ -21,6 +21,7 @@ public class CommandDesc {
     public static enum access_levels {
         A_NONE, A_PENDING, A_AUTHED, A_HELPER, A_OPER, A_SRA
     }
+
     public String command;
     public int ArgCount;
     public boolean InChannel;
@@ -28,8 +29,7 @@ public class CommandDesc {
     public String help;
     public String arguments;
 
-    public CommandDesc(String c, int a, boolean i, access_levels r, String h)
-    {
+    public CommandDesc(String c, int a, boolean i, access_levels r, String h) {
         command = c;
         ArgCount = a;
         InChannel = i;
@@ -38,8 +38,7 @@ public class CommandDesc {
         arguments = "";
     }
 
-    public CommandDesc(String c, int a, boolean i, access_levels r, String h, String arg)
-    {
+    public CommandDesc(String c, int a, boolean i, access_levels r, String h, String arg) {
         command = c;
         ArgCount = a;
         InChannel = i;

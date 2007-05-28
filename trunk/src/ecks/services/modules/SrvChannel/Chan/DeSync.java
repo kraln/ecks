@@ -17,14 +17,11 @@
  */
 package ecks.services.modules.SrvChannel.Chan;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
+import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvChannel;
-import ecks.services.SrvChannel_channel;
-import ecks.protocols.Protocol;
-import ecks.protocols.Generic;
-import ecks.Configuration;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
 public class DeSync extends bCommand {
     public final CommandDesc Desc = new CommandDesc("desync", 1, true, CommandDesc.access_levels.A_NONE, "Devoices and deops user", "[channel]");
@@ -46,8 +43,7 @@ public class DeSync extends bCommand {
             if (args[0].startsWith("#")) { // assume channel
                 whatchan = args[0];
             }
-            if (args[0].equals("silent"))
-            {
+            if (args[0].equals("silent")) {
                 silent = true;
             }
         }
@@ -57,8 +53,9 @@ public class DeSync extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
-                Generic.curProtocol.outSETMODE(who,whatchan,"-ov", whom + " " + whom);
-            } else if (!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
+                Generic.curProtocol.outSETMODE(who, whatchan, "-ov", whom + " " + whom);
+            } else
+            if (!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
         } else if (!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a channel!");
     }
 }

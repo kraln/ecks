@@ -17,15 +17,16 @@
  */
 package ecks.services;
 
-import java.util.Map;
-import java.util.HashMap;
-
-import ecks.*;
+import ecks.Configuration;
 import ecks.Hooks.Hooks;
-import ecks.services.modules.CommandModule;
-import ecks.services.modules.CommandDesc;
+import ecks.Logging;
 import ecks.protocols.Generic;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.CommandModule;
 import org.w3c.dom.NodeList;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class bService implements Service {
     public Map<String, CommandModule> Commands;

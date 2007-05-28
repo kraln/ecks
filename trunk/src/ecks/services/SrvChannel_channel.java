@@ -17,73 +17,71 @@
  */
 package ecks.services;
 
-import ecks.services.modules.CommandDesc;
-import ecks.util;
-
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class SrvChannel_channel { // direct correlation to a database entry
-    public static enum ChanAccess { C_NONE, C_PEON, C_CHANOP, C_MASTER, C_COOWNER, C_OWNER }
+
+    public static enum ChanAccess {
+        C_NONE, C_PEON, C_CHANOP, C_MASTER, C_COOWNER, C_OWNER
+    }
+
     public String channel;
     Map<String, ChanAccess> Users;
     Map<String, String> Settings;
     Map<String, String> Metadata;
 
-    public SrvChannel_channel(){}
-    public SrvChannel_channel(String chan, String o)
-    {
-        channel = chan;
-        Users = new HashMap<String,ChanAccess>();
-        Users.put(o,ChanAccess.C_OWNER);
-        Settings = new HashMap<String,String>();
-        Metadata = new HashMap<String,String>();
+    public SrvChannel_channel() {
     }
-    public SrvChannel_channel(String chan, Map<String, ChanAccess> u, Map<String, String> s, Map<String, String> m)
-    {
+
+    public SrvChannel_channel(String chan, String o) {
+        channel = chan;
+        Users = new HashMap<String, ChanAccess>();
+        Users.put(o, ChanAccess.C_OWNER);
+        Settings = new HashMap<String, String>();
+        Metadata = new HashMap<String, String>();
+    }
+
+    public SrvChannel_channel(String chan, Map<String, ChanAccess> u, Map<String, String> s, Map<String, String> m) {
         channel = chan;
         Users = u;
         Settings = s;
         Metadata = m;
     }
 
-    public Map<String,String> getAllMeta()
-    {
-        return new HashMap<String,String>(Metadata); // read only copy...
+    public Map<String, String> getAllMeta() {
+        return new HashMap<String, String>(Metadata); // read only copy...
     }
 
-    public String getMeta(String what) throws NoSuchElementException
-    {
-        if (Metadata.containsKey(what))
-        {
+    public String getMeta(String what) throws NoSuchElementException {
+        if (Metadata.containsKey(what)) {
             return Metadata.get(what);
         } else
             throw new java.util.NoSuchElementException();
     }
 
-    public void setMeta(String what, String val)
-    {
+    public void setMeta(String what, String val) {
         if (Metadata.containsKey(what))
             Metadata.remove(what);
-        Metadata.put(what,val);
+        Metadata.put(what, val);
     }
+
     public void rmMeta(String what) {
         if (Metadata.containsKey(what)) {
             Metadata.remove(what);
         }
     }
 
-    public Map<String,ChanAccess> getUsers()
-    {
+    public Map<String, ChanAccess> getUsers() {
         return Users;
     }
-    public Map<String,String> getSettings()
-    {
+
+    public Map<String, String> getSettings() {
         return Settings;
     }
-    public String toString()
-    {
+
+    public String toString() {
         return channel + " " + Users.size() + " users, " + Settings.size() + " settings, " + Metadata.size() + " meta.";
     }
 

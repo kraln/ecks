@@ -17,14 +17,16 @@
  */
 package ecks.services.modules;
 
-import ecks.protocols.Protocol;
 import ecks.protocols.Generic;
-import ecks.Configuration;
 import ecks.services.Service;
 
-public class cmdLoadModule extends bCommand{
+public class cmdLoadModule extends bCommand {
     public final CommandDesc Desc = new CommandDesc("loadmod", 1, true, CommandDesc.access_levels.A_SRA, "Load a module.", "<path to module>");
-    public CommandDesc getDesc() { return Desc; }
+
+    public CommandDesc getDesc() {
+        return Desc;
+    }
+
     public void handle_command(Service who, String user, String replyto, String arguments) {
         try {
             who.addCommand(((CommandModule) Class.forName(arguments).newInstance()).getName().toLowerCase(), (CommandModule) Class.forName(arguments).newInstance());
