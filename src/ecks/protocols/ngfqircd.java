@@ -17,17 +17,19 @@
  */
 package ecks.protocols;
 
-import ecks.*;
-import ecks.Utility.Client;
-import ecks.services.Service;
-
-import java.io.IOException;
-import java.io.BufferedWriter;
-import java.util.Map;
-import java.util.HashMap;
-
-import ecks.Hooks.Hooks.Events;
+import ecks.Configuration;
 import ecks.Hooks.Hooks;
+import ecks.Hooks.Hooks.Events;
+import ecks.Logging;
+import ecks.Utility.Client;
+import ecks.main;
+import ecks.services.Service;
+import ecks.util;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ngfqircd implements Protocol {
     BufferedWriter out; // where we send our irc commands to
@@ -38,16 +40,14 @@ public class ngfqircd implements Protocol {
     int nCount; // for keeping track of notices at the very beginning of the connection
     final String modeargs = "ovblkIE"; // what chanel modes are allowed to have arguments in this protocol
 
-    public long getWhenStarted()
-    {
+    public long getWhenStarted() {
         return connected;
     }
 
-    public Map<Character, Character> getPrefixMap()
-    {
-        Map <Character, Character> z = new HashMap<Character, Character>();
-        z.put('@','o');
-        z.put('+','v');
+    public Map<Character, Character> getPrefixMap() {
+        Map<Character, Character> z = new HashMap<Character, Character>();
+        z.put('@', 'o');
+        z.put('+', 'v');
         return z;
     }
 
@@ -56,15 +56,16 @@ public class ngfqircd implements Protocol {
         wasOnline = false;
         nCount = 0;
     }
-    
-    public String getModeArgs() { return modeargs; }
+
+    public String getModeArgs() {
+        return modeargs;
+    }
 
     public States getState() {
         return myState;
     }
 
-    public void setState(States newstate)
-    {
+    public void setState(States newstate) {
         myState = newstate;
     }
 
@@ -76,7 +77,7 @@ public class ngfqircd implements Protocol {
 
     public void Incoming(String line) {
 
-        Logging.raw(line,true); // raw lines get logged here
+        Logging.raw(line, true); // raw lines get logged here
 
         if (line == null) { // this should never, ever happen.
             Logging.error("PROTOCOL", "Got NULL incoming line!");
@@ -84,28 +85,26 @@ public class ngfqircd implements Protocol {
             return; // will never get here...
         }
 
-
         // deal with all our tokenization and so forth *here*
         boolean hasSource = line.startsWith(":");
         String halves[] = line.split(" :", 2);
         boolean hasExtArg = (halves.length > 1);
         String tokens[] = halves[0].split(" ");
-        String command = tokens[(hasSource?1:0)];
-        String source = (hasSource?tokens[0].substring(1):null);
+        String command = tokens[(hasSource ? 1 : 0)];
+        String source = (hasSource ? tokens[0].substring(1) : null);
 
-        Delegate(command, hasSource, source, tokens, hasExtArg, (hasExtArg?halves[1]:null));
+        Delegate(command, hasSource, source, tokens, hasExtArg, (hasExtArg ? halves[1] : null));
 
     }
 
     public void Outgoing(String what) throws IOException {
         out.write(what + "\r\n");
-        Logging.raw(what,false); 
+        Logging.raw(what, false);
         out.flush();
     }
 
 
-    void Delegate(String cmd, Boolean hasSource, String source, String[] tokens, Boolean hasargs, String args )
-    {
+    void Delegate(String cmd, Boolean hasSource, String source, String[] tokens, Boolean hasargs, String args) {
         try {
             if (cmd.equals("PING")) {                                                                            // PING
 
@@ -142,22 +141,21 @@ public class ngfqircd implements Protocol {
 
             } else if (cmd.equals("GNOTICE")) {                                                               // GNOTICE
 
-                if( myState != States.S_ONLINE )
-                {
+                if (myState != States.S_ONLINE) {
                     Logging.info("PROTOCOL", "Connection established. Beginning burst...");
                     myState = States.S_BURSTING;
                 }
             } else if (cmd.equals("NICK")) {                                                                     // NICK
 
                 if (hasSource) { // It's a rename
-                    Generic.nickRename(source,tokens[2], Long.parseLong(args));
+                    Generic.nickRename(source, tokens[2], Long.parseLong(args));
                 } else { // It's a new client, in a burst or otherwise
                     nickSignOn(tokens, args);
                 }
 
             } else if (cmd.equals("KICK")) {                                                                     // KICK
 
-                Generic.nickGotKicked( tokens[3], tokens[2]);
+                Generic.nickGotKicked(tokens[3], tokens[2]);
 
             } else if (cmd.equals("SERVER")) {                                                                 // SERVER
 
@@ -169,12 +167,12 @@ public class ngfqircd implements Protocol {
 
             } else if (cmd.equals("AWAY")) {                                                                     // AWAY
 
-               // goggles. suppresses 'unsupported command'
+                // goggles. suppresses 'unsupported command'
 
             } else if (cmd.equals("PART")) {                                                                     // PART
 
                 // :SOURCE PART #CHANNEL
-                Generic.chanPart(tokens[2],source);
+                Generic.chanPart(tokens[2], source);
 
 
             } else if (cmd.equals("QUIT")) {                                                                     // QUIT
@@ -185,29 +183,28 @@ public class ngfqircd implements Protocol {
 
                 String modestring;
                 if (tokens[2].startsWith("#")) { // is a channel mode
-                modestring = tokens[4];
-                if (tokens.length > 4)
-                    for (int i = 5; i< tokens.length; i++)
-                        modestring += " " + tokens[i];
+                    modestring = tokens[4];
+                    if (tokens.length > 4)
+                        for (int i = 5; i < tokens.length; i++)
+                            modestring += " " + tokens[i];
                     Generic.modeChan(tokens[2], modestring);
                 } else {                         // user mode has changed
                     modestring = args;
-                    Generic.modeUser(tokens[2], modestring);    
+                    Generic.modeUser(tokens[2], modestring);
                 }
 
             } else if (cmd.equals("PRIVMSG")) {                                                               // PRIVMSG
 
                 //:SOURCE PRIVMSG TARGET :MESSAGE
-                Hooks.hook(Events.E_PRIVMSG,source,tokens[2],args);
+                Hooks.hook(Events.E_PRIVMSG, source, tokens[2], args);
 
             } else if (cmd.equals("SJOIN")) {                                                                   // SJOIN
 
                 // :SOURCE SJOIN TS #CHANNEL MODES [MODEARGS] :USERS
-                if(!Generic.Users.containsKey(source.toLowerCase())) { // server is introducing channel
-                    if (tokens.length>4) {
+                if (!Generic.Users.containsKey(source.toLowerCase())) { // server is introducing channel
+                    if (tokens.length > 4) {
                         String ExtModes = "";
-                        for (int i = 5; i < tokens.length; i++)
-                        {
+                        for (int i = 5; i < tokens.length; i++) {
                             ExtModes = " " + tokens[i];
                         }
                         Generic.chanBurst(
@@ -234,13 +231,13 @@ public class ngfqircd implements Protocol {
                 }
             } else if (cmd.equals("TOPIC")) {                                                                   // TOPIC
                 // :SOURCE TOPIC #CHANNAME SETTER TS :NEWTOPIC
-                Generic.chanTopic(Integer.parseInt(tokens[4]),tokens[2],args);
+                Generic.chanTopic(Integer.parseInt(tokens[4]), tokens[2], args);
 
 
             } else if (cmd.equals("ERROR")) {                                                                   // ERROR
 
                 Logging.error("PROTOCOL", "Recieved Error. Disconnecting.");
-                Logging.warn("PROTOCOL", "Error was: " + (hasargs?args:""));
+                Logging.warn("PROTOCOL", "Error was: " + (hasargs ? args : ""));
                 main.goGracefullyIntoTheNight();
 
             } else {                                                                                          // UNKNOWN
@@ -255,33 +252,30 @@ public class ngfqircd implements Protocol {
     }
 
 
-
-    void nickSignOn(String[] tokens, String args)
-    {
+    void nickSignOn(String[] tokens, String args) {
         // bahamut specific...
         // nick NICKNAME HOPS SIGNON MODES IDENT HOST SERVER SERVICESID NUMERICIP :REALNAME
         // 0    1        2    3      4     5     6    7      8          9
 
         // generic...
         // uid hops signon modes ident host althost uplink svsid numericip realname nickid
-        String[] newargs = { null,
-                    tokens[1],
-                    tokens[2],
-                    tokens[3],
-                    tokens[4],
-                    tokens[5],
-                    tokens[6],
-                    tokens[6],
-                    tokens[7],
-                    tokens[8],
-                    tokens[9],
-                    args,
-                    null};
-        Generic.nickSignOn(newargs);        
+        String[] newargs = {null,
+                tokens[1],
+                tokens[2],
+                tokens[3],
+                tokens[4],
+                tokens[5],
+                tokens[6],
+                tokens[6],
+                tokens[7],
+                tokens[8],
+                tokens[9],
+                args,
+                null};
+        Generic.nickSignOn(newargs);
     }
 
-    void outPong() throws IOException
-    {
+    void outPong() throws IOException {
         Outgoing("PONG :" + util.getTS());
         Logging.info("PROTOCOL", "Server pinged...");
     }
@@ -308,9 +302,9 @@ public class ngfqircd implements Protocol {
                     + " services "
                     + Configuration.Config.get("hostname")
                     + " 0 1066435662 :Network Services";
-            Outgoing( o );
+            Outgoing(o);
             String[] tokens = o.split(" ");
-                    String[] newargs = { null,
+            String[] newargs = {null,
                     tokens[1],
                     tokens[2],
                     tokens[3],
@@ -323,26 +317,26 @@ public class ngfqircd implements Protocol {
                     tokens[9],
                     "Network Services",
                     null};
-            Generic.nickSignOn( newargs );
+            Generic.nickSignOn(newargs);
         } catch (IOException e) {
             Logging.error("PROTOCOL", "Got IOException while introducing service: " + whom.getname());
             Logging.error("PROTOCOL", "IOE Claims: " + e.getMessage());
         }
     }
 
-    public void srvJoin (Service who, String where, String modes)
+    public void srvJoin(Service who, String where, String modes)
     // Have service join a channel
     {
         try {
             Outgoing("SJOIN " + util.getTS() + " " + where + " " + modes + " :@" + who.getname());
-            Generic.chanJoin(Integer.parseInt(util.getTS()),where,who.getname());
+            Generic.chanJoin(Integer.parseInt(util.getTS()), where, who.getname());
         } catch (IOException e) {
             Logging.error("PROTOCOL", "Got IOException while sending a command.");
             Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
         }
     }
 
-    public void srvPart (Service who, String where, String why)
+    public void srvPart(Service who, String where, String why)
     // Have service leave a channel
     {
         try {
@@ -415,7 +409,7 @@ public class ngfqircd implements Protocol {
     {
         try {
             Outgoing(":" + me.getname() + " PART " + chan + " :" + reason);
-            Generic.chanPart(chan,me.getname());
+            Generic.chanPart(chan, me.getname());
         } catch (IOException e) {
             Logging.error("PROTOCOL", "Got IOException while sending a command.");
             Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
@@ -439,7 +433,7 @@ public class ngfqircd implements Protocol {
         try {
             String id;
             String host;
-            String [] t = mask.split("@");
+            String[] t = mask.split("@");
             id = t[0];
             host = t[1];
             Outgoing(":" + Configuration.Config.get("hostname") + " AKILL " + host + " " + id + " " + duration + " " + me.getname() + " " + util.getTS() + " :" + why);
@@ -455,7 +449,7 @@ public class ngfqircd implements Protocol {
         try {
             String id;
             String host;
-            String [] t = mask.split("@");
+            String[] t = mask.split("@");
             id = t[0];
             host = t[1];
             Outgoing("RAKILL " + host + " " + id + " " + me.getname());
@@ -488,6 +482,7 @@ public class ngfqircd implements Protocol {
             Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
         }
     }
+
     public void outINVITE(Service me, String who, String where)
     // Invite someone somewhere
     {
@@ -498,10 +493,9 @@ public class ngfqircd implements Protocol {
             Logging.error("PROTOCOL", "IOE: " + e.getMessage() + "... " + e.toString());
         }
     }
-    
-    public void outMODE(Service me, Client who, String what, String more)
-    {
-       try {
+
+    public void outMODE(Service me, Client who, String what, String more) {
+        try {
             Outgoing("SVSMODE " + who.uid + " " + who.signon + " " + what + " " + more);
             who.modes.applyChanges(what + " " + more);
         } catch (IOException e) {
@@ -510,8 +504,7 @@ public class ngfqircd implements Protocol {
         }
     }
 
-    public void outTOPIC(Service me, String where, String what)
-    {
+    public void outTOPIC(Service me, String where, String what) {
         try {
             Outgoing(":" + me.getname() + " TOPIC " + where + " NETWORK " + util.getTS() + " :" + what);
         } catch (IOException e) {

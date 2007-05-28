@@ -17,18 +17,16 @@
  */
 package ecks.services.modules.SrvChannel;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
+import ecks.Configuration;
+import ecks.Logging;
+import ecks.protocols.Generic;
 import ecks.services.Service;
+import ecks.services.SrvAuth;
 import ecks.services.SrvChannel;
 import ecks.services.SrvChannel_channel;
-import ecks.services.SrvAuth;
-import ecks.protocols.Protocol;
-import ecks.protocols.Generic;
-import ecks.Configuration;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 import ecks.util;
-import ecks.Logging;
-import ecks.Storage;
 
 public class Register extends bCommand {
     public final CommandDesc Desc = new CommandDesc("register", 2, true, CommandDesc.access_levels.A_HELPER, "Registers a channel.", "<channel> <user>");
@@ -48,18 +46,20 @@ public class Register extends bCommand {
                     if (!temp.getChannels().containsKey(ch)) {
                         temp.getChannels().put(ch, new SrvChannel_channel(ch, u));
                         temp.getChannels().get(ch).getUsers().put(u, SrvChannel_channel.ChanAccess.C_OWNER);
-                        ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().get(u).WhereAccess.put(ch,SrvChannel_channel.ChanAccess.C_OWNER.toString());
+                        ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().get(u).WhereAccess.put(ch, SrvChannel_channel.ChanAccess.C_OWNER.toString());
                         temp.getChannels().get(ch).setMeta("_registered-by", Generic.Users.get(user.toLowerCase()).authhandle);
                         temp.getChannels().get(ch).setMeta("_ts_registered", util.getTS());
                         temp.getChannels().get(ch).setMeta("_ts_last", util.getTS());
                         Generic.curProtocol.outPRVMSG(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Registration Succeeded!");
-                        Logging.info("SRVCHAN", "Channel " + ch + " registered by " + user + " to " +  u +  ".");
+                        Logging.info("SRVCHAN", "Channel " + ch + " registered by " + user + " to " + u + ".");
                         Generic.curProtocol.srvJoin(who, ch, "+strn");
                         Generic.curProtocol.outSETMODE(who, ch, "+ro", who.getname());
-                        
-                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Channel is already registered.");
+
+                    } else
+                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Channel is already registered.");
                 } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Owner to-be is not logged in!");
             } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 No such user is online!");
-        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: register [channel] [user]");
+        } else
+            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: register [channel] [user]");
     }
 }

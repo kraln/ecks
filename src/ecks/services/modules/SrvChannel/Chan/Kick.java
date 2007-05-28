@@ -17,17 +17,14 @@
  */
 package ecks.services.modules.SrvChannel.Chan;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
+import ecks.Configuration;
+import ecks.Logging;
+import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvChannel;
 import ecks.services.SrvChannel_channel;
-import ecks.protocols.Protocol;
-import ecks.protocols.Generic;
-import ecks.Configuration;
-import ecks.Logging;
-import ecks.util;
-import ecks.Storage;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
 public class Kick extends bCommand {
     public final CommandDesc Desc = new CommandDesc("kick", 99, true, CommandDesc.access_levels.A_AUTHED, "Kicks a user from a channel", "[channel] <user> [reason]");
@@ -81,8 +78,7 @@ public class Kick extends bCommand {
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
                 if (Generic.Users.containsKey(whom)) {
-                    if (Configuration.getSvc().containsKey(whom))
-                    {
+                    if (Configuration.getSvc().containsKey(whom)) {
                         Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Users should not play with fire. (You cannot kick network services)");
                         return;
                     }
@@ -97,11 +93,14 @@ public class Kick extends bCommand {
                                         SrvChannel_channel.ChanAccess alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(aname);
                                         if (mlevel.ordinal() > alevel.ordinal()) {
                                             Generic.curProtocol.outKICK(who, whom, whatchan, "(" + who + ") " + reason);
-                                        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has access equal to or more than yours!");
+                                        } else
+                                            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has access equal to or more than yours!");
                                     } else Generic.curProtocol.outKICK(who, whom, whatchan, reason);
                                 } else Generic.curProtocol.outKICK(who, whom, whatchan, reason);
-                            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You do not have sufficient access to perform that command");
-                        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You have no access to this channel");
+                            } else
+                                Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You do not have sufficient access to perform that command");
+                        } else
+                            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You have no access to this channel");
                     } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You are not authed!");
                 } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User does not exist!");
             } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");

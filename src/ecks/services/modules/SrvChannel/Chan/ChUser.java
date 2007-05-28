@@ -17,16 +17,14 @@
  */
 package ecks.services.modules.SrvChannel.Chan;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
-import ecks.services.Service;
-import ecks.services.SrvChannel_channel;
-import ecks.services.SrvChannel;
-import ecks.services.SrvAuth;
-import ecks.protocols.Protocol;
-import ecks.protocols.Generic;
 import ecks.Configuration;
-import ecks.Storage;
+import ecks.protocols.Generic;
+import ecks.services.Service;
+import ecks.services.SrvAuth;
+import ecks.services.SrvChannel;
+import ecks.services.SrvChannel_channel;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
 public class ChUser extends bCommand {
     public final CommandDesc Desc = new CommandDesc("chuser", 3, true, CommandDesc.access_levels.A_AUTHED, "Changes a user's access on a channel", "<user> [channel] <access>");
@@ -113,13 +111,18 @@ public class ChUser extends bCommand {
                                             if (newacc.ordinal() < alevel.ordinal()) {
                                                 ((SrvChannel) who).getChannels().get(whatchan).getUsers().remove(Generic.Users.get(whom).authhandle);
                                                 ((SrvChannel) who).getChannels().get(whatchan).getUsers().put(Generic.Users.get(whom).authhandle, newacc);
-                                                ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().get(Generic.Users.get(whom).authhandle).WhereAccess.put(whatchan,newacc.toString()); // should not create a duplicate entry. If it does, issues...
+                                                ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().get(Generic.Users.get(whom).authhandle).WhereAccess.put(whatchan, newacc.toString()); // should not create a duplicate entry. If it does, issues...
                                                 Generic.curProtocol.outPRVMSG(who, replyto, "User Changed!");
-                                            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You cannot change a user to higher access than yourself!");
-                                        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You cannot change a with higher access than yourself!");
-                                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User does not have access to channel!");
-                                } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You have no access to channel!");
-                            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You cannot change yourself!");
+                                            } else
+                                                Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You cannot change a user to higher access than yourself!");
+                                        } else
+                                            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You cannot change a with higher access than yourself!");
+                                    } else
+                                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User does not have access to channel!");
+                                } else
+                                    Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You have no access to channel!");
+                            } else
+                                Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You cannot change yourself!");
                         } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You are not authed!");
                     } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User is not authed!");
                 } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 No such user!");

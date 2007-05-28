@@ -17,16 +17,13 @@
  */
 package ecks.services.modules.SrvChannel.Chan;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
+import ecks.Logging;
+import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvChannel;
-import ecks.protocols.Protocol;
-import ecks.protocols.Generic;
-import ecks.Configuration;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 import ecks.util;
-import ecks.Logging;
-import ecks.Storage;
 
 public class Access extends bCommand {
     public final CommandDesc Desc = new CommandDesc("access", 2, true, CommandDesc.access_levels.A_PENDING, "Shows access of user in a channel", "[channel] [user]");
@@ -82,7 +79,8 @@ public class Access extends bCommand {
                             String alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(aname).toString();
 
                             Generic.curProtocol.outPRVMSG(who, replyto, util.pad("\u0002" + aname + "\u0002 ", 20) + alevel.substring(2));
-                        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has no access to channel!");
+                        } else
+                            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has no access to channel!");
                     } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User is not authed!");
                 } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User does not exist!");
             } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");

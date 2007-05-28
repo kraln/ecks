@@ -17,12 +17,12 @@
  */
 package ecks.services.modules.SrvChannel.Chan;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
+import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvChannel;
 import ecks.services.SrvChannel_channel;
-import ecks.protocols.Generic;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
 public class SetModes extends bCommand {
     public final CommandDesc Desc = new CommandDesc("setmodes", 2, true, CommandDesc.access_levels.A_AUTHED, "Enforces the current channel modes.", "[channel]");
@@ -48,11 +48,10 @@ public class SetModes extends bCommand {
         if (args.length > 0 && (!(args[0].equals(""))))  // if we have arguments
             if (args[0].startsWith("#")) { // assume channel
                 whatchan = args[0];
-                what = arguments.substring(whatchan.length()+1);
+                what = arguments.substring(whatchan.length() + 1);
             } else {
                 what = arguments;
             }
-
 
 
         whom = whom.toLowerCase();
@@ -65,16 +64,17 @@ public class SetModes extends bCommand {
                         String aname = Generic.Users.get(whom).authhandle;
                         if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
                             if (((SrvChannel) who).getChannels().get(whatchan).getUsers().get(aname).ordinal() >= SrvChannel_channel.ChanAccess.C_MASTER.ordinal()) {
-                                if (!what.trim().equals("*"))
-                                {
+                                if (!what.trim().equals("*")) {
                                     ((SrvChannel) who).getChannels().get(whatchan).setMeta("enfmodes", Generic.Channels.get(whatchan).modes.getModes());
                                     Generic.curProtocol.outPRVMSG(who, replyto, "Enforced Modes Set.");
                                 } else {
                                     ((SrvChannel) who).getChannels().get(whatchan).rmMeta("enfmodes");
                                     Generic.curProtocol.outPRVMSG(who, replyto, "Enforced Modes Cleared.");
                                 }
-                            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Must be master or greater to set modes!");
-                        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has no access to channel!");
+                            } else
+                                Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Must be master or greater to set modes!");
+                        } else
+                            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has no access to channel!");
                     } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User is not authed!");
                 } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User does not exist!");
             } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");

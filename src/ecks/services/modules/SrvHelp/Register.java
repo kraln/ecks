@@ -17,14 +17,13 @@
  */
 package ecks.services.modules.SrvHelp;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
-import ecks.services.*;
-import ecks.protocols.Protocol;
-import ecks.protocols.Generic;
-import ecks.Configuration;
 import ecks.Logging;
-import ecks.Storage;
+import ecks.protocols.Generic;
+import ecks.services.Service;
+import ecks.services.SrvHelp;
+import ecks.services.SrvHelp_channel;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
 public class Register extends bCommand {
     public final CommandDesc Desc = new CommandDesc("register", 2, true, CommandDesc.access_levels.A_OPER, "Registers a channel.", "<channel>");
@@ -37,14 +36,15 @@ public class Register extends bCommand {
         SrvHelp temp = ((SrvHelp) who);
         String args[] = arguments.split(" ");
         if (args.length == 1) {
-                    String ch = args[0].toLowerCase();
-                    if (!temp.getChannels().containsKey(ch)) {
-                        temp.getChannels().put(ch, new SrvHelp_channel(ch));
-                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Registration Succeeded!");
-                        Logging.info("SRVHELP", "Channel " + ch + " registered by " + user + ".");
-                        Generic.curProtocol.srvJoin(who, ch, "+stn");
-                        Generic.curProtocol.outSETMODE(who, ch, "+o", who.getname());
-                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Channel is already registered.");
-        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: register [channel]");
+            String ch = args[0].toLowerCase();
+            if (!temp.getChannels().containsKey(ch)) {
+                temp.getChannels().put(ch, new SrvHelp_channel(ch));
+                Generic.curProtocol.outPRVMSG(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Registration Succeeded!");
+                Logging.info("SRVHELP", "Channel " + ch + " registered by " + user + ".");
+                Generic.curProtocol.srvJoin(who, ch, "+stn");
+                Generic.curProtocol.outSETMODE(who, ch, "+o", who.getname());
+            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Channel is already registered.");
+        } else
+            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Arguments. Usage: register [channel]");
     }
 }

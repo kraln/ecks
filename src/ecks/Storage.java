@@ -18,20 +18,18 @@
 package ecks;
 
 import ecks.services.Service;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-import java.util.Map;
-import java.util.HashMap;
-import java.io.FileWriter;
-import java.io.BufferedWriter;
-import java.io.IOException;
-
-import org.xml.sax.SAXException;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Map;
 
 public class Storage {
     public void loadDB() {

@@ -17,15 +17,17 @@
  */
 package ecks.services.modules;
 
-import ecks.protocols.Protocol;
 import ecks.protocols.Generic;
-import ecks.Configuration;
-import ecks.util;
 import ecks.services.Service;
+import ecks.util;
 
-public class ctcpVersion extends bCommand{
+public class ctcpVersion extends bCommand {
     public final CommandDesc Desc = new CommandDesc("\u0001version", 0, true, CommandDesc.access_levels.A_NONE, "Reports service version.");
-    public CommandDesc getDesc() { return Desc; }
+
+    public CommandDesc getDesc() {
+        return Desc;
+    }
+
     public void handle_command(Service who, String user, String replyto, String arguments) {
         Generic.curProtocol.outNOTICE(who, replyto, "\u0001VERSION SrvEcks " + util.getVersion());
     }

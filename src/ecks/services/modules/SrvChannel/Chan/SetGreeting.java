@@ -17,12 +17,12 @@
  */
 package ecks.services.modules.SrvChannel.Chan;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
+import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvChannel;
 import ecks.services.SrvChannel_channel;
-import ecks.protocols.Generic;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
 public class SetGreeting extends bCommand {
     public final CommandDesc Desc = new CommandDesc("setgreeting", 99, true, CommandDesc.access_levels.A_AUTHED, "Sets a short message that all users will be greeted with when entering a channel", "[channel] [message]");
@@ -48,11 +48,10 @@ public class SetGreeting extends bCommand {
         if (args.length > 0 && (!(args[0].equals(""))))  // if we have arguments
             if (args[0].startsWith("#")) { // assume channel
                 whatchan = args[0];
-                what = arguments.substring(whatchan.length()+1);
+                what = arguments.substring(whatchan.length() + 1);
             } else {
                 what = arguments;
             }
-
 
 
         whom = whom.toLowerCase();
@@ -65,16 +64,17 @@ public class SetGreeting extends bCommand {
                         String aname = Generic.Users.get(whom).authhandle;
                         if (((SrvChannel) who).getChannels().get(whatchan).getUsers().containsKey(aname)) {
                             if (((SrvChannel) who).getChannels().get(whatchan).getUsers().get(aname).ordinal() >= SrvChannel_channel.ChanAccess.C_MASTER.ordinal()) {
-                                if (!what.trim().equals("*"))
-                                {
+                                if (!what.trim().equals("*")) {
                                     ((SrvChannel) who).getChannels().get(whatchan).setMeta("greeting", what);
                                     Generic.curProtocol.outPRVMSG(who, replyto, "Greeting Set.");
                                 } else {
                                     ((SrvChannel) who).getChannels().get(whatchan).rmMeta("greeting");
                                     Generic.curProtocol.outPRVMSG(who, replyto, "Greeting Cleared.");
                                 }
-                            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Must be master or greater to set greeting!");
-                        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has no access to channel!");
+                            } else
+                                Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Must be master or greater to set greeting!");
+                        } else
+                            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User has no access to channel!");
                     } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User is not authed!");
                 } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User does not exist!");
             } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");

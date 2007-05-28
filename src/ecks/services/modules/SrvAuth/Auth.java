@@ -18,14 +18,12 @@
 package ecks.services.modules.SrvAuth;
 
 import ecks.Configuration;
-import ecks.Storage;
-import ecks.util;
-import ecks.protocols.Protocol;
 import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
 import ecks.services.modules.CommandDesc;
 import ecks.services.modules.bCommand;
+import ecks.util;
 
 import java.util.NoSuchElementException;
 
@@ -46,14 +44,14 @@ public class Auth extends bCommand {
                         Generic.Users.get(user).authhandle = uname;
                         ((SrvAuth) who).getUsers().get(uname).setMeta("_ts_last", util.getTS()); // update last seen metadata
                         try {
-                            Generic.curProtocol.srvSetAuthed(who,Generic.Users.get(user).uid, Long.parseLong(temp.getUsers().get(uname).getMeta("svsid")));
+                            Generic.curProtocol.srvSetAuthed(who, Generic.Users.get(user).uid, Long.parseLong(temp.getUsers().get(uname).getMeta("svsid")));
                         } catch (NoSuchElementException nsee) {
                             temp.getUsers().get(uname).setMeta("svsid", "-1");
-                            Generic.curProtocol.srvSetAuthed(who,Generic.Users.get(user).uid, (long)-1);
+                            Generic.curProtocol.srvSetAuthed(who, Generic.Users.get(user).uid, (long) -1);
                         }
                         Generic.curProtocol.outNOTICE(who, replyto, "\u0002" + Generic.Users.get(user).uid + ":\u0002 Welcome back!");
                         if (Configuration.getSvc().containsKey(Configuration.chanservice))
-                            Configuration.getSvc().get(Configuration.chanservice).handle(user,user,"syncall"); // up them in all of their channels
+                            Configuration.getSvc().get(Configuration.chanservice).handle(user, user, "syncall"); // up them in all of their channels
                     } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Invalid Password!");
                 } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Username not found!");
             } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You are already logged in!");

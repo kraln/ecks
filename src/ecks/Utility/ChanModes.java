@@ -18,27 +18,24 @@
 package ecks.Utility;
 
 import ecks.protocols.Generic;
-import ecks.Utility.Modes;
 
-import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ChanModes implements Modes {
     // I hate this class. I really do.
 
 
-    Map <Character, List> modes;
+    Map<Character, List> modes;
 
-    public ChanModes()
-    {
+    public ChanModes() {
         modes = new HashMap<Character, List>();
     }
 
     // this class represents modes
-    public void applyChanges(String newmodes)
-    {
+    public void applyChanges(String newmodes) {
         int plusstart;
         int plusend = 0;
         int minusstart;
@@ -47,7 +44,7 @@ public class ChanModes implements Modes {
 
         plusstart = toks[0].indexOf('+');
         minusstart = toks[0].indexOf('-');
-        if (plusstart>=0) {
+        if (plusstart >= 0) {
             if (minusstart > 0)
                 plusend = minusstart;
             else
@@ -58,64 +55,54 @@ public class ChanModes implements Modes {
         String minuses = "";
 
         if (plusstart > -1)
-        plusses = newmodes.substring(plusstart+1,plusend);
+            plusses = newmodes.substring(plusstart + 1, plusend);
 
         if (minusstart > -1)
-        minuses = newmodes.substring(minusstart+1);
+            minuses = newmodes.substring(minusstart + 1);
 
         int numofargssofar = 0;
 
-        for (int i = 0; i < plusses.length(); i++)
-        {
-            CharSequence w = plusses.subSequence(i, i+1);
-            if (modes.containsKey(w.charAt(0)))
-            {
-                if (Generic.curProtocol.getModeArgs().contains(w))
-                {
-                    if (modes.get(w.charAt(0)).contains(toks[numofargssofar+1]))
-                    {
-                      // do nothing - this argument is already on this list.
+        for (int i = 0; i < plusses.length(); i++) {
+            CharSequence w = plusses.subSequence(i, i + 1);
+            if (modes.containsKey(w.charAt(0))) {
+                if (Generic.curProtocol.getModeArgs().contains(w)) {
+                    if (modes.get(w.charAt(0)).contains(toks[numofargssofar + 1])) {
+                        // do nothing - this argument is already on this list.
                     } else {
-                      modes.get(w.charAt(0)).add(toks[numofargssofar+1]); // add this argument to the list for this mode
+                        modes.get(w.charAt(0)).add(toks[numofargssofar + 1]); // add this argument to the list for this mode
                     }
                     numofargssofar++;
                 } else {
                     // do nothing because this mode is alerady set
                 }
             } else {
-                if (Generic.curProtocol.getModeArgs().contains(w))
-                {
+                if (Generic.curProtocol.getModeArgs().contains(w)) {
                     List t = new ArrayList<String>();
-                    t.add(toks[numofargssofar+1]); 
+                    t.add(toks[numofargssofar + 1]);
                     modes.put(w.charAt(0), t);
                     numofargssofar++;
                 } else {
-                    modes.put(w.charAt(0),null); // add mode
+                    modes.put(w.charAt(0), null); // add mode
                 }
             }
         }
 
-        for (int i = 0; i < minuses.length(); i++)
-        {
-            CharSequence w = minuses.subSequence(i, i+1);
-            if (modes.containsKey(w.charAt(0)))
-            {
-                if (Generic.curProtocol.getModeArgs().contains(w))
-                {
-                    if (toks.length < (numofargssofar+1))
-                    numofargssofar--; // todo: hack hack hack
+        for (int i = 0; i < minuses.length(); i++) {
+            CharSequence w = minuses.subSequence(i, i + 1);
+            if (modes.containsKey(w.charAt(0))) {
+                if (Generic.curProtocol.getModeArgs().contains(w)) {
+                    if (toks.length < (numofargssofar + 1))
+                        numofargssofar--; // todo: hack hack hack
 
                     try {
-                    if (modes.get(w.charAt(0)).contains(toks[numofargssofar+1]))
-                    {
-                        modes.get(w.charAt(0)).remove(toks[numofargssofar+1]); // remove it
-                        if (modes.get(w.charAt(0)).size() == 0)
-                            modes.remove(w.charAt(0)); // mode has no more complex arguments, remove mode
-                    } else {
-                        // do nothing because this complex argument wasn't there
-                    }
-                    } catch (Exception e)
-                    {
+                        if (modes.get(w.charAt(0)).contains(toks[numofargssofar + 1])) {
+                            modes.get(w.charAt(0)).remove(toks[numofargssofar + 1]); // remove it
+                            if (modes.get(w.charAt(0)).size() == 0)
+                                modes.remove(w.charAt(0)); // mode has no more complex arguments, remove mode
+                        } else {
+                            // do nothing because this complex argument wasn't there
+                        }
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                     numofargssofar++;
@@ -126,21 +113,17 @@ public class ChanModes implements Modes {
         }
     }
 
-    public boolean contains(String what)
-    {
+    public boolean contains(String what) {
         return modes.containsKey(what.charAt(0));
     }
-    public String getModes()
-    {
 
-        String t ="", ca =" ";
-        for (Map.Entry<Character, List> e : modes.entrySet())
-        {
-            if (e.getValue() != null)
-            {
+    public String getModes() {
+
+        String t = "", ca = " ";
+        for (Map.Entry<Character, List> e : modes.entrySet()) {
+            if (e.getValue() != null) {
                 List j = e.getValue();
-                for (int k = 0; k < j.size(); k++)
-                {
+                for (int k = 0; k < j.size(); k++) {
                     t += e.getKey();
                     ca += j.get(k) + " ";
                 }

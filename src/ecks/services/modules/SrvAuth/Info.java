@@ -1,21 +1,24 @@
 package ecks.services.modules.SrvAuth;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
+import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
 import ecks.services.SrvAuth_user;
-import ecks.protocols.Generic;
-import ecks.Configuration;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 import ecks.util;
 
-import java.util.Map;
-import java.util.Date;
 import java.text.DateFormat;
+import java.util.Date;
+import java.util.Map;
 
 public class Info extends bCommand {
     public final CommandDesc Desc = new CommandDesc("info", 1, true, CommandDesc.access_levels.A_AUTHED, "Returns information about a handle");
-    public CommandDesc getDesc() { return Desc; }
+
+    public CommandDesc getDesc() {
+        return Desc;
+    }
+
     public void handle_command(Service who, String user, String replyto, String arguments) {
         if (((SrvAuth) who).getUsers().containsKey(arguments.toLowerCase())) {
 
@@ -25,12 +28,12 @@ public class Info extends bCommand {
             Generic.curProtocol.outNOTICE(who, user, "Access Level: " + t.getAccess());
 
             if (t.getAllMeta().containsKey("_ts_registered"))
-                Generic.curProtocol.outNOTICE(who, user, "Registered On: " + DateFormat.getDateTimeInstance(DateFormat.LONG,DateFormat.LONG).format(new Date(Integer.parseInt(t.getMeta("_ts_registered"))*1000L)));
+                Generic.curProtocol.outNOTICE(who, user, "Registered On: " + DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date(Integer.parseInt(t.getMeta("_ts_registered")) * 1000L)));
             else
                 Generic.curProtocol.outNOTICE(who, user, "Unknown Registration Date.");
 
             if (t.getAllMeta().containsKey("_ts_last"))
-                Generic.curProtocol.outNOTICE(who, user, "Last Seen On: " + DateFormat.getDateTimeInstance(DateFormat.LONG,DateFormat.LONG).format(new Date(Integer.parseInt(t.getMeta("_ts_last"))*1000L)));
+                Generic.curProtocol.outNOTICE(who, user, "Last Seen On: " + DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date(Integer.parseInt(t.getMeta("_ts_last")) * 1000L)));
             else
                 Generic.curProtocol.outNOTICE(who, user, "Has never logged in.");
 
@@ -39,11 +42,10 @@ public class Info extends bCommand {
             else
                 Generic.curProtocol.outNOTICE(who, user, "Has no staff note.");
 
-            if (t.getAllMeta().containsKey("cookie"))
-            {
+            if (t.getAllMeta().containsKey("cookie")) {
                 Generic.curProtocol.outNOTICE(who, user, "Has a cookie");
                 if (util.checkaccess(user, CommandDesc.access_levels.A_HELPER.ordinal()))
-                Generic.curProtocol.outNOTICE(who, user, "Cookie: " + t.getMeta("cookie"));
+                    Generic.curProtocol.outNOTICE(who, user, "Cookie: " + t.getMeta("cookie"));
             }
 
             if (t.WhereAccess.size() == 0)

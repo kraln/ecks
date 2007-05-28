@@ -17,18 +17,12 @@
  */
 package ecks.services.modules.SrvOper;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
-import ecks.services.modules.CommandModule;
-import ecks.services.Service;
-import ecks.services.SrvAuth;
-import ecks.protocols.Protocol;
-import ecks.protocols.Generic;
-import ecks.Configuration;
-import ecks.util;
 import ecks.Logging;
+import ecks.protocols.Generic;
+import ecks.services.Service;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
-import java.util.Map;
 import java.io.IOException;
 
 public class Raw extends bCommand {
@@ -44,7 +38,7 @@ public class Raw extends bCommand {
             Logging.warn("SRVOPER", user + " issued raw command!");
             Logging.info("SRVOPER RAW", arguments);
         } catch (IOException e) {
-            e.printStackTrace(); 
+            e.printStackTrace();
             Logging.error("SRVOPER", user + " issued raw command, and it failed miserably.");
         }
     }

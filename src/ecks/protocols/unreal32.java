@@ -17,18 +17,18 @@
  */
 package ecks.protocols;
 
-import ecks.Logging;
-import ecks.main;
-import ecks.util;
 import ecks.Configuration;
-import ecks.Utility.Client;
-import ecks.services.Service;
 import ecks.Hooks.Hooks;
+import ecks.Logging;
+import ecks.Utility.Client;
+import ecks.main;
+import ecks.services.Service;
+import ecks.util;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class unreal32 implements Protocol {
     /*
@@ -61,9 +61,8 @@ public class unreal32 implements Protocol {
         wasOnline = false;
     }
 
-     public Map<Character, Character> getPrefixMap()
-    {
-        Map <Character, Character> z = new HashMap<Character, Character>();
+    public Map<Character, Character> getPrefixMap() {
+        Map<Character, Character> z = new HashMap<Character, Character>();
         z.put('~', 'q');
         z.put('%', 'h');
         z.put('&', 'a');
@@ -147,15 +146,14 @@ public class unreal32 implements Protocol {
             } else if (cmd.equals("NOTICE")) {                                                                 // NOTICE
 
                 if (args.startsWith("*** Found"))
-                if (myState == States.S_HASBUFFERS) { // We're probably being told about hostnames and so forth
+                    if (myState == States.S_HASBUFFERS) { // We're probably being told about hostnames and so forth
                         outHandshake(); // send our half of the server information handshake
                         Logging.info("PROTOCOL", "Sending Handshake...");
-                }
+                    }
 
             } else if (cmd.equals("SMO")) {                                                                   // GNOTICE
 
-                if (myState == States.S_HASBUFFERS)
-                {
+                if (myState == States.S_HASBUFFERS) {
                     Logging.info("PROTOCOL", "Connection established. Beginning burst...");
                     myState = States.S_BURSTING;
                 }
@@ -457,7 +455,7 @@ public class unreal32 implements Protocol {
         try {
             String id;
             String host;
-            String [] t = mask.split("@");
+            String[] t = mask.split("@");
             id = t[0];
             host = t[1];
             Outgoing(":" + Configuration.Config.get("hostname") + " TKL + G " + id + " " + host + " " + me.getname() + " " + (util.getTS() + duration) + " " + util.getTS() + " :" + why);
@@ -473,7 +471,7 @@ public class unreal32 implements Protocol {
         try {
             String id;
             String host;
-            String [] t = mask.split("@");
+            String[] t = mask.split("@");
             id = t[0];
             host = t[1];
             Outgoing("TKL - " + id + " " + host + " " + me.getname());

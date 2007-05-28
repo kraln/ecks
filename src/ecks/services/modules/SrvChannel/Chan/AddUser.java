@@ -17,15 +17,14 @@
  */
 package ecks.services.modules.SrvChannel.Chan;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
+import ecks.Configuration;
+import ecks.protocols.Generic;
 import ecks.services.Service;
+import ecks.services.SrvAuth;
 import ecks.services.SrvChannel;
 import ecks.services.SrvChannel_channel;
-import ecks.services.SrvAuth;
-import ecks.protocols.Protocol;
-import ecks.protocols.Generic;
-import ecks.Configuration;import ecks.Storage;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
 public class AddUser extends bCommand {
     public final CommandDesc Desc = new CommandDesc("adduser", 3, true, CommandDesc.access_levels.A_AUTHED, "Adds a user to a channel. Access is one of [none|peon|chanop|master|coowner].", "<user> [channel] [access]");
@@ -117,12 +116,16 @@ public class AddUser extends bCommand {
                                         SrvChannel_channel.ChanAccess alevel = ((SrvChannel) who).getChannels().get(whatchan).getUsers().get(aname);
                                         if (newacc.ordinal() < alevel.ordinal()) {
                                             ((SrvChannel) who).getChannels().get(whatchan).getUsers().put(Generic.Users.get(whom).authhandle, newacc);
-                                            ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().get(Generic.Users.get(whom).authhandle).WhereAccess.put(whatchan,newacc.toString());
+                                            ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).getUsers().get(Generic.Users.get(whom).authhandle).WhereAccess.put(whatchan, newacc.toString());
                                             Generic.curProtocol.outPRVMSG(who, replyto, "User Added!");
-                                        } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You cannot grant a user higher access than yourself!");
-                                    } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You have no access to channel!");
-                                } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User already exists (use chuser)!");
-                            } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You cannot add yourself!");
+                                        } else
+                                            Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You cannot grant a user higher access than yourself!");
+                                    } else
+                                        Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You have no access to channel!");
+                                } else
+                                    Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User already exists (use chuser)!");
+                            } else
+                                Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You cannot add yourself!");
                         } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 You are not authed!");
                     } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 User is not authed!");
                 } else Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 No such user!");

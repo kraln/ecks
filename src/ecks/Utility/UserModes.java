@@ -17,12 +17,8 @@
  */
 package ecks.Utility;
 
-import ecks.Utility.Modes;
-import ecks.Logging;
-import ecks.protocols.Generic;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class UserModes implements Modes {
     // I hate this class. I really do.
@@ -55,10 +51,10 @@ public class UserModes implements Modes {
         String minuses = "";
 
         if (plusstart > -1)
-            plusses = newmodes.substring(plusstart+1, plusend);
+            plusses = newmodes.substring(plusstart + 1, plusend);
 
         if (minusstart > -1)
-            minuses = newmodes.substring(minusstart+1);
+            minuses = newmodes.substring(minusstart + 1);
 
         for (int i = 0; i < plusses.length(); i++) {
             CharSequence w = plusses.subSequence(i, i + 1);

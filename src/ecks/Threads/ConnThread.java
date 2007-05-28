@@ -17,14 +17,15 @@
  */
 package ecks.Threads;
 
-import ecks.protocols.Protocol;
-import ecks.protocols.Generic;
 import ecks.Logging;
-import ecks.util;
 import ecks.main;
+import ecks.protocols.Generic;
+import ecks.protocols.Protocol;
+import ecks.util;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.net.SocketException;
 import java.nio.channels.ClosedByInterruptException;
 
 public class ConnThread implements Runnable {
@@ -33,54 +34,56 @@ public class ConnThread implements Runnable {
 
     BufferedReader stream;
     Protocol handoff;
-    public ConnThread(BufferedReader in, Protocol p){ stream = in; handoff = p; }
 
-    public void run()
-    {
-      for(;;) // the semicolons, they do nothing!
-      {
-          try {
-              handoff.Incoming(  stream.readLine().trim() ); // give the incoming line to the protocol handler
-          } catch (ClosedByInterruptException e) { // occurs when we get interrupted
-              e.printStackTrace();
-              Logging.warn("CONNTHREAD", "Thread is being interrupted.");
-              break;
-          } catch (SocketException e) {
-              Generic.curProtocol.setState(Protocol.States.S_DISCONNECTED);
-              Logging.error("CONNTHREAD", "Connection terminated unexpectedly, quitting");
-              break;
+    public ConnThread(BufferedReader in, Protocol p) {
+        stream = in;
+        handoff = p;
+    }
+
+    public void run() {
+        for (; ;) // the semicolons, they do nothing!
+        {
+            try {
+                handoff.Incoming(stream.readLine().trim()); // give the incoming line to the protocol handler
+            } catch (ClosedByInterruptException e) { // occurs when we get interrupted
+                e.printStackTrace();
+                Logging.warn("CONNTHREAD", "Thread is being interrupted.");
+                break;
+            } catch (SocketException e) {
+                Generic.curProtocol.setState(Protocol.States.S_DISCONNECTED);
+                Logging.error("CONNTHREAD", "Connection terminated unexpectedly, quitting");
+                break;
             } catch (NullPointerException npe) {
-              npe.printStackTrace();
-              Logging.error("CONNTHREAD", "Null pointer exception!");
-                  Generic.curProtocol.setState(Protocol.States.S_DISCONNECTING);
-                  Logging.error("CONNTHREAD", "Upstream is null; Server closed connection.");                   
-                    break;
-          } catch (IOException e) {
-              e.printStackTrace();
-              break;
-          } catch (Exception e) {
-              e.printStackTrace();
-              Logging.error("CONNTHREAD", "Thread got exception!");
-              try {
-                  if (!stream.ready())
-                  {
+                npe.printStackTrace();
+                Logging.error("CONNTHREAD", "Null pointer exception!");
+                Generic.curProtocol.setState(Protocol.States.S_DISCONNECTING);
+                Logging.error("CONNTHREAD", "Upstream is null; Server closed connection.");
+                break;
+            } catch (IOException e) {
+                e.printStackTrace();
+                break;
+            } catch (Exception e) {
+                e.printStackTrace();
+                Logging.error("CONNTHREAD", "Thread got exception!");
+                try {
+                    if (!stream.ready()) {
                         Generic.curProtocol.setState(Protocol.States.S_DISCONNECTING);
                         Logging.error("CONNTHREAD", "Upstream is null; Server closed connection.");
                         break;
-                  }
-              } catch (IOException e1) {
-                  break;
-              }
-              Logging.info("CONNTHREAD", e.getMessage());
-          }
+                    }
+                } catch (IOException e1) {
+                    break;
+                }
+                Logging.info("CONNTHREAD", e.getMessage());
+            }
 
-          if(Thread.interrupted())
-              break; // we've been interrupted. likely going for a shutdown
-      }
+            if (Thread.interrupted())
+                break; // we've been interrupted. likely going for a shutdown
+        }
 
-      Logging.warn("CONNTHREAD", "Thread has broken free of loop.");
-      main.goGracefullyIntoTheNight();
-      util.getThreads().remove(Thread.currentThread()); // if we're out of this loop, then this thread is over.
+        Logging.warn("CONNTHREAD", "Thread has broken free of loop.");
+        main.goGracefullyIntoTheNight();
+        util.getThreads().remove(Thread.currentThread()); // if we're out of this loop, then this thread is over.
 
     }
 }

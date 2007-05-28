@@ -20,8 +20,8 @@ package ecks.services;
 import ecks.services.modules.CommandDesc;
 import ecks.util;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class SrvAuth_user { // direct correlation to a database entry

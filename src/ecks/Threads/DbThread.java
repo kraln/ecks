@@ -17,33 +17,28 @@
  */
 package ecks.Threads;
 
-import ecks.protocols.Protocol;
 import ecks.Logging;
 import ecks.Storage;
 import ecks.util;
-
-import java.io.*;
-import java.net.*;
 
 public class DbThread implements Runnable {
 
     // my entire existence is to flush the DB to disk every five minutes
 
-    public void run()
-    {
-      for(;;) // the semicolons, they do nothing!
-      {
-          try {
-              Thread.sleep(1000 * 60 * 5);
-          } catch (InterruptedException e) {
-              Logging.warn("DBTHREAD", "Thread interrupted. Initiating DB Write...");
-              Storage.flushDB();
-              Logging.info("DBTHREAD", "DB Write completed...");
-              break;
-          }
-          Storage.flushDB();
-          Logging.info("DBTHREAD", "Wrote database...");
-      }
-      util.getThreads().remove(Thread.currentThread()); // if we're out of this loop, then this thread is over.
+    public void run() {
+        for (; ;) // the semicolons, they do nothing!
+        {
+            try {
+                Thread.sleep(1000 * 60 * 5);
+            } catch (InterruptedException e) {
+                Logging.warn("DBTHREAD", "Thread interrupted. Initiating DB Write...");
+                Storage.flushDB();
+                Logging.info("DBTHREAD", "DB Write completed...");
+                break;
+            }
+            Storage.flushDB();
+            Logging.info("DBTHREAD", "Wrote database...");
+        }
+        util.getThreads().remove(Thread.currentThread()); // if we're out of this loop, then this thread is over.
     }
 }

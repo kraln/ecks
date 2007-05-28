@@ -17,12 +17,16 @@
  */
 package ecks.services.modules;
 
-import ecks.services.Service;
 import ecks.protocols.Generic;
+import ecks.services.Service;
 
-public class cmdSay extends bCommand{
+public class cmdSay extends bCommand {
     public final CommandDesc Desc = new CommandDesc("say", 99, true, CommandDesc.access_levels.A_OPER, "Sends a message as a services agent");
-    public CommandDesc getDesc() { return Desc; }
+
+    public CommandDesc getDesc() {
+        return Desc;
+    }
+
     public void handle_command(Service who, String user, String replyto, String arguments) {
         String whatchan = replyto;
         String what = arguments;

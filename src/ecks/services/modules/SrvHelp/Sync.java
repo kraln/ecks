@@ -17,17 +17,13 @@
  */
 package ecks.services.modules.SrvHelp;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
+import ecks.Configuration;
+import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvChannel;
-import ecks.services.SrvChannel_channel;
 import ecks.services.SrvHelp;
-import ecks.protocols.Protocol;
-import ecks.protocols.Generic;
-import ecks.Configuration;
-import ecks.util;
-import ecks.Storage;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
 public class Sync extends bCommand {
     public final CommandDesc Desc = new CommandDesc("sync", 1, true, CommandDesc.access_levels.A_NONE, "Initiates a help request", "[channel]");
@@ -59,15 +55,16 @@ public class Sync extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvHelp) who).getChannels().containsKey(whatchan)) {
-                if (( (SrvChannel)Configuration.getSvc().get(Configuration.chanservice)).getChannels().containsKey(whatchan))
+                if (((SrvChannel) Configuration.getSvc().get(Configuration.chanservice)).getChannels().containsKey(whatchan))
                     if (Generic.Users.containsKey(whom))
-                        if (!((SrvChannel)Configuration.getSvc().get(Configuration.chanservice)).getChannels().get(whatchan).getUsers().containsKey(Generic.Users.get(whom).authhandle))
+                        if (!((SrvChannel) Configuration.getSvc().get(Configuration.chanservice)).getChannels().get(whatchan).getUsers().containsKey(Generic.Users.get(whom).authhandle))
                         // if you have access to the channel you don't get it.
                         {
                             ((SrvHelp) who).getChannels().get(whatchan).queue.add(Generic.Users.get(whom));
                             Generic.curProtocol.outPRVMSG(who, whom, "Welcome to " + whatchan + ", " + whom + ". Your are in position #" + ((SrvHelp) who).getChannels().get(whatchan).queue.indexOf(Generic.Users.get(whom)) + ". Please wait patiently until one of the channel operators responds to you.");
                         }
-            } else if(!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
-        } else if(!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a channel!");
+            } else
+            if (!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a registered channel!");
+        } else if (!silent) Generic.curProtocol.outPRVMSG(who, replyto, "\u0002Error:\u0002 Not a channel!");
     }
 }

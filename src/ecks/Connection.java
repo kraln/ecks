@@ -17,12 +17,13 @@
  */
 package ecks;
 
-import ecks.protocols.Protocol;
-import ecks.protocols.Generic;
 import ecks.Threads.ConnThread;
+import ecks.protocols.Generic;
+import ecks.protocols.Protocol;
 
 import java.io.*;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.Socket;
 
 public class Connection {
     // Hi. I handle all the specifics of connecting at a tcp/ip level.
@@ -31,31 +32,38 @@ public class Connection {
     // which, by the way, I tell how to talk to the server. Neat, huh?
 
 
-     String host, lp;
-     InetAddress lhost;
-     int p;
-     Protocol prot;
-     public static Socket sock;
-     BufferedWriter out;
-     BufferedReader in;
+    String host, lp;
+    InetAddress lhost;
+    int p;
+    Protocol prot;
+    public static Socket sock;
+    BufferedWriter out;
+    BufferedReader in;
 
-     Connection(String hostname, int port, String lport, InetAddress lh, Protocol grok) {host=hostname; p=port; prot=grok; lhost = lh; lp = lport; }
-     public void Connect() {
-         try {
-             if (lp.equals("any")) // we don't care about binding to a specific address
-                 sock = new Socket(host, p);
-             else // we do care. sigh.
-                 sock = new Socket(host, p, lhost, Integer.parseInt(lp));
-             out = new BufferedWriter (new OutputStreamWriter(sock.getOutputStream()));
-             in = new BufferedReader (new InputStreamReader(sock.getInputStream()));
-         } catch (IOException e) {
-             e.printStackTrace();
-             Logging.error("CONNECTION", "Exception! (Probably couldn't bind or timeout):" + e.getMessage());
-             main.goGracefullyIntoTheNight();
-         }
-         Generic.curProtocol.setBuffers(out);
+    Connection(String hostname, int port, String lport, InetAddress lh, Protocol grok) {
+        host = hostname;
+        p = port;
+        prot = grok;
+        lhost = lh;
+        lp = lport;
+    }
 
-         util.startThread(new Thread(new ConnThread(in,prot))).start(); // start async input thread
+    public void Connect() {
+        try {
+            if (lp.equals("any")) // we don't care about binding to a specific address
+                sock = new Socket(host, p);
+            else // we do care. sigh.
+                sock = new Socket(host, p, lhost, Integer.parseInt(lp));
+            out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
+            in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            Logging.error("CONNECTION", "Exception! (Probably couldn't bind or timeout):" + e.getMessage());
+            main.goGracefullyIntoTheNight();
+        }
+        Generic.curProtocol.setBuffers(out);
 
-     }
+        util.startThread(new Thread(new ConnThread(in, prot))).start(); // start async input thread
+
+    }
 }

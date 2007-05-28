@@ -17,14 +17,13 @@
  */
 package ecks.services.modules.SrvAuth;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
+import ecks.Logging;
+import ecks.protocols.Generic;
 import ecks.services.Service;
 import ecks.services.SrvAuth;
 import ecks.services.SrvAuth_user;
-import ecks.protocols.Generic;
-import ecks.Configuration;
-import ecks.Logging;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 
 public class ReAuth extends bCommand {
     public final CommandDesc Desc = new CommandDesc("reauth", 2, true, CommandDesc.access_levels.A_NONE, "Re-logs you into services after split", "<dbid>, <ts>");
@@ -64,7 +63,7 @@ public class ReAuth extends bCommand {
 //                                Configuration.getSvc().get(Configuration.chanservice).handle(user, user, "syncall"); // sync them in all of their channels
                         } else {
                             // mismatch for whatever reason. Unset authed
-                            Generic.curProtocol.srvUnSetAuthed(who,Generic.Users.get(user).uid);
+                            Generic.curProtocol.srvUnSetAuthed(who, Generic.Users.get(user).uid);
                         }
                     }
                 }

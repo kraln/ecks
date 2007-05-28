@@ -17,14 +17,19 @@
  */
 package ecks.protocols;
 
-import ecks.services.Service;
-import ecks.*;
+import ecks.Configuration;
 import ecks.Hooks.Hooks;
-import ecks.Utility.*;
+import ecks.Logging;
+import ecks.Utility.ChanModes;
+import ecks.Utility.Channel;
+import ecks.Utility.Client;
+import ecks.Utility.UserModes;
+import ecks.main;
+import ecks.services.Service;
 
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class Generic {
@@ -76,7 +81,7 @@ public class Generic {
 
     }
 
-   public static void vHost(String target, String newhost)
+    public static void vHost(String target, String newhost)
     // a user changed his/her modes
     {
         Users.get(target.toLowerCase()).althost = newhost;
@@ -121,7 +126,7 @@ public class Generic {
             if (Configuration.getSvc().containsKey(Configuration.authservice)) // if we have an auth service
             {
                 Logging.info("PROTOCOL", "Attempting re-entry...");
-                Configuration.getSvc().get(Configuration.authservice).handle(tokens[1].toLowerCase(),"service","reauth " + tokens[9] + " " + tokens[3]);
+                Configuration.getSvc().get(Configuration.authservice).handle(tokens[1].toLowerCase(), "service", "reauth " + tokens[9] + " " + tokens[3]);
             }
         }
     }
@@ -134,7 +139,7 @@ public class Generic {
             for (String chan : blah)
                 chanPart(chan, who);
             Users.remove(who.toLowerCase());
-            
+
             Logging.verbose("PROTOCOL", "User " + who + " is no longer being tracked.");
         } else {
             Logging.warn("PROTOCOL", "Tried to sign off a user that didn't exist!");
@@ -153,7 +158,8 @@ public class Generic {
     }
 
     public static void nickGotKilled(String user) {
-        if (!Users.containsKey(user.toLowerCase())) return; // sanity, god I love it (this actually caused some insanity)
+        if (!Users.containsKey(user.toLowerCase()))
+            return; // sanity, god I love it (this actually caused some insanity)
         if (Configuration.getSvc().containsKey(user.toLowerCase())) {
             // they've killed one of us. possibly wrong protocol?
             Logging.error("PROTOCOL", "Service was killed! Attempting 'reconnect'.");
@@ -168,35 +174,32 @@ public class Generic {
         Map<Client, UserModes> cm = new HashMap<Client, UserModes>();
 
         m.applyChanges(modes);
-        Map <Character, Character> xlate = curProtocol.getPrefixMap();
+        Map<Character, Character> xlate = curProtocol.getPrefixMap();
 
         if (users.length != 0)
-        for (String user : users) {
-            UserModes t = new UserModes();
-            String tUser, tMode;
-            Client z;
+            for (String user : users) {
+                UserModes t = new UserModes();
+                String tUser, tMode;
+                Client z;
 
-            tUser = user.toLowerCase();
-            tMode = null;
-            for (Map.Entry<Character, Character> e : xlate.entrySet())
-            {
-                if (user.startsWith(e.getKey().toString()))
-                {
-                    tUser = user.substring(1).toLowerCase();
-                    tMode = "+" + xlate.get(user.substring(0,1).toCharArray());
+                tUser = user.toLowerCase();
+                tMode = null;
+                for (Map.Entry<Character, Character> e : xlate.entrySet()) {
+                    if (user.startsWith(e.getKey().toString())) {
+                        tUser = user.substring(1).toLowerCase();
+                        tMode = "+" + xlate.get(user.substring(0, 1).toCharArray());
+                    }
                 }
+
+                z = Users.get(tUser);
+                if (tMode != null)
+                    t.applyChanges(tMode);
+                cm.put(z, t); // add this client -> mode mapping to channel
+
             }
 
-            z = Users.get(tUser);
-            if (tMode != null)
-                t.applyChanges(tMode);
-            cm.put(z, t); // add this client -> mode mapping to channel
-
-        }
-
         if (Channels.containsKey(channel.toLowerCase())) {
-            if (!curProtocol.getState().equals(Protocol.States.S_BURSTING))
-            {
+            if (!curProtocol.getState().equals(Protocol.States.S_BURSTING)) {
                 Logging.error("PROTOCOL", "Attempted to add a channel " + channel + " that already exists. " + cm.size() + " user(s) joined.");
                 Logging.info("PROTOCOL", "Chan is: " + Channels.get(channel.toLowerCase()).toString());
                 Channels.get(channel.toLowerCase()).clientmodes.putAll(cm);

@@ -17,14 +17,12 @@
  */
 package ecks.services.modules.SrvChannel.Chan;
 
-import ecks.services.modules.bCommand;
-import ecks.services.modules.CommandDesc;
-import ecks.services.Service;
-import ecks.services.SrvChannel_channel;
-import ecks.services.SrvChannel;
-import ecks.protocols.Protocol;
 import ecks.protocols.Generic;
-import ecks.Configuration;
+import ecks.services.Service;
+import ecks.services.SrvChannel;
+import ecks.services.SrvChannel_channel;
+import ecks.services.modules.CommandDesc;
+import ecks.services.modules.bCommand;
 import ecks.util;
 
 import java.util.Map;
@@ -47,10 +45,10 @@ public class ShowUsers extends bCommand {
 
         if (whatchan.startsWith("#")) {
             if (((SrvChannel) who).getChannels().containsKey(whatchan)) {
-                Generic.curProtocol.outPRVMSG(who, user, "\u0002" + util.pad("USER",12) + "\u0002 " + "ACCESS");
+                Generic.curProtocol.outPRVMSG(who, user, "\u0002" + util.pad("USER", 12) + "\u0002 " + "ACCESS");
                 Generic.curProtocol.outPRVMSG(who, user, "------------------------------");
                 for (Map.Entry<String, SrvChannel_channel.ChanAccess> t : ((SrvChannel) who).getChannels().get(whatchan).getUsers().entrySet()) {
-                    Generic.curProtocol.outPRVMSG(who, user, "\u0002" + util.pad(t.getKey(),12) + "\u0002 " + t.getValue().toString().substring(2));
+                    Generic.curProtocol.outPRVMSG(who, user, "\u0002" + util.pad(t.getKey(), 12) + "\u0002 " + t.getValue().toString().substring(2));
                 }
             } else Generic.curProtocol.outPRVMSG(who, user, "\u0002Error:\u0002 Not a registered channel!");
         } else Generic.curProtocol.outPRVMSG(who, user, "\u0002Error:\u0002 Not a channel!");

@@ -17,27 +17,30 @@
  */
 package ecks;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.net.InetAddress;
-import java.net.URLEncoder;
-import java.net.URLDecoder;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
-
-import sun.misc.BASE64Encoder;
 import ecks.Threads.EmailThread;
 import ecks.services.SrvAuth;
-import ecks.services.modules.CommandDesc;
+import sun.misc.BASE64Encoder;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class util {
 
     public static List<Thread> threads;
 
+    /**
+     * Method getVersion returns the version of ecks
+     *
+     * @return the version (type String)
+     */
     public static String getVersion() {
         return "0.6B";
     }
@@ -58,8 +61,12 @@ public class util {
         return paddingString(s, n, ' ', false);
     }
 
-    public static String getTS()
-    {
+    /**
+     * Method getTS returns the current unix time
+     *
+     * @return the TS (type String)
+     */
+    public static String getTS() {
         return String.valueOf(System.currentTimeMillis() / 1000);
     }
 
@@ -141,9 +148,8 @@ public class util {
         }
         return result;
     }
-    
-    public static boolean checkaccess(String user, int level)
-    {
+
+    public static boolean checkaccess(String user, int level) {
         return ((SrvAuth) Configuration.getSvc().get(Configuration.authservice)).checkAccess(user.toLowerCase()).ordinal() >= level;
     }
 
@@ -174,34 +180,24 @@ public class util {
         return (new BASE64Encoder()).encode(raw);
     }
 
-     static class CustomException extends Exception {
+    static class CustomException extends Exception {
         CustomException(String message) {
             super(message);
         }
     }
 
-    public static String long2string(Long i)
-    {
+    public static String long2string(Long i) {
         double in = i.doubleValue();
-        double SIP1=in / Math.pow(256,3);
-        double SIP2=((in%Math.pow(256,3))/Math.pow(256,2));
-        double SIP3=(((in%Math.pow(256,3))%Math.pow(256,2))/Math.pow(256,1));
-        double SIP4=((((in%Math.pow(256,3))%Math.pow(256,2))%Math.pow(256,1))/Math.pow(256,0));
+        double SIP1 = in / Math.pow(256, 3);
+        double SIP2 = ((in % Math.pow(256, 3)) / Math.pow(256, 2));
+        double SIP3 = (((in % Math.pow(256, 3)) % Math.pow(256, 2)) / Math.pow(256, 1));
+        double SIP4 = ((((in % Math.pow(256, 3)) % Math.pow(256, 2)) % Math.pow(256, 1)) / Math.pow(256, 0));
 
-        return (int)SIP1 + "." + (int)SIP2 + "." + (int)SIP3 + "." + (int)SIP4;
+        return (int) SIP1 + "." + (int) SIP2 + "." + (int) SIP3 + "." + (int) SIP4;
     }
 
 
     public static long ip2long(String s) {
-
-        long num = 0;
-     /*   StringTokenizer st = new StringTokenizer(s, ".");
-
-        num = ((long) 16777216 * Long.valueOf(st.nextToken())) +
-              ((long) 65536 * Long.valueOf(st.nextToken())) +
-              ((long) 256 * Long.valueOf(st.nextToken())) +
-              Long.valueOf(st.nextToken());
-       */
         return (convert1(s));
     }
 

@@ -17,27 +17,26 @@
  */
 package ecks.Threads;
 
-import com.crackj2ee.mail.MailEngine;
-import com.crackj2ee.mail.MxConfig;
 import com.crackj2ee.mail.Mail;
+import com.crackj2ee.mail.MailEngine;
 import com.crackj2ee.mail.MailListenerAdapter;
+import com.crackj2ee.mail.MxConfig;
+import ecks.Logging;
+import ecks.util;
 
 import java.io.IOException;
-
-import ecks.util;
-import ecks.Logging;
 
 public class EmailThread implements Runnable {
     String to;
     String code;
-    public EmailThread(String t, String c)
-    {
+
+    public EmailThread(String t, String c) {
         to = t;
         code = c;
     }
-    public void run()
-    {
-         MailEngine sender = new MailEngine();
+
+    public void run() {
+        MailEngine sender = new MailEngine();
         sender.setMxConfig(new MxConfig());
 
         // Create a new Mail:
@@ -53,8 +52,7 @@ public class EmailThread implements Runnable {
             sender.send(mail, new MailListenerAdapter()); // send it!                    
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

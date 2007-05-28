@@ -17,27 +17,99 @@
  */
 package ecks.services;
 
-import ecks.*;
 import ecks.Hooks.Hooks;
 import ecks.services.modules.CommandModule;
-import ecks.protocols.Protocol;
 import org.w3c.dom.NodeList;
 
 import java.util.Map;
 
+/**
+ * Interface Service - the interface which all services agents must provide
+ *
+ * @author Jeff Katz
+ */
 public abstract interface Service {
-    Map <String, CommandModule> Commands = null;
+    Map<String, CommandModule> Commands = null;
 
+    /**
+     * Method introduce instructs the service what to do when it is called into existence
+     */
     public void introduce();
+
+    /**
+     * Method getname returns the configured name of the services agent
+     *
+     * @return String (the name of the agent)
+     */
     public String getname();
+
+    /**
+     * Method getcount returns a number (usually the number of objects this agent tracks)
+     * This is usually used for RPC purposes
+     *
+     * @return int (whatever the agent wants)
+     */
     public int getcount();
+
+    /**
+     * Method setname sets the name of the services agent to something else
+     *
+     * @param nname of type String
+     */
     public void setname(String nname);
+
+    /**
+     * Method handle asks the services agent to deal with a command
+     *
+     * @param user    of type String
+     * @param replyto of type String
+     * @param command of type String
+     */
     public void handle(String user, String replyto, String command);
+
+    /**
+     * Method die instructs the agent to cleanup whatever it's doing and prepare to die
+     *
+     * @param message of type String
+     */
     public void die(String message);
-    public void addCommand (String cmdName, CommandModule newCmd);
+
+    /**
+     * Method addCommand adds a command module to the list of commands this agent can process
+     *
+     * @param cmdName of type String
+     * @param newCmd  of type CommandModule
+     */
+    public void addCommand(String cmdName, CommandModule newCmd);
+
+    /**
+     * Method getCommands returns the commands of this Service object.
+     *
+     * @return the commands (type Map<String, CommandModule>) of this Service object.
+     */
     public Map<String, CommandModule> getCommands();
+
+    /**
+     * Method hookDispatch accepts system hooks and handles them
+     *
+     * @param what   of type Events
+     * @param source of type String
+     * @param target of type String
+     * @param args   of type String
+     */
     public void hookDispatch(Hooks.Events what, String source, String target, String args);
 
+    /**
+     * Method getSRVDB returns the SRVDB of this Service object.
+     *
+     * @return the SRVDB (type String) of this Service object.
+     */
     public String getSRVDB();
+
+    /**
+     * Method loadSRVDB ...
+     *
+     * @param XMLin of type NodeList
+     */
     public void loadSRVDB(NodeList XMLin);
 }
