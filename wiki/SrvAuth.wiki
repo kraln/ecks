@@ -4,7 +4,8 @@
 
 SrvAuth provides user authentication for the other services
 
-= Usage Examples = 
+= Usage = 
+
 {{{
 /msg srvauth register someusername sekreit lame@email.tld
 -SrvAuth- SomeGui: Registration Succeeded!
@@ -20,6 +21,7 @@ SrvAuth provides user authentication for the other services
 -SrvAuth- User Info: SomeGui: svsid: 0, +Rr ~SumGui pool-80-191-131-45.washdc.fios.verizon.net (pool-80-191-131-45.washdc.fios.verizon.net) on :nethack.GamesNET.net. In 3 channels: #ecks #debug #staff
 -SrvAuth- Services Info: someusername lame@email.tld A_AUTHED
 }}}
+
 = Modules =
 
 || *MODULE* || *ACCESS LEVEL* || *DESCRIPTION*||
