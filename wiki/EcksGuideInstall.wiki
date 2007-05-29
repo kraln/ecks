@@ -18,10 +18,9 @@ From a terminal (or command prompt), cd to the directory where you extracted Eck
 
 {{{ java -jar Ecks.jar }}}
 
-If you see an error related to a missing srvdb.xml, this is normal. Make sure everything links up and works properly, then you'll want to run Ecks in a way that doesn't take control of your terminal. On *nix, I recommend screen. 
+If you see an error related to a missing srvdb.xml, this is normal. Make sure everything links up and works properly, then you'll want to run Ecks in a way that doesn't take control of your terminal. On linux and freebsd, I recommend screen. 
 
 [EcksGuideIRCDGuide <- Previous] | [EcksGuideFirstLinking Next ->]
-
 
 
 
