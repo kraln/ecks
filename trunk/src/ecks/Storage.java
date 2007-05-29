@@ -92,6 +92,7 @@ public class Storage {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            util.getThreads().remove(Thread.currentThread());
         }
     }
 }
