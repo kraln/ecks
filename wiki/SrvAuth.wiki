@@ -4,18 +4,17 @@
 
 SrvAuth provides user authentication for the other services
 
-
 = Modules =
 
 || *MODULE* || *ACCESS LEVEL* || *DESCRIPTION*||
-|| dumpusers || A_SRA || Dumps registered users. ||
-|| confirm || A_PENDING || Verifies your email. ||
-|| unregister || A_HELPER || Unregisters an account ||
-|| info || A_AUTHED || Returns information about a handle ||
-|| promote || A_HELPER || Sets user services access. ||
-|| reauth || A_NONE || Re-logs you into services after split (INTERNAL COMMAND) ||
-|| whoami || [A_NONE || Gives you information about yourself, including services info ||
-|| auth || A_NONE || Logs you into services. ||
-|| whois || A_HELPER || Gives you information about a user ||
-|| changepass || A_PENDING || Changes your password. ||
-|| register || A_NONE || Registers your account with services|| 
+|| SrvAuth\DumpUsers || SRA || Dumps registered users. ||
+|| SrvAuth\Confirm || PENDING || Verifies your email. ||
+|| SrvAuth\Unregister || HELPER || Unregisters an account ||
+|| SrvAuth\Info || AUTHED || Returns information about a handle ||
+|| SrvAuth\Promote || HELPER || Sets user services access. ||
+|| SrvAuth\ReAuth || NONE || Re-logs you into services after split (INTERNAL COMMAND) ||
+|| SrvAuth\WhoAmi || NONE || Gives you information about yourself, including services info ||
+|| SrvAuth\Auth || NONE || Logs you into services. ||
+|| SrvAuth\Whois || HELPER || Gives you information about a user ||
+|| SrvAuth\ChangePass || PENDING || Changes your password. ||
+|| SrvAuth\Register || NONE || Registers your account with services|| 
