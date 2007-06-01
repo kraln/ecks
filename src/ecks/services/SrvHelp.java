@@ -70,23 +70,22 @@ public class SrvHelp extends bService {
 
     public String getSRVDB() {
         Logging.verbose("SRVHELP", "Started gathering SrvHelp Database...");
-        String tOut = "";
-        tOut = tOut + "<service class=\"" + this.getClass().getName() + "\" name=\"" + name + "\">\r\n";
+        StringBuilder tOut = new StringBuilder("<service class=\"" + this.getClass().getName() + "\" name=\"" + name + "\">\r\n");
         HashMap<String, SrvHelp_channel> X = new HashMap<String, SrvHelp_channel>(Channels);
 
         for (Map.Entry<String, SrvHelp_channel> usar : X.entrySet()) {
-            tOut = tOut + "\t" + "<channel>\r\n";
-            tOut = tOut + "\t\t" + "<name value=\"" + util.encodeUTF(usar.getValue().channel) + "\"/>\r\n";
-            tOut = tOut + "\t\t" + "<metadata>\r\n";
+            tOut.append("\t" + "<channel>\r\n");
+            tOut.append("\t\t" + "<name value=\"").append(util.encodeUTF(usar.getValue().channel)).append("\"/>\r\n");
+            tOut.append("\t\t" + "<metadata>\r\n");
             for (Map.Entry<String, String> md : usar.getValue().getAllMeta().entrySet()) {
-                tOut = tOut + "\t\t\t" + "<" + util.encodeUTF(md.getKey()) + " value=\"" + util.encodeUTF(md.getValue()) + "\"/>\r\n";
+                tOut.append("\t\t\t" + "<").append(util.encodeUTF(md.getKey())).append(" value=\"").append(util.encodeUTF(md.getValue())).append("\"/>\r\n");
             }
-            tOut = tOut + "\t\t" + "</metadata>\r\n";
-            tOut = tOut + "\t" + "</channel>\r\n";
+            tOut.append("\t\t" + "</metadata>\r\n");
+            tOut.append("\t" + "</channel>\r\n");
         }
-        tOut = tOut + "</service>\r\n";
+        tOut.append("</service>\r\n");
         Logging.verbose("SRVHELP", "Done...");
-        return tOut;
+        return tOut.toString();
     }
 
     public void loadSRVDB(NodeList XMLin) {

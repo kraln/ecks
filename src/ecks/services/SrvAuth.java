@@ -97,25 +97,24 @@ public class SrvAuth extends bService {
 
     public String getSRVDB() {
         Logging.verbose("SRVAUTH", "Started gathering SrvAuth Database...");
-        String tOut = "";
-        tOut = tOut + "<service class=\"" + this.getClass().getName() + "\" name=\"" + name + "\">\r\n";
+        StringBuilder tOut = new StringBuilder("<service class=\"" + this.getClass().getName() + "\" name=\"" + name + "\">\r\n");
         HashMap<String, SrvAuth_user> X = new HashMap<String, SrvAuth_user>(Users);
         for (Map.Entry<String, SrvAuth_user> usar : X.entrySet()) {
-            tOut = tOut + "\t" + "<user>\r\n";
-            tOut = tOut + "\t\t" + "<username value=\"" + util.encodeUTF(usar.getValue().username) + "\"/>\r\n";
-            tOut = tOut + "\t\t" + "<password value=\"" + util.encodeUTF(usar.getValue().password) + "\"/>\r\n";
-            tOut = tOut + "\t\t" + "<email value=\"" + util.encodeUTF(usar.getValue().email) + "\"/>\r\n";
-            tOut = tOut + "\t\t" + "<access value=\"" + usar.getValue().services_access + "\"/>\r\n";
-            tOut = tOut + "\t\t" + "<metadata>\r\n";
+            tOut.append("\t" + "<user>\r\n");
+            tOut.append("\t\t" + "<username value=\"").append(util.encodeUTF(usar.getValue().username)).append("\"/>\r\n");
+            tOut.append("\t\t" + "<password value=\"").append(util.encodeUTF(usar.getValue().password)).append("\"/>\r\n");
+            tOut.append("\t\t" + "<email value=\"").append(util.encodeUTF(usar.getValue().email)).append("\"/>\r\n");
+            tOut.append("\t\t" + "<access value=\"").append(usar.getValue().services_access).append("\"/>\r\n");
+            tOut.append("\t\t" + "<metadata>\r\n");
             for (Map.Entry<String, String> md : usar.getValue().getAllMeta().entrySet()) {
-                tOut = tOut + "\t\t\t" + "<" + util.encodeUTF(md.getKey()) + " value=\"" + util.encodeUTF(md.getValue()) + "\"/>\r\n";
+                tOut.append("\t\t\t" + "<").append(util.encodeUTF(md.getKey())).append(" value=\"").append(util.encodeUTF(md.getValue())).append("\"/>\r\n");
             }
-            tOut = tOut + "\t\t" + "</metadata>\r\n";
-            tOut = tOut + "\t" + "</user>\r\n";
+            tOut.append("\t\t" + "</metadata>\r\n");
+            tOut.append("\t" + "</user>\r\n");
         }
-        tOut = tOut + "</service>\r\n";
-        Logging.verbose("SRVAUTH", "Done...");
-        return tOut;
+        tOut.append("</service>\r\n");
+        Logging.verbose("SRVAUTH", "Done gathering...");
+        return tOut.toString();
     }
 
     public void loadSRVDB(NodeList XMLin) {
