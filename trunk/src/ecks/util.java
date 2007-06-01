@@ -42,7 +42,7 @@ public class util {
      * @return the version (type String)
      */
     public static String getVersion() {
-        return "0.7";
+        return "0.7B";
     }
 
     public static Thread startThread(Thread whattostart) {

@@ -184,6 +184,8 @@ public class inspircd implements Protocol {
                 if (!Generic.Users.containsKey(source.toLowerCase())) { // server is introducing channel
                     String m = "";
                     String n[];
+
+                    // I am entirely aware of what a clusterf*** this is. Thanks - Jeff
                     if (hasargs) {
                         n = args.split(" ");
                         String z[] = n;
@@ -216,8 +218,6 @@ public class inspircd implements Protocol {
                         NPE.printStackTrace();
 
                     }
-                    // todo: fix null pointer here.
-
                 } else { // just a user joining
                     Generic.chanJoin(
                             Integer.parseInt(tokens[2]),
@@ -225,9 +225,15 @@ public class inspircd implements Protocol {
                             source
                     );
                 }
-
+            } else if (cmd.equals("FHOST")) {                                                                   // FHOST
+                if(Generic.Users.containsKey(source.toLowerCase()))
+                   Generic.Users.get(source.toLowerCase()).althost = tokens[2];
+            } else if (cmd.equals("FTOPIC")) {                                                                 // FTOPIC
+                Generic.chanTopic(Integer.valueOf(tokens[3]), tokens[2], args);
             } else if (cmd.equals("TOPIC")) {                                                                   // TOPIC
                 Generic.chanTopic(0, tokens[2], args);
+            } else if (cmd.equals("ADDLINE")) {                                                               // ADDLINE
+                // goggles
             } else {                                                                                          // UNKNOWN
                 Logging.warn("PROTOCOL", "Unsupported command: " + cmd);
             }
