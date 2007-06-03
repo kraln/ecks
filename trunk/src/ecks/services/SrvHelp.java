@@ -32,7 +32,7 @@ import java.util.Map;
 public class SrvHelp extends bService {
     public String name = "SrvHelp";
     public Map<String, SrvHelp_channel> Channels;
-    public Map<Client, SrvHelp_channel> qMap;
+    public Map<Client, helpEntry> qMap;
 
     public void introduce() {
         Generic.srvIntroduce(this);
@@ -65,7 +65,7 @@ public class SrvHelp extends bService {
 
     public SrvHelp() {
         Channels = new HashMap<String, SrvHelp_channel>();
-        qMap = new HashMap<Client, SrvHelp_channel>();
+        qMap = new HashMap<Client, helpEntry>();
     }
 
     public String getSRVDB() {
@@ -117,15 +117,36 @@ public class SrvHelp extends bService {
     public void hookDispatch(Hooks.Events what, String source, String target, String args) {
         switch (what) {
             case E_PRIVMSG:
-                if (qMap.containsKey(Generic.Users.get(source.toLowerCase()))) {
-                    // user is being helped. instead of parsing their text as commands,
-                    // add it to a buffer or redirect it to the person assigned to them
+                String user = source.toLowerCase();
+                String msg = args;
+                if (qMap.containsKey(Generic.Users.get(user))) {
+                    String chan = target;
+                    helpEntry h = qMap.get(Generic.Users.get(user));
+                    if (h.cbuffer.containsKey(Channels.get(chan)))
+                    {
+                        if (h.redirect2 != null)
+                        {
+                            Generic.curProtocol.outPRVMSG(this,h.redirect2.uid,user +"> " + msg);
+                        } else
+                        h.cbuffer.get(Channels.get(chan)).append("\r\n").append(msg);
+                    } else {
+                        h.cbuffer.put(Channels.get(chan),new StringBuilder(msg));
+                    }
                     break;
                 }
             default:
-                super.hookDispatch(this, what, source, target, args); // this comes after we handle things, so if we're a privmsg
-                // we can intercept without causing an error
+                super.hookDispatch(this, what, source, target, args);
         }
     }
+}
 
+class helpEntry
+{
+    public Client redirect2;
+    public Map<SrvHelp_channel,StringBuilder> cbuffer;
+    public helpEntry()
+    {
+        redirect2 = null;
+        cbuffer = new HashMap<SrvHelp_channel,StringBuilder>();
+    }
 }

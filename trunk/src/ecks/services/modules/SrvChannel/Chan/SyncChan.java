@@ -24,6 +24,7 @@ import ecks.services.SrvChannel;
 import ecks.services.SrvChannel_channel;
 import ecks.services.modules.CommandDesc;
 import ecks.services.modules.bCommand;
+import ecks.Configuration;
 
 public class SyncChan extends bCommand {
     public final CommandDesc Desc = new CommandDesc("syncchan", 1, true, CommandDesc.access_levels.A_AUTHED, "Synchronizes all users in a channel", "[channel]");
@@ -62,14 +63,16 @@ public class SyncChan extends bCommand {
                             String newmode = "-ov";
                             if (alevel.ordinal() >= SrvChannel_channel.ChanAccess.C_PEON.ordinal()) {
                                 newmode = "+v";
-                            } else if (alevel.ordinal() >= SrvChannel_channel.ChanAccess.C_CHANOP.ordinal()) {
+                            }
+                            if (alevel.ordinal() >= SrvChannel_channel.ChanAccess.C_CHANOP.ordinal()) {
                                 newmode = "+o";
                             }
                             Generic.curProtocol.outSETMODE(who, whatchan, newmode, whom.uid.toLowerCase());
                         }
                     } else {
-                        if (!whom.modes.contains("o"))
-                            Generic.curProtocol.outSETMODE(who, whatchan, "-ov", whom.uid.toLowerCase());
+                        if(!Configuration.getSvc().containsKey(whom.uid.toLowerCase()))
+                            if (!whom.modes.contains("o"))
+                                Generic.curProtocol.outSETMODE(who, whatchan, "-ov", whom.uid.toLowerCase());
                     }
 
                 }
