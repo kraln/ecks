@@ -60,17 +60,20 @@ public class Generic {
         String oldid = oldnick.toLowerCase();
         String newid = newnick.toLowerCase();
 
+        try {
         Client client = Users.get(oldid);
         client.uid = newnick; // keep their uid in step with their nickname...
         client.signon = ts;
 
         if (oldid.equals(newid)) return;
-        // this was a major issue. ircd sends nick changes for case changing.
-        // we are case insensitive. we'd end up removing the user and causing all sorts of crap
-        // so the above should fix it.
 
         Users.put(newid, client);
         Users.remove(oldid);
+        } catch (NullPointerException NPE)
+        {
+            NPE.printStackTrace();
+            Logging.warn("PROTOCOL", "Got NPE whilst renaming user! (from " + oldid + " to " + newid + ")");
+        }
     }
 
     public static void modeUser(String target, String modes)
